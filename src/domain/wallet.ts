@@ -32,10 +32,7 @@ export function freshWallet(): Wallet {
 
 export function isEpisodeInSeries(episodeCount: number | null, episode: number): boolean {
   return (
-    episodeCount !== null &&
-    Number.isInteger(episode) &&
-    episode >= 1 &&
-    episode <= episodeCount
+    episodeCount !== null && Number.isInteger(episode) && episode >= 1 && episode <= episodeCount
   );
 }
 
@@ -48,7 +45,9 @@ export function isEpisodeUnlocked(wallet: Wallet, seriesId: string, episode: num
     return true;
   }
 
-  return wallet.unlocks.some((unlock) => unlock.seriesId === seriesId && unlock.episode === episode);
+  return wallet.unlocks.some(
+    (unlock) => unlock.seriesId === seriesId && unlock.episode === episode,
+  );
 }
 
 export function unlockEpisode(wallet: Wallet, seriesId: string, episode: number): Wallet {

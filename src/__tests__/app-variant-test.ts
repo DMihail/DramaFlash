@@ -1,6 +1,7 @@
 import type { ExpoConfig } from 'expo/config';
 
 import { APPLICATION_IDS, applyAppVariant, resolveAppVariant } from '@/config/app-variant';
+
 import appJson from '../../app.json';
 
 const EAS_PROJECT_ID = '33a80453-d173-4c89-a709-54dd349a68b2';

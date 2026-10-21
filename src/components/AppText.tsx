@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { type StyleProp, type TextProps, type TextStyle, Text } from 'react-native';
+import { type StyleProp, Text, type TextProps, type TextStyle } from 'react-native';
 
 import { useFontsReady } from '@/theme/fonts';
 import { type ColorName, colors } from '@/theme/tokens';

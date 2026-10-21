@@ -34,10 +34,10 @@ npm run android
 
 These scripts set `APP_VARIANT=development`.
 
-| Variant | Name | iOS and Android id | Scheme |
-| --- | --- | --- | --- |
+| Variant     | Name              | iOS and Android id       | Scheme           |
+| ----------- | ----------------- | ------------------------ | ---------------- |
 | development | drama-flash (Dev) | `com.dramaflash.app.dev` | `dramaflash-dev` |
-| production | drama-flash | `com.dramaflash.app` | `dramaflash` |
+| production  | drama-flash       | `com.dramaflash.app`     | `dramaflash`     |
 
 An empty `APP_VARIANT` means production. An unknown value throws an error.
 
@@ -59,11 +59,11 @@ EAS project: `drama-flash`
 Owner: `dmihail`  
 Project ID: `33a80453-d173-4c89-a709-54dd349a68b2`
 
-| Profile | Use |
-| --- | --- |
-| `development` | Dev client for Android, and for an iOS device |
-| `development-simulator` | Dev client for the iOS Simulator |
-| `production` | Store build |
+| Profile                 | Use                                           |
+| ----------------------- | --------------------------------------------- |
+| `development`           | Dev client for Android, and for an iOS device |
+| `development-simulator` | Dev client for the iOS Simulator              |
+| `production`            | Store build                                   |
 
 ```bash
 npx eas-cli@latest build --platform ios --profile development-simulator

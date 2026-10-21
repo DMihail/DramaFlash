@@ -40,6 +40,9 @@ export function applyAppVariant(config: Partial<ExpoConfig>, variant: AppVariant
       ...config.android,
       package: APPLICATION_IDS[variant],
     },
-    plugins: [...(config.plugins ?? []), ['expo-dev-client', { addGeneratedScheme: isDevelopment }]],
+    plugins: [
+      ...(config.plugins ?? []),
+      ['expo-dev-client', { addGeneratedScheme: isDevelopment }],
+    ],
   };
 }

@@ -1,5 +1,6 @@
-import type { LucideIcon } from 'lucide-react-native';
 import { Pressable, StyleSheet } from 'react-native';
+
+import type { LucideIcon } from 'lucide-react-native';
 
 import { colors, control, iconSize, iconStroke, pressOpacity } from '@/theme/tokens';
 

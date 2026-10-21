@@ -10,10 +10,10 @@ Shared engineering rules live in this file. Cursor reads it from the repository 
 
 Cursor also supports project rules in `.cursor/rules/` as `.mdc` files. A plain `.md` file in that folder is ignored. Use `.cursor/rules/` only for Cursor behavior. Do not copy these shared rules into a new `.mdc` file.
 
-| File | Who reads it | What it covers |
-| --- | --- | --- |
-| `AGENTS.md` | Every coding agent | App stack, Expo docs, git, checks, how to talk to the user, GitHub writing |
-| `.cursor/rules/github-communication.mdc` | Cursor only, every chat | Do not add Cursor signatures or automatic AI co-author lines |
+| File                                     | Who reads it            | What it covers                                                             |
+| ---------------------------------------- | ----------------------- | -------------------------------------------------------------------------- |
+| `AGENTS.md`                              | Every coding agent      | App stack, Expo docs, git, checks, how to talk to the user, GitHub writing |
+| `.cursor/rules/github-communication.mdc` | Cursor only, every chat | Do not add Cursor signatures or automatic AI co-author lines               |
 
 ## Local plans
 
