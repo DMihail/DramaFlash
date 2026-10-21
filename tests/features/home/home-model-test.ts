@@ -72,7 +72,10 @@ describe('home catalog', () => {
       pathname: '/discover',
       params: { category: 'Trending Romance' },
     });
-    expect(searchDestination()).toBe('/discover');
+    expect(searchDestination()).toEqual({
+      pathname: '/discover',
+      params: { category: '' },
+    });
     expect(profileDestination()).toBe('/profile');
     expect(romanceDestination()).toEqual({
       pathname: '/discover',

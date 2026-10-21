@@ -1,0 +1,32 @@
+appId: com.dramaflash.app.dev
+---
+- launchApp:
+    clearState: false
+- openLink: dramaflash-dev:///dev/reset-library
+- extendedWaitUntil:
+    visible:
+      id: library.reset
+    timeout: 20000
+- openLink: dramaflash-dev:///series/shadow-kiss
+- extendedWaitUntil:
+    visible:
+      id: series.play
+    timeout: 20000
+- tapOn:
+    id: series.play
+- extendedWaitUntil:
+    visible:
+      id: player.play
+    timeout: 20000
+- openLink: dramaflash-dev:///library
+- extendedWaitUntil:
+    visible:
+      id: library.resume.shadow-kiss
+    timeout: 20000
+- tapOn:
+    id: library.resume.shadow-kiss
+- extendedWaitUntil:
+    visible:
+      id: player.episode
+      text: Episode 1
+    timeout: 20000

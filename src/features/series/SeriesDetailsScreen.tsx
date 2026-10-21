@@ -13,6 +13,8 @@ import { type DemoAuth } from '@/domain/auth';
 import { type Wallet } from '@/domain/wallet';
 import { walletReadErrorMessage } from '@/features/coins/model';
 import { posterArt } from '@/features/home/assets';
+import { useOptionalLibrarySelector } from '@/features/library/LibraryProvider';
+import { librarySaveFailedMessage } from '@/features/library/model';
 import {
   continueEpisode,
   emptyEpisodesMessage,
@@ -40,8 +42,10 @@ import { holdLoginTicket } from '@/navigation/pendingLogin';
 import { testIds } from '@/testing/testIds';
 import { colors, layout, radius, space } from '@/theme/tokens';
 
-// A guest save opens Login. This screen does not mark a series as saved.
-// The shared wallet is used unless a test passes its own wallet.
+// A guest save is stored on this device when the library store is mounted.
+// Without that store, the screen still opens the login ticket and does not
+// pretend the guest is signed in. The shared wallet is used unless a test
+// passes its own wallet.
 export function SeriesDetailsScreen({
   auth = null,
   loadSeries = loadSeriesDetails,
@@ -55,6 +59,9 @@ export function SeriesDetailsScreen({
 }) {
   const insets = useSafeAreaInsets();
   const shared = useOptionalWallet();
+  const libraryStatus = useOptionalLibrarySelector((state) => state.status);
+  const savedSeriesIds = useOptionalLibrarySelector((state) => state.savedSeriesIds);
+  const toggleSave = useOptionalLibrarySelector((state) => state.toggleSave);
   const { retry, state } = useSeriesDetails(seriesId, loadSeries);
   const [sort, setSort] = useState<EpisodeSort>('asc');
   const [expanded, setExpanded] = useState(false);
@@ -120,13 +127,26 @@ export function SeriesDetailsScreen({
       return;
     }
 
-    const result = seriesSaveRequest(seriesId, auth);
-    if (result.type !== 'login') {
+    if (!toggleSave) {
+      const result = seriesSaveRequest(seriesId, auth);
+      if (result.type !== 'login') {
+        return;
+      }
+
+      holdLoginTicket(result.ticket);
+      router.push(seriesLoginDestination());
       return;
     }
 
-    holdLoginTicket(result.ticket);
-    router.push(seriesLoginDestination());
+    if (libraryStatus !== 'ready') {
+      return;
+    }
+
+    void toggleSave(seriesId).then((result) => {
+      if (result.status === 'save-failed') {
+        setNotice(librarySaveFailedMessage);
+      }
+    });
   };
 
   const handleShare = () => {
@@ -242,6 +262,7 @@ export function SeriesDetailsScreen({
             onPlay={handlePlayFirst}
             onSave={handleSave}
             onShare={handleShare}
+            saved={seriesId ? (savedSeriesIds?.includes(seriesId) ?? false) : false}
             onSort={handleSort}
             showPlay={data.episodes.some((episode) => episode.number === 1)}
             showSort={data.episodeStatus === 'success'}

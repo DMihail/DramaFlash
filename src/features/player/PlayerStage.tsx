@@ -53,6 +53,7 @@ export function PlayerStage({
   onPrevious,
   onSave,
   onShare,
+  saved = false,
   onUnlock,
   preview,
   previousEpisode,
@@ -73,6 +74,7 @@ export function PlayerStage({
   onPrevious: () => void;
   onSave: () => void;
   onShare: () => void;
+  saved?: boolean;
   onUnlock: () => void;
   preview: PlayerPreview;
   previousEpisode: number | null;
@@ -152,10 +154,11 @@ export function PlayerStage({
       <View style={[styles.bottom, { paddingBottom: bottomInset + space.lg }]}>
         <View style={styles.sideActions}>
           <SideAction
-            accessibilityLabel="Save series"
+            accessibilityLabel={saved ? 'Remove from library' : 'Save series'}
             icon={Heart}
-            label="Save"
+            label={saved ? 'Saved' : 'Save'}
             onPress={onSave}
+            saved={saved}
             testID={testIds.player.save}
           />
           <SideAction
@@ -252,12 +255,14 @@ function SideAction({
   icon: Icon,
   label,
   onPress,
+  saved = false,
   testID,
 }: {
   accessibilityLabel: string;
   icon: LucideIcon;
   label: string;
   onPress: () => void;
+  saved?: boolean;
   testID: string;
 }) {
   return (
@@ -268,7 +273,12 @@ function SideAction({
       testID={testID}
     >
       <View style={styles.sideButton}>
-        <Icon color={colors.text} size={iconSize.header} strokeWidth={iconStroke} />
+        <Icon
+          color={colors.text}
+          size={iconSize.header}
+          strokeWidth={iconStroke}
+          {...(saved ? { fill: colors.primary } : {})}
+        />
         <AppText role="micro">{label}</AppText>
       </View>
     </Pressable>

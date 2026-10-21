@@ -15,6 +15,21 @@ function homeGenreId(genre: HomeGenre) {
   }
 }
 
+function discoverGenreId(genre: HomeGenre) {
+  switch (genre) {
+    case 'All':
+      return 'discover.genre.all';
+    case 'Romance':
+      return 'discover.genre.romance';
+    case 'Drama':
+      return 'discover.genre.drama';
+    case 'Action':
+      return 'discover.genre.action';
+    case 'Mystery':
+      return 'discover.genre.mystery';
+  }
+}
+
 export const testIds = {
   home: {
     screen: 'home.screen',
@@ -75,5 +90,28 @@ export const testIds = {
     error: 'wallet.error',
     retry: 'wallet.retry',
     reset: 'wallet.reset',
+  },
+  discover: {
+    screen: 'discover.screen',
+    search: 'discover.search',
+    clear: 'discover.clear',
+    loading: 'discover.loading',
+    empty: 'discover.empty',
+    retry: 'discover.retry',
+    genre: discoverGenreId,
+    poster: (seriesId: string) => `discover.poster.${seriesId}`,
+  },
+  library: {
+    screen: 'library.screen',
+    loading: 'library.loading',
+    empty: 'library.empty',
+    error: 'library.error',
+    retry: 'library.retry',
+    saved: 'library.saved',
+    continue: 'library.continue',
+    explore: 'library.explore',
+    reset: 'library.reset',
+    poster: (seriesId: string) => `library.poster.${seriesId}`,
+    resume: (seriesId: string) => `library.resume.${seriesId}`,
   },
 } as const;

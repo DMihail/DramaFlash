@@ -105,7 +105,7 @@ Prefer official Expo and React Native APIs over custom implementations for nontr
 
 Use Zustand for shared client state and MMKV for persistent local state. Keep screen-local state in React components and domain logic in pure TypeScript. Use typed selectors, validated persistence, explicit schema migrations, and feature-focused stores. Do not add Context providers for general application state without a clear reason. Preserve persisted user data during storage migrations. Do not show a successful wallet transaction before its storage write succeeds.
 
-The demo wallet is the shared persistent state: coin balance and paid episode unlocks. Keep saved series, demo authentication, and viewing progress in their domain functions until those features are built. Do not add empty stores for them. Filters, notices, the unlock sheet, the selected coin pack, and the player session stay in the screen. Episode labels are derived. Series and player requests stay in their screen hooks.
+The demo wallet is the shared persistent state for coin balance and paid episode unlocks. Saved series and the last opened episode live in one library store. Keep demo authentication in its domain functions until Login is built. Do not add an auth store before that. A guest can save a series on this device. That save does not sign the guest in. Search text, genre filters, notices, the unlock sheet, the selected coin pack, and the player session stay on the screen. Episode labels are derived. Series and player requests stay in their screen hooks.
 
 ## Loading and performance
 
@@ -172,6 +172,8 @@ All React Native testID values must be defined in src/testing/testIds.ts. Compon
 Maestro flows live in `tests/e2e/maestro` and use the development app id `com.dramaflash.app.dev`. Jest only collects TypeScript tests, so the YAML flows stay out of `npm test`. Run `npm run e2e` on a booted iOS simulator or Android emulator with the development build open and Metro running. Do not point these flows at the production app id. GitHub CI does not run Maestro, because that job has no emulator. EAS Workflows can run Maestro later. Leave that optional.
 
 The demo wallet is stored in MMKV. The first launch copies a valid AsyncStorage wallet into MMKV and does not replace a wallet that is already there. If that saved wallet is later missing, the app shows an error instead of a new 15-coin balance. A development build can open `dramaflash-dev:///dev/reset-wallet` to restore 15 coins and lock paid episodes again. That route does nothing in production, and it is not a normal user action. Maestro flows that need a known balance open it first. The flow that checks an unlock after restart must not open it between the unlock and the restart.
+
+Saved series and continue watching are separate MMKV records. A missing record means the list is empty. A broken record shows an error and is not replaced with an empty list. A development build can open `dramaflash-dev:///dev/reset-library` to clear saved series and continue watching. That route does not change the wallet, it does nothing in production, and it is not a normal user action.
 
 ## Commands
 

@@ -15,6 +15,7 @@ export type HomeGenre = (typeof homeGenres)[number];
 export type HomeRail = {
   id: string;
   title: string;
+  genre: HomeGenre;
   groupLabel: string | null;
   seriesIds: readonly string[];
 };
@@ -46,6 +47,7 @@ const actionIds = ['avenging-angel', 'band-of-fate', 'second-chance'] as const;
 const romanceRail: HomeRail = {
   id: 'trending-romance',
   title: 'Trending Romance',
+  genre: 'Romance',
   groupLabel: 'Romance',
   seriesIds: romanceIds,
 };
@@ -53,6 +55,7 @@ const romanceRail: HomeRail = {
 const dramaRail: HomeRail = {
   id: 'forbidden-love',
   title: 'Forbidden Love',
+  genre: 'Drama',
   groupLabel: null,
   seriesIds: dramaIds,
 };
@@ -60,9 +63,26 @@ const dramaRail: HomeRail = {
 const watchedRail: HomeRail = {
   id: 'most-watched',
   title: 'Most Watched',
+  genre: 'Action',
   groupLabel: 'Popular Micro Dramas',
   seriesIds: actionIds,
 };
+
+// null means every catalog series. Home rails and Discover use this same list.
+export function seriesIdsForGenre(genre: HomeGenre): readonly string[] | null {
+  switch (genre) {
+    case 'All':
+      return null;
+    case 'Romance':
+      return romanceIds;
+    case 'Drama':
+      return dramaIds;
+    case 'Action':
+      return actionIds;
+    case 'Mystery':
+      return [];
+  }
+}
 
 export const caughtUpMessage = 'You’re all caught up. Your next obsession awaits.';
 export const emptyCategoryMessage = 'No dramas in this category yet.';
@@ -131,7 +151,8 @@ export function discoverDestination(category: string): Href {
 }
 
 export function searchDestination(): Href {
-  return '/discover';
+  // Send an empty category so Expo Router replaces the genre stored on the Discover tab.
+  return { pathname: '/discover', params: { category: '' } };
 }
 
 export function profileDestination(): Href {

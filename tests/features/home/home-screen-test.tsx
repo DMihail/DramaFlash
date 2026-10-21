@@ -162,6 +162,30 @@ describe('home screen', () => {
     expect(mockRouter.push).toHaveBeenLastCalledWith(seriesRoute);
 
     await act(async () => {
+      pressTestId(screen, testIds.home.seeAll('trending-romance'))();
+    });
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith({
+      pathname: '/discover',
+      params: { category: 'Romance' },
+    });
+
+    await act(async () => {
+      pressTestId(screen, testIds.home.search)();
+    });
+
+    expect(mockRouter.navigate).toHaveBeenLastCalledWith({
+      pathname: '/discover',
+      params: { category: '' },
+    });
+
+    await act(async () => {
+      pressTestId(screen, testIds.home.save)();
+    });
+
+    expect(mockRouter.push).toHaveBeenCalledWith('/login');
+
+    await act(async () => {
       pressTestId(screen, testIds.home.genre('Mystery'))();
     });
 

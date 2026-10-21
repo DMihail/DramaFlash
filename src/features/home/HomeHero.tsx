@@ -2,7 +2,7 @@ import { Image, type ImageSourcePropType, StyleSheet, View } from 'react-native'
 
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { Play, Plus } from 'lucide-react-native';
+import { Check, Play, Plus } from 'lucide-react-native';
 
 import { AppText } from '@/components/AppText';
 import { IconButton } from '@/components/IconButton';
@@ -15,12 +15,14 @@ export function HomeHero({
   image,
   onSave,
   onWatch,
+  saved = false,
   title,
 }: {
   episodeLabel: string;
   image: ImageSourcePropType | undefined;
   onSave: () => void;
   onWatch: () => void;
+  saved?: boolean;
   title: string;
 }) {
   return (
@@ -72,8 +74,8 @@ export function HomeHero({
             />
           </View>
           <IconButton
-            accessibilityLabel="Add to library"
-            icon={Plus}
+            accessibilityLabel={saved ? 'Remove from library' : 'Add to library'}
+            icon={saved ? Check : Plus}
             onPress={onSave}
             testID={testIds.home.save}
           />
