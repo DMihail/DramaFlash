@@ -182,7 +182,7 @@ export function SeriesDetailsScreen({
   const sortLabel = sort === 'asc' ? 'Sort episodes, oldest first' : 'Sort episodes, newest first';
 
   return (
-    <Screen safeArea="full">
+    <Screen safeArea="full" testID="series.screen">
       <FlatList
         contentContainerStyle={{ paddingBottom: insets.bottom + space.xxxl }}
         data={rows}

@@ -20,7 +20,12 @@ export function SeriesDetailsLoading({
     <Screen safeArea="full">
       <SeriesDetailsSkeleton />
       <View style={[styles.overlayBack, { top: topInset + space.sm }]}>
-        <IconButton accessibilityLabel="Go back" icon={ChevronLeft} onPress={onBack} />
+        <IconButton
+          accessibilityLabel="Go back"
+          icon={ChevronLeft}
+          onPress={onBack}
+          testID="series.back"
+        />
       </View>
     </Screen>
   );
@@ -42,7 +47,12 @@ export function SeriesDetailsMessage({
   return (
     <Screen safeArea="full">
       <View style={[styles.statusBar, { paddingTop: topInset + space.sm }]}>
-        <IconButton accessibilityLabel="Go back" icon={ChevronLeft} onPress={onBack} />
+        <IconButton
+          accessibilityLabel="Go back"
+          icon={ChevronLeft}
+          onPress={onBack}
+          testID="series.back"
+        />
       </View>
       <View style={styles.statusBody}>
         <AppText role="displayM" style={styles.center}>
@@ -53,7 +63,7 @@ export function SeriesDetailsMessage({
             {detail}
           </AppText>
         ) : null}
-        {onRetry ? <PrimaryButton label="Retry" onPress={onRetry} /> : null}
+        {onRetry ? <PrimaryButton label="Retry" onPress={onRetry} testID="series.retry" /> : null}
       </View>
     </Screen>
   );

@@ -20,13 +20,19 @@ export function Screen({
   children,
   safeArea,
   style,
+  testID,
 }: {
   children: ReactNode;
   safeArea: ScreenSafeArea;
   style?: StyleProp<ViewStyle>;
+  testID?: string;
 }) {
   return (
-    <SafeAreaView edges={screenEdges[safeArea]} style={[styles.screen, style]}>
+    <SafeAreaView
+      edges={screenEdges[safeArea]}
+      style={[styles.screen, style]}
+      {...(testID ? { testID } : {})}
+    >
       {children}
     </SafeAreaView>
   );

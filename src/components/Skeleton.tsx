@@ -19,11 +19,13 @@ export function Skeleton({
   width,
   radius: corner = radius.md,
   style,
+  testID,
 }: {
   height: number;
   width: ViewStyle['width'];
   radius?: number;
   style?: ViewStyle;
+  testID?: string;
 }) {
   const [opacity] = useState(() => new Animated.Value(skeletonOpacity.visible));
   const [reducedMotion, setReducedMotion] = useState<boolean | null>(null);
@@ -86,6 +88,7 @@ export function Skeleton({
     <Animated.View
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
+      {...(testID ? { testID } : {})}
       style={[styles.bone, { height, width, borderRadius: corner, opacity }, style]}
     />
   );

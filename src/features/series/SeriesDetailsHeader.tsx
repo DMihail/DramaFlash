@@ -62,20 +62,42 @@ export function SeriesDetailsHeader({
           style={styles.topBarScrim}
         />
         <View style={[styles.heroBar, { paddingTop: topInset + space.sm }]}>
-          <IconButton accessibilityLabel="Go back" icon={ChevronLeft} onPress={onBack} />
+          <IconButton
+            accessibilityLabel="Go back"
+            icon={ChevronLeft}
+            onPress={onBack}
+            testID="series.back"
+          />
           <View style={styles.heroActions}>
-            <IconButton accessibilityLabel="Share series" icon={Share2} onPress={onShare} />
-            <IconButton accessibilityLabel="Save series" icon={Heart} onPress={onSave} />
+            <IconButton
+              accessibilityLabel="Share series"
+              icon={Share2}
+              onPress={onShare}
+              testID="series.share"
+            />
+            <IconButton
+              accessibilityLabel="Save series"
+              icon={Heart}
+              onPress={onSave}
+              testID="series.save"
+            />
           </View>
         </View>
       </View>
       <View style={styles.copy}>
-        <AppText accessibilityRole="header" role="displayL">
+        <AppText accessibilityRole="header" role="displayL" testID="series.title">
           {title}
         </AppText>
         <AppText role="bodySmall">{episodeCountLabel(episodeCount)}</AppText>
         {showPlay ? (
-          <PrimaryButton fill icon={Play} label="Play Ep 1" onPress={onPlay} variant="player" />
+          <PrimaryButton
+            fill
+            icon={Play}
+            label="Play Ep 1"
+            onPress={onPlay}
+            testID="series.play"
+            variant="player"
+          />
         ) : null}
       </View>
       <View style={styles.episodeHeading}>
@@ -89,6 +111,7 @@ export function SeriesDetailsHeader({
             accessibilityRole="button"
             onPress={onSort}
             style={styles.sortButton}
+            testID="series.sort"
           >
             <ArrowUpDown color={colors.primary} size={iconSize.header} strokeWidth={iconStroke} />
             <AppText color="primary" role="caption">

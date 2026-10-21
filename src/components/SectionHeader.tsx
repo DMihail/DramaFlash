@@ -8,11 +8,13 @@ export function SectionHeader({
   actionLabel,
   onActionPress,
   inset = layout.marginScreen,
+  testID,
 }: {
   title: string;
   actionLabel?: string;
   onActionPress?: () => void;
   inset?: typeof layout.marginScreen | typeof layout.marginDetail;
+  testID?: string;
 }) {
   return (
     <View style={[styles.row, { paddingHorizontal: inset }]}>
@@ -21,9 +23,11 @@ export function SectionHeader({
       </AppText>
       {actionLabel ? (
         <Pressable
+          accessibilityLabel={actionLabel}
           accessibilityRole="button"
           hitSlop={{ top: 12, bottom: 12, left: 8, right: 8 }}
           onPress={onActionPress}
+          {...(testID ? { testID } : {})}
           style={({ pressed }) => (pressed ? styles.pressed : null)}
         >
           <AppText color="primary" role="caption">

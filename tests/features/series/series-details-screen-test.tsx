@@ -25,12 +25,19 @@ jest.mock('lucide-react-native', () => {
   };
 });
 
+const mockRouter = {
+  back: jest.fn(),
+  canGoBack: jest.fn(() => true),
+  navigate: jest.fn(),
+  push: jest.fn(),
+};
+
 jest.mock('expo-router', () => ({
   router: {
-    back: jest.fn(),
-    canGoBack: jest.fn(() => true),
-    navigate: jest.fn(),
-    push: jest.fn(),
+    back: (...args: unknown[]) => mockRouter.back(...args),
+    canGoBack: () => mockRouter.canGoBack(),
+    navigate: (...args: unknown[]) => mockRouter.navigate(...args),
+    push: (...args: unknown[]) => mockRouter.push(...args),
   },
 }));
 
@@ -78,8 +85,43 @@ function hasLabel(renderer: TestRenderer.ReactTestRenderer, label: string): bool
   return renderer.root.findAll((node) => node.props.accessibilityLabel === label).length > 0;
 }
 
+function hasTestId(renderer: TestRenderer.ReactTestRenderer, testID: string): boolean {
+  return renderer.root.findAll((node) => node.props.testID === testID).length > 0;
+}
+
+function nodeTestId(node: TestRenderer.ReactTestInstance): string | null {
+  const props = node.props as { testID?: unknown };
+  return typeof props.testID === 'string' ? props.testID : null;
+}
+
+function ownedTestIds(renderer: TestRenderer.ReactTestRenderer): string[] {
+  return renderer.root
+    .findAll((node) => {
+      const testID = nodeTestId(node);
+      if (testID === null) {
+        return false;
+      }
+
+      return node.findAll((child) => child !== node && nodeTestId(child) === testID).length === 0;
+    })
+    .map((node) => nodeTestId(node) ?? '');
+}
+
+function pressTestId(renderer: TestRenderer.ReactTestRenderer, testID: string) {
+  const match = renderer.root.findAll((node) => node.props.testID === testID).at(0);
+  const press = readPress(match);
+  if (!press) {
+    throw new Error(`No press handler for ${testID}`);
+  }
+
+  return press;
+}
+
 describe('series details screen', () => {
   beforeEach(() => {
+    mockRouter.back.mockClear();
+    mockRouter.push.mockClear();
+    mockRouter.canGoBack.mockReturnValue(true);
     jest.spyOn(Animated, 'loop').mockReturnValue({
       start: jest.fn(),
       stop: jest.fn(),
@@ -100,8 +142,11 @@ describe('series details screen', () => {
     });
 
     expect(renderer).toBeDefined();
-    expect(hasLabel(renderer as TestRenderer.ReactTestRenderer, 'Loading series')).toBe(true);
-    expect(textOf(renderer as TestRenderer.ReactTestRenderer)).not.toContain('The CEO and I');
+    const screen = renderer as TestRenderer.ReactTestRenderer;
+    expect(hasLabel(screen, 'Loading series')).toBe(true);
+    expect(hasTestId(screen, 'series.loading')).toBe(true);
+    expect(hasTestId(screen, 'series.screen')).toBe(false);
+    expect(textOf(screen)).not.toContain('The CEO and I');
   });
 
   test('shows an error, then the series after retry', async () => {
@@ -125,6 +170,9 @@ describe('series details screen', () => {
 
     const screen = renderer as TestRenderer.ReactTestRenderer;
     expect(textOf(screen)).toContain(seriesErrorMessage);
+    expect(hasTestId(screen, 'series.retry')).toBe(true);
+    expect(hasTestId(screen, 'series.screen')).toBe(false);
+    expect(hasLabel(screen, 'Go back')).toBe(true);
 
     const onRetry = readPress(screen.root.findAll((node) => isRetryButton(node))[0]);
     if (!onRetry) {
@@ -137,7 +185,23 @@ describe('series details screen', () => {
 
     expect(textOf(screen)).toContain('The CEO and I');
     expect(textOf(screen)).toContain('50 episodes');
+    expect(hasTestId(screen, 'series.screen')).toBe(true);
+    expect(hasTestId(screen, 'series.title')).toBe(true);
+    expect(hasTestId(screen, 'series.loading')).toBe(false);
+    expect(hasTestId(screen, 'series.retry')).toBe(false);
+    expect(hasTestId(screen, 'series.episode.1')).toBe(true);
+    expect(hasTestId(screen, 'series.episode.4')).toBe(true);
     expect(hasLabel(screen, 'Episode 1, free')).toBe(true);
     expect(hasLabel(screen, 'Episode 4, locked, 10 coins')).toBe(true);
+    expect(new Set(ownedTestIds(screen)).size).toBe(ownedTestIds(screen).length);
+
+    await act(async () => {
+      pressTestId(screen, 'series.episode.4')();
+    });
+
+    expect(mockRouter.push).toHaveBeenCalledWith({
+      pathname: '/player/[seriesId]',
+      params: { seriesId: 'the-ceo-and-i', episode: '4' },
+    });
   });
 });

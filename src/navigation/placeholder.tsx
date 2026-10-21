@@ -8,13 +8,15 @@ export function Placeholder({
   title,
   detail,
   safeArea,
+  testID,
 }: {
   title: string;
   detail?: string;
   safeArea: ScreenSafeArea;
+  testID?: string;
 }) {
   return (
-    <Screen safeArea={safeArea}>
+    <Screen safeArea={safeArea} {...(testID ? { testID } : {})}>
       <View style={styles.content}>
         <AppText role="displayM" style={styles.center}>
           {title}

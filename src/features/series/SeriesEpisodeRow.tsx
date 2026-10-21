@@ -31,6 +31,7 @@ export function SeriesEpisodeRow({
       accessibilityRole="button"
       onPress={handlePress}
       style={styles.episodeRow}
+      testID={`series.episode.${episode.number}`}
     >
       <View style={[styles.episodeBadge, access === 'locked' ? styles.episodeLocked : null]}>
         {access === 'locked' ? (

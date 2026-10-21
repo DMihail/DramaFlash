@@ -1,0 +1,24 @@
+appId: com.dramaflash.app.dev
+---
+- launchApp:
+    clearState: false
+- extendedWaitUntil:
+    visible:
+      id: home.screen
+    timeout: 30000
+- scrollUntilVisible:
+    element:
+      id: home.poster.the-ceo-and-i
+    direction: DOWN
+    timeout: 20000
+    visibilityPercentage: 100
+    centerElement: true
+- tapOn:
+    id: home.poster.the-ceo-and-i
+- extendedWaitUntil:
+    visible:
+      id: series.screen
+    timeout: 20000
+- assertVisible:
+    id: series.title
+    text: The CEO and I

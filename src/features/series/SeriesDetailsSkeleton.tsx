@@ -7,7 +7,12 @@ const episodePlaceholders = [0, 1, 2, 3, 4, 5] as const;
 
 export function SeriesDetailsSkeleton() {
   return (
-    <View accessibilityLabel="Loading series" accessibilityState={{ busy: true }} accessible>
+    <View
+      accessibilityLabel="Loading series"
+      accessibilityState={{ busy: true }}
+      accessible
+      testID="series.loading"
+    >
       <Skeleton height={420} radius={0} width="100%" />
       <View style={styles.copy}>
         <Skeleton height={32} width="72%" />

@@ -98,6 +98,28 @@ function hasLabel(renderer: TestRenderer.ReactTestRenderer, label: string): bool
   return renderer.root.findAll((node) => node.props.accessibilityLabel === label).length > 0;
 }
 
+function hasTestId(renderer: TestRenderer.ReactTestRenderer, testID: string): boolean {
+  return renderer.root.findAll((node) => node.props.testID === testID).length > 0;
+}
+
+function nodeTestId(node: TestRenderer.ReactTestInstance): string | null {
+  const props = node.props as { testID?: unknown };
+  return typeof props.testID === 'string' ? props.testID : null;
+}
+
+function ownedTestIds(renderer: TestRenderer.ReactTestRenderer): string[] {
+  return renderer.root
+    .findAll((node) => {
+      const testID = nodeTestId(node);
+      if (testID === null) {
+        return false;
+      }
+
+      return node.findAll((child) => child !== node && nodeTestId(child) === testID).length === 0;
+    })
+    .map((node) => nodeTestId(node) ?? '');
+}
+
 function pressBy(
   renderer: TestRenderer.ReactTestRenderer,
   label: string,
@@ -158,9 +180,20 @@ describe('player screen', () => {
     }
 
     expect(textOf(screen)).toContain('The CEO and I');
+    expect(textOf(screen)).toContain('Episode 1');
     expect(textOf(screen)).not.toContain('Playing artwork preview');
     expect(textOf(screen)).toContain('Paused artwork preview');
     expect(textOf(screen)).toContain('No video is playing.');
+    expect(hasTestId(screen, 'player.screen')).toBe(true);
+    expect(hasTestId(screen, 'player.loading')).toBe(false);
+    expect(hasTestId(screen, 'player.episode')).toBe(true);
+    expect(hasTestId(screen, 'player.play')).toBe(true);
+    expect(hasTestId(screen, 'player.pause')).toBe(false);
+    expect(hasTestId(screen, 'player.previous')).toBe(true);
+    expect(hasTestId(screen, 'player.next')).toBe(true);
+    expect(hasLabel(screen, 'Previous episode')).toBe(true);
+    expect(hasLabel(screen, 'Next episode 2')).toBe(true);
+    expect(new Set(ownedTestIds(screen)).size).toBe(ownedTestIds(screen).length);
 
     await act(async () => {
       pressBy(screen, 'Watch', 'text')();
@@ -168,6 +201,9 @@ describe('player screen', () => {
 
     expect(textOf(screen)).toContain('Playing artwork preview');
     expect(textOf(screen)).toContain('Pause');
+    expect(hasTestId(screen, 'player.pause')).toBe(true);
+    expect(hasTestId(screen, 'player.play')).toBe(false);
+    expect(hasLabel(screen, 'Pause')).toBe(true);
   });
 
   test('moves between episodes and stops at the first and last', async () => {
@@ -233,8 +269,16 @@ describe('player screen', () => {
     }
 
     expect(textOf(screen)).toContain('Unlock Episode 4');
+    expect(textOf(screen)).toContain('Episode 4');
     expect(textOf(screen)).toContain('does not charge coins');
+    expect(textOf(screen)).toContain('10 coins');
     expect(textOf(screen)).not.toContain('Watch');
+    expect(hasTestId(screen, 'player.locked')).toBe(true);
+    expect(hasTestId(screen, 'player.unlock')).toBe(true);
+    expect(hasTestId(screen, 'player.play')).toBe(false);
+    expect(hasTestId(screen, 'player.pause')).toBe(false);
+    expect(hasLabel(screen, 'Unlock')).toBe(true);
+    expect(new Set(ownedTestIds(screen)).size).toBe(ownedTestIds(screen).length);
     expect(wallet.balance).toBe(15);
     expect(wallet.unlocks).toEqual([]);
 
@@ -292,6 +336,10 @@ describe('player screen', () => {
     }
 
     expect(textOf(screen)).toContain(playerErrorMessage);
+    expect(hasTestId(screen, 'player.error')).toBe(true);
+    expect(hasTestId(screen, 'player.retry')).toBe(true);
+    expect(hasTestId(screen, 'player.screen')).toBe(false);
+    expect(hasLabel(screen, 'Go back')).toBe(true);
     fail = false;
 
     await act(async () => {
@@ -300,6 +348,11 @@ describe('player screen', () => {
 
     expect(textOf(screen)).toContain('My Secret Life');
     expect(textOf(screen)).toContain('Paused artwork preview');
+    expect(hasTestId(screen, 'player.screen')).toBe(true);
+    expect(hasTestId(screen, 'player.error')).toBe(false);
+    expect(hasTestId(screen, 'player.retry')).toBe(false);
+    expect(hasTestId(screen, 'player.episode')).toBe(true);
+    expect(textOf(screen)).toContain('Episode 2');
   });
 
   test('ignores a slow result after the episode changes', async () => {
@@ -317,6 +370,8 @@ describe('player screen', () => {
     });
 
     expect(hasLabel(renderer!, 'Loading episode')).toBe(true);
+    expect(hasTestId(renderer!, 'player.loading')).toBe(true);
+    expect(hasTestId(renderer!, 'player.screen')).toBe(false);
 
     await act(async () => {
       renderer?.update(
@@ -397,6 +452,7 @@ describe('player screen', () => {
     });
 
     expect(hasLabel(renderer!, 'Loading episode')).toBe(true);
+    expect(hasTestId(renderer!, 'player.loading')).toBe(true);
     expect(textOf(renderer!)).not.toContain(playerErrorMessage);
 
     await act(async () => {

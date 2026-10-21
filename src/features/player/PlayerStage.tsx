@@ -116,12 +116,27 @@ export function PlayerStage({
         style={[StyleSheet.absoluteFill, { opacity: gradient.playerScrim.opacity }]}
       />
       <View style={[styles.topBar, { paddingTop: topInset + space.sm }]}>
-        <IconButton accessibilityLabel="Go back" icon={ChevronLeft} onPress={onBack} />
+        <IconButton
+          accessibilityLabel="Go back"
+          icon={ChevronLeft}
+          onPress={onBack}
+          testID="player.back"
+        />
         <AppText role="titleS">DramaFlash</AppText>
-        <IconButton accessibilityLabel="Episodes" icon={ListVideo} onPress={onEpisodes} />
+        <IconButton
+          accessibilityLabel="Episodes"
+          icon={ListVideo}
+          onPress={onEpisodes}
+          testID="player.episodes"
+        />
       </View>
       {locked ? (
-        <Pressable accessibilityRole="button" onPress={onUnlock} style={styles.lockCard}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={onUnlock}
+          style={styles.lockCard}
+          testID="player.locked"
+        >
           <Lock color={colors.coin} size={iconSize.button} strokeWidth={iconStroke} />
           <AppText role="titleS">{`Unlock Episode ${episode}`}</AppText>
           <AppText role="caption" style={styles.lockCopy}>
@@ -131,34 +146,52 @@ export function PlayerStage({
       ) : null}
       <View style={[styles.bottom, { paddingBottom: bottomInset + space.lg }]}>
         <View style={styles.sideActions}>
-          <SideAction accessibilityLabel="Save series" icon={Heart} label="Save" onPress={onSave} />
+          <SideAction
+            accessibilityLabel="Save series"
+            icon={Heart}
+            label="Save"
+            onPress={onSave}
+            testID="player.save"
+          />
           <SideAction
             accessibilityLabel="Comments"
             icon={MessageCircle}
             label="Comments"
             onPress={onComments}
+            testID="player.comments"
           />
           <SideAction
             accessibilityLabel="Share episode"
             icon={Share2}
             label="Share"
             onPress={onShare}
+            testID="player.share"
           />
         </View>
         <AppText accessibilityRole="header" role="displayM">
           {title}
         </AppText>
+        <AppText role="bodySmall" testID="player.episode">
+          {`Episode ${episode}`}
+        </AppText>
         <AppText accessibilityLiveRegion="polite" role="bodySmall">
           {status}
         </AppText>
         {locked ? (
-          <PrimaryButton icon={Lock} label="Unlock" onPress={onUnlock} variant="player" />
+          <PrimaryButton
+            icon={Lock}
+            label="Unlock"
+            onPress={onUnlock}
+            testID="player.unlock"
+            variant="player"
+          />
         ) : null}
         {canPreviewPlayback(access, preview) ? (
           <PrimaryButton
             icon={playing ? Pause : Play}
             label={playing ? 'Pause' : 'Watch'}
             onPress={handleTogglePlayback}
+            testID={playing ? 'player.pause' : 'player.play'}
             variant="player"
           />
         ) : null}
@@ -169,6 +202,7 @@ export function PlayerStage({
             icon={ChevronLeft}
             label="Previous"
             onPress={onPrevious}
+            testID="player.previous"
           />
           <TransportButton
             accessibilityLabel={
@@ -178,6 +212,7 @@ export function PlayerStage({
             icon={ChevronRight}
             label="Next"
             onPress={onNext}
+            testID="player.next"
           />
         </View>
       </View>
@@ -207,14 +242,21 @@ function SideAction({
   icon: Icon,
   label,
   onPress,
+  testID,
 }: {
   accessibilityLabel: string;
   icon: LucideIcon;
   label: string;
   onPress: () => void;
+  testID: string;
 }) {
   return (
-    <Pressable accessibilityLabel={accessibilityLabel} accessibilityRole="button" onPress={onPress}>
+    <Pressable
+      accessibilityLabel={accessibilityLabel}
+      accessibilityRole="button"
+      onPress={onPress}
+      testID={testID}
+    >
       <View style={styles.sideButton}>
         <Icon color={colors.text} size={iconSize.header} strokeWidth={iconStroke} />
         <AppText role="micro">{label}</AppText>
@@ -229,12 +271,14 @@ function TransportButton({
   icon: Icon,
   label,
   onPress,
+  testID,
 }: {
   accessibilityLabel: string;
   disabled: boolean;
   icon: LucideIcon;
   label: string;
   onPress: () => void;
+  testID: string;
 }) {
   return (
     <Pressable
@@ -244,6 +288,7 @@ function TransportButton({
       disabled={disabled}
       onPress={onPress}
       style={styles.transportButton}
+      testID={testID}
     >
       <Icon
         color={disabled ? colors.textMuted : colors.text}

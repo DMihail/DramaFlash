@@ -36,6 +36,7 @@ export function HomeHeader({
           icon={Search}
           onPress={onSearch}
           size={control.iconHeader}
+          testID="home.search"
         />
         <View>
           <IconButton
@@ -44,6 +45,7 @@ export function HomeHeader({
             icon={Bell}
             onPress={onNotifications}
             size={control.iconHeader}
+            testID="home.notifications"
           />
           <View pointerEvents="none" style={styles.dot} />
         </View>
@@ -53,6 +55,7 @@ export function HomeHeader({
           hitSlop={8}
           onPress={onProfile}
           style={({ pressed }) => (pressed ? styles.pressed : null)}
+          testID="home.profile"
         >
           <Image accessibilityIgnoresInvertColors source={homeAvatar} style={styles.avatar} />
         </Pressable>

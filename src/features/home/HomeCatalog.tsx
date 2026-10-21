@@ -42,6 +42,7 @@ export function HomeCatalog({
             label={item}
             onPress={() => onGenreChange(item)}
             selected={item === genre}
+            testID={`home.genre.${item.toLowerCase()}`}
           />
         ))}
       </ScrollView>
@@ -63,6 +64,7 @@ export function HomeCatalog({
             <SectionHeader
               actionLabel="See all"
               onActionPress={() => onSeeAll(rail.title)}
+              testID={`home.seeAll.${rail.id}`}
               title={rail.title}
             />
             <ScrollView
@@ -79,6 +81,7 @@ export function HomeCatalog({
                   <PosterCard
                     key={poster.id}
                     onPress={() => onOpenSeries(poster.id)}
+                    testID={`home.poster.${poster.id}`}
                     title={poster.title}
                     variant="rail"
                     {...(image ? { image } : {})}

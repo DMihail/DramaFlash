@@ -76,7 +76,7 @@ export function HomeScreen() {
   };
 
   return (
-    <Screen safeArea="tabs">
+    <Screen safeArea="tabs" testID="home.screen">
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <HomeHeader
           onNotifications={() => setNotice(caughtUpMessage)}

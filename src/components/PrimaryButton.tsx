@@ -26,6 +26,7 @@ export function PrimaryButton({
   icon: Icon,
   label,
   onPress,
+  testID,
   variant = 'primary',
 }: {
   disabled?: boolean;
@@ -33,14 +34,17 @@ export function PrimaryButton({
   icon?: LucideIcon;
   label: string;
   onPress?: () => void;
+  testID?: string;
   variant?: ButtonVariant;
 }) {
   return (
     <Pressable
+      accessibilityLabel={label}
       accessibilityRole="button"
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
+      {...(testID ? { testID } : {})}
       style={({ pressed }) => [
         styles.button,
         fill ? styles.fill : null,
