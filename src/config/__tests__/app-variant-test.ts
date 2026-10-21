@@ -1,6 +1,9 @@
 import type { ExpoConfig } from 'expo/config';
 
 import { APPLICATION_IDS, applyAppVariant, resolveAppVariant } from '@/config/app-variant';
+import appJson from '../../../app.json';
+
+const EAS_PROJECT_ID = '33a80453-d173-4c89-a709-54dd349a68b2';
 
 const baseConfig = {
   name: 'drama-flash',
@@ -52,5 +55,27 @@ describe('app variants', () => {
 
   test('rejects an unknown variant instead of silently shipping production ids', () => {
     expect(() => resolveAppVariant('staging')).toThrow('Unsupported APP_VARIANT "staging"');
+  });
+
+  test('keeps the EAS project id and owner on both variants', () => {
+    expect(appJson.expo.owner).toBe('dmihail');
+    expect(appJson.expo.extra.eas.projectId).toBe(EAS_PROJECT_ID);
+    expect(appJson.expo.ios.bundleIdentifier).toBe(APPLICATION_IDS.production);
+    expect(appJson.expo.android.package).toBe(APPLICATION_IDS.production);
+
+    const linked = {
+      ...baseConfig,
+      owner: appJson.expo.owner,
+      extra: appJson.expo.extra,
+    } as ExpoConfig;
+
+    for (const variant of ['development', 'production'] as const) {
+      const config = applyAppVariant(linked, variant);
+
+      expect(config.owner).toBe('dmihail');
+      expect(config.extra?.eas).toEqual({ projectId: EAS_PROJECT_ID });
+      expect(config.ios?.bundleIdentifier).toBe(APPLICATION_IDS[variant]);
+      expect(config.android?.package).toBe(APPLICATION_IDS[variant]);
+    }
   });
 });
