@@ -129,6 +129,10 @@ Use EAS to build, sign, and submit the app in the cloud (`eas build`, `eas submi
 
 Docs: `https://docs.expo.dev/eas/index.md`
 
+## Tests
+
+All application tests must be located in the root tests/ directory. Do not place test files inside src/. Organize tests by feature or domain, and keep them included in TypeScript, ESLint, Jest, and CI validation.
+
 ## Commands
 
 ```bash
