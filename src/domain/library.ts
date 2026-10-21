@@ -16,10 +16,6 @@ export type SavedLibraryResult =
 export type ProgressLoadResult =
   { status: 'empty' } | { status: 'ready'; entries: ProgressEntry[] } | { status: 'corrupt' };
 
-export function emptySavedIds(): string[] {
-  return [];
-}
-
 export function toggleSeriesId(ids: readonly string[], seriesId: string): string[] {
   if (ids.includes(seriesId)) {
     return ids.filter((id) => id !== seriesId);

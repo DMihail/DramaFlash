@@ -95,6 +95,7 @@ describe('discover screen', () => {
     }
 
     expect(host(screen, testIds.discover.screen)).toBeTruthy();
+    expect(host(screen, testIds.discover.search).props.autoFocus).toBe(false);
     expect(textOf(screen)).toContain('Love on Detours');
     expect(textOf(screen)).not.toContain('Avenging Angel');
     expect(host(screen, testIds.discover.genre('Romance')).props.accessibilityState).toEqual({
@@ -147,6 +148,78 @@ describe('discover screen', () => {
     });
 
     expect(mockRouter.push).toHaveBeenCalledWith(seriesDestination('love-on-detours'));
+  });
+
+  test('clears a leftover search when the route genre changes', async () => {
+    let renderer: TestRenderer.ReactTestRenderer | undefined;
+    await act(async () => {
+      renderer = renderScreen(<DiscoverScreen loadCatalog={loadNow()} />);
+    });
+    const screen = renderer;
+    if (!screen) {
+      throw new Error('expected a screen');
+    }
+
+    await act(async () => {
+      changeSearch(screen, 'secret');
+    });
+
+    expect(textOf(screen)).toContain('My Secret Life');
+    expect(textOf(screen)).not.toContain('Love on Detours');
+
+    await act(async () => {
+      screen.update(
+        <SafeAreaProvider initialMetrics={metrics}>
+          <DiscoverScreen category="Romance" loadCatalog={loadNow()} />
+        </SafeAreaProvider>,
+      );
+    });
+
+    expect(host(screen, testIds.discover.search).props.value).toBe('');
+    expect(host(screen, testIds.discover.search).props.autoFocus).toBe(false);
+    expect(host(screen, testIds.discover.genre('Romance')).props.accessibilityState).toEqual({
+      selected: true,
+    });
+    expect(textOf(screen)).toContain('Stories you’ll love');
+    expect(textOf(screen)).toContain('Love on Detours');
+    expect(textOf(screen)).toContain('The CEO and I');
+    expect(textOf(screen)).toContain('My Secret Life');
+    expect(textOf(screen)).not.toContain('Avenging Angel');
+    expect(textOf(screen)).not.toContain('Search results');
+  });
+
+  test('replaces an old category when Home opens search', async () => {
+    let renderer: TestRenderer.ReactTestRenderer | undefined;
+    await act(async () => {
+      renderer = renderScreen(<DiscoverScreen category="Romance" loadCatalog={loadNow()} />);
+    });
+    const screen = renderer;
+    if (!screen) {
+      throw new Error('expected a screen');
+    }
+
+    await act(async () => {
+      changeSearch(screen, 'secret');
+    });
+
+    expect(textOf(screen)).not.toContain('Love on Detours');
+
+    await act(async () => {
+      screen.update(
+        <SafeAreaProvider initialMetrics={metrics}>
+          <DiscoverScreen loadCatalog={loadNow()} />
+        </SafeAreaProvider>,
+      );
+    });
+
+    expect(host(screen, testIds.discover.search).props.value).toBe('');
+    expect(host(screen, testIds.discover.search).props.autoFocus).toBe(true);
+    expect(host(screen, testIds.discover.genre('All')).props.accessibilityState).toEqual({
+      selected: true,
+    });
+    expect(textOf(screen)).toContain('Love on Detours');
+    expect(textOf(screen)).toContain('Avenging Angel');
+    expect(textOf(screen)).toContain('Stories you’ll love');
   });
 
   test('shows an empty genre, then loading, error, and retry', async () => {

@@ -174,7 +174,10 @@ describe('home screen', () => {
       pressTestId(screen, testIds.home.search)();
     });
 
-    expect(mockRouter.navigate).toHaveBeenLastCalledWith('/discover');
+    expect(mockRouter.navigate).toHaveBeenLastCalledWith({
+      pathname: '/discover',
+      params: { category: '' },
+    });
 
     await act(async () => {
       pressTestId(screen, testIds.home.save)();

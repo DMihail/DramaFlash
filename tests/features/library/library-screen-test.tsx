@@ -277,4 +277,39 @@ describe('library screen', () => {
     expect(local.snapshot(MMKV_LIBRARY_KEY)).toContain('missing-show');
     expect(local.snapshot(MMKV_WALLET_KEY)).toContain('the-ceo-and-i');
   });
+
+  test('keeps free continue watching when the wallet cannot be read', async () => {
+    const local = memoryLocal({
+      [MMKV_PROGRESS_KEY]: serializeViewingProgress([
+        { seriesId: 'the-ceo-and-i', episode: 4, updatedAt: 30 },
+        { seriesId: 'love-on-detours', episode: 2, updatedAt: 10 },
+      ]),
+      [MMKV_WALLET_KEY]: '{',
+    });
+
+    const renderer = await mount(
+      <WalletProvider legacy={memoryLegacy()} local={local}>
+        <LibraryProvider local={local}>
+          <LibraryScreen />
+        </LibraryProvider>
+      </WalletProvider>,
+    );
+
+    expect(
+      renderer.root.findAll((node) => node.props.testID === testIds.library.empty),
+    ).toHaveLength(0);
+    expect(textOf(renderer)).not.toContain(libraryEmptyBody);
+    expect(
+      renderer.root.findAll(
+        (node) => node.props.testID === testIds.library.resume('love-on-detours'),
+      ).length,
+    ).toBeGreaterThan(0);
+    expect(
+      renderer.root.findAll(
+        (node) => node.props.testID === testIds.library.resume('the-ceo-and-i'),
+      ),
+    ).toHaveLength(0);
+    expect(textOf(renderer)).toContain('Love on Detours');
+    expect(textOf(renderer)).not.toContain('The CEO and I');
+  });
 });

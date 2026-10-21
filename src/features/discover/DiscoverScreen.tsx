@@ -60,6 +60,7 @@ export function DiscoverScreen({
   if (routeGenre !== trackedGenre) {
     setTrackedGenre(routeGenre);
     setGenre(routeGenre);
+    setQuery('');
   }
 
   const handleOpenSeries = (seriesId: string) => {
@@ -83,7 +84,9 @@ export function DiscoverScreen({
       </View>
       <View style={styles.searchField}>
         <Search color={colors.textMuted} size={iconSize.header} strokeWidth={iconStroke} />
+        {/* A new key mounts the field again, so autoFocus runs after Home search. */}
         <TextInput
+          key={category === undefined ? 'search' : 'browse'}
           accessibilityLabel="Search dramas"
           autoCapitalize="none"
           autoCorrect={false}

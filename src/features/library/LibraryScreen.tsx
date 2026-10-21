@@ -38,9 +38,13 @@ export function LibraryScreen() {
   const entries = useLibrarySelector((state) => state.entries);
   const retry = useLibrarySelector((state) => state.retry);
   const wallet = useOptionalWallet();
-  const walletReady = !wallet || wallet.status === 'ready';
+  // A missing or unreadable wallet still leaves free episodes open. Paid
+  // progress stays hidden until the real unlocks load.
+  const continueWallet = wallet?.status === 'ready' ? wallet.wallet : null;
   const continueList =
-    status === 'ready' && walletReady ? continueItems(entries, wallet?.wallet ?? null) : [];
+    status === 'ready' && wallet?.status !== 'loading'
+      ? continueItems(entries, continueWallet)
+      : [];
   const saved = status === 'ready' ? savedPosters(savedSeriesIds) : [];
 
   const handleExplore = () => {

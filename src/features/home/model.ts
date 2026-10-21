@@ -151,7 +151,8 @@ export function discoverDestination(category: string): Href {
 }
 
 export function searchDestination(): Href {
-  return '/discover';
+  // Send an empty category so Expo Router replaces the genre stored on the Discover tab.
+  return { pathname: '/discover', params: { category: '' } };
 }
 
 export function profileDestination(): Href {
