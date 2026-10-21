@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { testIds } from '@/testing/testIds';
@@ -65,6 +65,7 @@ describe('test id registry', () => {
       testIds.home.poster('the-ceo-and-i'),
       testIds.series.episode(1),
       testIds.series.episode(4),
+      testIds.coins.package('coins-300'),
     ]);
     const selectors = maestroIds();
 
@@ -88,7 +89,11 @@ describe('test id registry', () => {
         testIds.player.locked,
         testIds.player.unlock,
         testIds.player.play,
+        testIds.player.unlockConfirm,
         testIds.coins.store,
+        testIds.coins.package('coins-300'),
+        testIds.wallet.balance,
+        testIds.wallet.reset,
       ]),
     );
   });

@@ -13,12 +13,14 @@ import { layout, space } from '@/theme/tokens';
 export function SeriesDetailsLoading({
   topInset,
   onBack,
+  testID,
 }: {
   topInset: number;
   onBack: () => void;
+  testID?: string;
 }) {
   return (
-    <Screen safeArea="full">
+    <Screen safeArea="full" {...(testID ? { testID } : {})}>
       <SeriesDetailsSkeleton />
       <View style={[styles.overlayBack, { top: topInset + space.sm }]}>
         <IconButton

@@ -44,5 +44,9 @@ export function applyAppVariant(config: Partial<ExpoConfig>, variant: AppVariant
       ...(config.plugins ?? []),
       ['expo-dev-client', { addGeneratedScheme: isDevelopment }],
     ],
+    extra: {
+      ...config.extra,
+      appVariant: variant,
+    },
   };
 }

@@ -1,0 +1,98 @@
+appId: com.dramaflash.app.dev
+---
+- launchApp:
+    clearState: false
+- openLink: dramaflash-dev:///dev/reset-wallet
+- extendedWaitUntil:
+    visible:
+      id: wallet.reset
+    timeout: 20000
+- openLink: dramaflash-dev:///
+- extendedWaitUntil:
+    visible:
+      id: home.screen
+    timeout: 30000
+- scrollUntilVisible:
+    element:
+      id: home.poster.the-ceo-and-i
+    direction: DOWN
+    timeout: 20000
+    visibilityPercentage: 100
+    centerElement: true
+- tapOn:
+    id: home.poster.the-ceo-and-i
+- extendedWaitUntil:
+    visible:
+      id: series.screen
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      id: series.episode.4
+    direction: DOWN
+    timeout: 20000
+    visibilityPercentage: 100
+    centerElement: true
+- tapOn:
+    id: series.episode.4
+- extendedWaitUntil:
+    visible:
+      id: player.locked
+    timeout: 20000
+- assertVisible:
+    id: wallet.balance
+    text: '15 coins'
+- tapOn:
+    id: player.unlock
+- extendedWaitUntil:
+    visible:
+      id: player.unlockConfirm
+    timeout: 10000
+- tapOn:
+    id: player.unlockConfirm
+- extendedWaitUntil:
+    visible:
+      id: player.play
+    timeout: 20000
+- assertVisible:
+    id: wallet.balance
+    text: '5 coins'
+- assertNotVisible:
+    id: player.locked
+- stopApp
+- launchApp:
+    clearState: false
+- extendedWaitUntil:
+    visible:
+      id: home.screen
+    timeout: 30000
+- scrollUntilVisible:
+    element:
+      id: home.poster.the-ceo-and-i
+    direction: DOWN
+    timeout: 20000
+    visibilityPercentage: 100
+    centerElement: true
+- tapOn:
+    id: home.poster.the-ceo-and-i
+- extendedWaitUntil:
+    visible:
+      id: series.screen
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      id: series.episode.4
+    direction: DOWN
+    timeout: 20000
+    visibilityPercentage: 100
+    centerElement: true
+- tapOn:
+    id: series.episode.4
+- extendedWaitUntil:
+    visible:
+      id: player.play
+    timeout: 20000
+- assertNotVisible:
+    id: player.locked
+- assertVisible:
+    id: wallet.balance
+    text: '5 coins'

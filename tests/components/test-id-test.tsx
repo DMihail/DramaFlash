@@ -4,7 +4,6 @@ import { Heart } from 'lucide-react-native';
 import { type Metrics, SafeAreaProvider } from 'react-native-safe-area-context';
 import TestRenderer, { act } from 'react-test-renderer';
 
-import CoinStoreScreen from '@/app/coins';
 import { GenreChip } from '@/components/GenreChip';
 import { IconButton } from '@/components/IconButton';
 import { PosterCard } from '@/components/PosterCard';
@@ -12,14 +11,29 @@ import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
 import { Skeleton } from '@/components/Skeleton';
+import { type WalletStorage } from '@/domain/wallet';
+import { CoinStoreScreen } from '@/features/coins/CoinStoreScreen';
+import { demoPurchaseNote } from '@/features/coins/model';
+import { WalletProvider } from '@/features/wallet/WalletProvider';
 import { Placeholder } from '@/navigation/placeholder';
 import { testIds } from '@/testing/testIds';
 
 jest.mock('lucide-react-native', () => {
   const Icon = () => null;
 
-  return { Heart: Icon };
+  return new Proxy({ Heart: Icon }, { get: () => Icon });
 });
+
+jest.mock('expo-router', () => ({
+  router: {
+    back: jest.fn(),
+    canGoBack: () => false,
+    navigate: jest.fn(),
+    push: jest.fn(),
+    replace: jest.fn(),
+  },
+  useLocalSearchParams: () => ({}),
+}));
 
 const metrics: Metrics = {
   frame: { x: 0, y: 0, width: 390, height: 844 },
@@ -128,12 +142,21 @@ describe('shared test IDs', () => {
   test('coin store screen uses the store test ID', async () => {
     let renderer: TestRenderer.ReactTestRenderer | undefined;
 
+    const storage: WalletStorage = {
+      getItem: async () => null,
+      setItem: async () => undefined,
+      removeItem: async () => undefined,
+    };
+
     await act(async () => {
       renderer = TestRenderer.create(
         <SafeAreaProvider initialMetrics={metrics}>
-          <CoinStoreScreen />
+          <WalletProvider storage={storage}>
+            <CoinStoreScreen />
+          </WalletProvider>
         </SafeAreaProvider>,
       );
+      await Promise.resolve();
     });
 
     const screen = renderer;
@@ -142,8 +165,9 @@ describe('shared test IDs', () => {
     }
 
     expect(hosts(screen, testIds.coins.store)).toHaveLength(1);
+    expect(hosts(screen, testIds.coins.balance)).toHaveLength(1);
     expect(
-      screen.root.findAll((node) => node.props.children === 'Coin store').length,
+      screen.root.findAll((node) => node.props.children === demoPurchaseNote).length,
     ).toBeGreaterThan(0);
 
     await act(async () => {
