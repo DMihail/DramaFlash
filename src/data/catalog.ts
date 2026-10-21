@@ -25,3 +25,12 @@ export type SeriesId = (typeof catalog)[number]['id'];
 export function findSeries(id: string): Series | undefined {
   return catalog.find((series) => series.id === id);
 }
+
+export function episodeCountFor(seriesId: string): number | null {
+  const episodeCount = findSeries(seriesId)?.episodeCount ?? null;
+  if (episodeCount === null || !Number.isInteger(episodeCount) || episodeCount < 1) {
+    return null;
+  }
+
+  return episodeCount;
+}

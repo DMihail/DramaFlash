@@ -10,12 +10,20 @@ describe('catalog and route params', () => {
     expect(findSeries('missing')).toBeUndefined();
   });
 
-  test('falls back to episode 1 when the number is missing or invalid', () => {
-    expect(parseEpisodeNumber(undefined)).toBe(1);
-    expect(parseEpisodeNumber('4')).toBe(4);
-    expect(parseEpisodeNumber('0')).toBe(1);
-    expect(parseEpisodeNumber('46')).toBe(1);
-    expect(parseEpisodeNumber('nope')).toBe(1);
-    expect(parseEpisodeNumber(['12', '3'])).toBe(12);
+  test('falls back to episode 1 when the number is missing or outside the series', () => {
+    expect(parseEpisodeNumber(undefined, 50)).toBe(1);
+    expect(parseEpisodeNumber('4', 50)).toBe(4);
+    expect(parseEpisodeNumber('50', 50)).toBe(50);
+    expect(parseEpisodeNumber('51', 50)).toBe(1);
+    expect(parseEpisodeNumber('25', 25)).toBe(25);
+    expect(parseEpisodeNumber('26', 25)).toBe(1);
+    expect(parseEpisodeNumber('45', 45)).toBe(45);
+    expect(parseEpisodeNumber('46', 45)).toBe(1);
+    expect(parseEpisodeNumber('90', 90)).toBe(90);
+    expect(parseEpisodeNumber('91', 90)).toBe(1);
+    expect(parseEpisodeNumber('4', null)).toBe(1);
+    expect(parseEpisodeNumber('0', 90)).toBe(1);
+    expect(parseEpisodeNumber('nope', 50)).toBe(1);
+    expect(parseEpisodeNumber(['12', '3'], 50)).toBe(12);
   });
 });

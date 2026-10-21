@@ -1,9 +1,10 @@
+import { episodeCountFor } from '@/data/catalog';
 import {
-  LAST_EPISODE,
   STARTING_BALANCE,
   WALLET_STORAGE_KEY,
   coinPacks,
   freshWallet,
+  isEpisodeInSeries,
   isEpisodeUnlocked,
   loadWallet,
   purchaseCoins,
@@ -78,13 +79,54 @@ describe('wallet', () => {
   test('does not charge for free, invalid, or unknown purchases', () => {
     const wallet = freshWallet();
 
-    for (const episode of [1, 2, 3, 0, -1, LAST_EPISODE + 1, 4.5, Number.NaN]) {
+    for (const episode of [1, 2, 3, 0, -1, 51, 4.5, Number.NaN]) {
       expect(unlockEpisode(wallet, seriesA, episode)).toBe(wallet);
     }
 
     expect(unlockEpisode(wallet, '', 4)).toBe(wallet);
+    expect(unlockEpisode(wallet, 'missing-series', 4)).toBe(wallet);
+    expect(isEpisodeInSeries(null, 4)).toBe(false);
+    expect(isEpisodeUnlocked(wallet, 'missing-series', 1)).toBe(false);
     expect(purchaseCoins(wallet, -1)).toBe(wallet);
     expect(purchaseCoins(wallet, coinPacks.length)).toBe(wallet);
+  });
+
+  test('uses the selected series length for episodes 25, 45, 50, and 90', () => {
+    const lengths = [
+      ['band-of-fate', 25],
+      ['shadow-kiss', 45],
+      ['the-ceo-and-i', 50],
+      ['avenging-angel', 90],
+    ] as const;
+    const funded = purchaseCoins(freshWallet(), 0);
+
+    for (const [seriesId, episodeCount] of lengths) {
+      expect(episodeCountFor(seriesId)).toBe(episodeCount);
+      expect(isEpisodeUnlocked(freshWallet(), seriesId, 1)).toBe(true);
+      expect(isEpisodeUnlocked(freshWallet(), seriesId, 3)).toBe(true);
+      expect(isEpisodeUnlocked(funded, seriesId, episodeCount)).toBe(false);
+
+      const unlocked = unlockEpisode(funded, seriesId, episodeCount);
+      const pastTheEnd = unlockEpisode(funded, seriesId, episodeCount + 1);
+
+      expect(unlocked.balance).toBe(funded.balance - 10);
+      expect(unlocked.unlocks).toEqual([{ seriesId, episode: episodeCount }]);
+      expect(pastTheEnd).toBe(funded);
+
+      const stored = JSON.stringify({
+        balance: STARTING_BALANCE,
+        unlocks: [{ seriesId, episode: episodeCount }],
+      });
+      const tooFar = JSON.stringify({
+        balance: STARTING_BALANCE,
+        unlocks: [{ seriesId, episode: episodeCount + 1 }],
+      });
+
+      expect(loadWallet({ getItem: () => stored }).unlocks).toEqual([
+        { seriesId, episode: episodeCount },
+      ]);
+      expect(loadWallet({ getItem: () => tooFar })).toEqual(freshWallet());
+    }
   });
 
   test('recovers from missing or bad storage', () => {
@@ -94,6 +136,7 @@ describe('wallet', () => {
       'null',
       '{"balance":-1,"unlocks":[]}',
       '{"balance":15,"unlocks":[{"seriesId":"the-ceo-and-i","episode":99}]}',
+      '{"balance":15,"unlocks":[{"seriesId":"missing-series","episode":4}]}',
       '{"balance":15,"unlockedEpisodes":[4]}',
     ]) {
       expect(loadWallet({ getItem: () => value })).toEqual(freshWallet());

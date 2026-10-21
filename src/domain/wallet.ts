@@ -1,7 +1,8 @@
+import { episodeCountFor } from '@/data/catalog';
+
 export const WALLET_STORAGE_KEY = 'dramaflash.option-a.v1';
 export const EPISODE_COST = 10;
 export const FREE_EPISODE_LIMIT = 3;
-export const LAST_EPISODE = 45;
 export const STARTING_BALANCE = 15;
 
 export const coinPacks = [
@@ -29,9 +30,22 @@ export function freshWallet(): Wallet {
   return { balance: STARTING_BALANCE, unlocks: [] };
 }
 
+export function isEpisodeInSeries(episodeCount: number | null, episode: number): boolean {
+  return (
+    episodeCount !== null &&
+    Number.isInteger(episode) &&
+    episode >= 1 &&
+    episode <= episodeCount
+  );
+}
+
 export function isEpisodeUnlocked(wallet: Wallet, seriesId: string, episode: number): boolean {
-  if (!isPayableEpisode(seriesId, episode)) {
-    return episode >= 1 && episode <= FREE_EPISODE_LIMIT && Number.isInteger(episode);
+  if (!isEpisodeInSeries(episodeCountFor(seriesId), episode)) {
+    return false;
+  }
+
+  if (episode <= FREE_EPISODE_LIMIT) {
+    return true;
   }
 
   return wallet.unlocks.some((unlock) => unlock.seriesId === seriesId && unlock.episode === episode);
@@ -39,7 +53,7 @@ export function isEpisodeUnlocked(wallet: Wallet, seriesId: string, episode: num
 
 export function unlockEpisode(wallet: Wallet, seriesId: string, episode: number): Wallet {
   if (
-    !isPayableEpisode(seriesId, episode) ||
+    !isPaidEpisode(seriesId, episode) ||
     isEpisodeUnlocked(wallet, seriesId, episode) ||
     wallet.balance < EPISODE_COST
   ) {
@@ -77,13 +91,8 @@ export function loadWallet(storage: KeyValueStore): Wallet {
   }
 }
 
-function isPayableEpisode(seriesId: string, episode: number): boolean {
-  return (
-    seriesId.length > 0 &&
-    Number.isInteger(episode) &&
-    episode > FREE_EPISODE_LIMIT &&
-    episode <= LAST_EPISODE
-  );
+function isPaidEpisode(seriesId: string, episode: number): boolean {
+  return isEpisodeInSeries(episodeCountFor(seriesId), episode) && episode > FREE_EPISODE_LIMIT;
 }
 
 function isWalletRecord(value: unknown): value is Wallet {
@@ -109,11 +118,8 @@ function isUnlock(value: unknown): value is EpisodeUnlock {
   const unlock = value as { seriesId?: unknown; episode?: unknown };
   return (
     typeof unlock.seriesId === 'string' &&
-    unlock.seriesId.length > 0 &&
     typeof unlock.episode === 'number' &&
-    Number.isInteger(unlock.episode) &&
-    unlock.episode > FREE_EPISODE_LIMIT &&
-    unlock.episode <= LAST_EPISODE
+    isPaidEpisode(unlock.seriesId, unlock.episode)
   );
 }
 
