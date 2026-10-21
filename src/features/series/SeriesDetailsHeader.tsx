@@ -1,12 +1,14 @@
 import { Image, type ImageSourcePropType, Pressable, StyleSheet, View } from 'react-native';
 
+import { LinearGradient } from 'expo-linear-gradient';
+
 import { ArrowUpDown, ChevronLeft, Heart, Play, Share2 } from 'lucide-react-native';
 
 import { AppText } from '@/components/AppText';
 import { IconButton } from '@/components/IconButton';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { episodeCountLabel } from '@/features/series/model';
-import { colors, control, iconSize, iconStroke, layout, space } from '@/theme/tokens';
+import { colors, control, gradient, iconSize, iconStroke, layout, space } from '@/theme/tokens';
 
 export function SeriesDetailsHeader({
   episodeCount,
@@ -37,12 +39,28 @@ export function SeriesDetailsHeader({
 }) {
   return (
     <View>
-      <View>
+      <View style={styles.heroFrame}>
         {image ? (
           <Image accessibilityIgnoresInvertColors source={image} style={styles.hero} />
         ) : (
           <View style={[styles.hero, styles.heroFallback]} />
         )}
+        <LinearGradient
+          colors={gradient.detailHero.colors}
+          end={gradient.detailHero.end}
+          locations={gradient.detailHero.locations}
+          pointerEvents="none"
+          start={gradient.detailHero.start}
+          style={styles.heroScrim}
+        />
+        <LinearGradient
+          colors={gradient.detailTopBar.colors}
+          end={gradient.detailTopBar.end}
+          locations={gradient.detailTopBar.locations}
+          pointerEvents="none"
+          start={gradient.detailTopBar.start}
+          style={styles.topBarScrim}
+        />
         <View style={[styles.heroBar, { paddingTop: topInset + space.sm }]}>
           <IconButton accessibilityLabel="Go back" icon={ChevronLeft} onPress={onBack} />
           <View style={styles.heroActions}>
@@ -84,10 +102,27 @@ export function SeriesDetailsHeader({
 }
 
 const styles = StyleSheet.create({
+  heroFrame: {
+    width: '100%',
+  },
   hero: {
     width: '100%',
     aspectRatio: 3 / 4,
     backgroundColor: colors.surfaceMedia,
+  },
+  heroScrim: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+  },
+  topBarScrim: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: gradient.detailTopBar.height,
   },
   heroFallback: {
     backgroundColor: colors.surface,

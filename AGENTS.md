@@ -97,6 +97,10 @@ A simple one-line callback may stay inline when the name would not make the JSX 
 - Use `FlatList` for a long or dynamic list.
 - Do not add an animation or gesture library without a clear need.
 
+## Platform APIs
+
+Prefer official Expo and React Native APIs over custom implementations for nontrivial platform features. Before adding a dependency, check existing packages and official SDK support. Use maintained libraries when they clearly reduce complexity, improve reliability, or provide native capabilities. Keep simple domain logic as pure TypeScript functions. Avoid reinventing platform functionality, unnecessary dependencies, and premature abstractions. Follow DRY, KISS, modern React patterns, and React Compiler requirements.
+
 ## React Compiler
 
 React Compiler is enabled with `experiments.reactCompiler` in `app.json`. Expo SDK 58 configures Babel for it. Do not add a custom Babel config or a second compiler plugin.

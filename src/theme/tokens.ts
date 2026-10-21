@@ -69,6 +69,49 @@ export const glow = {
   player: { offsetY: 8, opacity: 0.2, radius: 8 },
 } as const;
 
+const scrim = {
+  clear: 'rgba(0, 0, 0, 0)',
+  faint: 'rgba(0, 0, 0, 0.1)',
+  top: 'rgba(0, 0, 0, 0.4)',
+  mid: 'rgba(0, 0, 0, 0.6)',
+  strong: 'rgba(0, 0, 0, 0.8)',
+  solid: 'rgba(0, 0, 0, 1)',
+} as const;
+
+export const gradient = {
+  brand: {
+    colors: [colors.primary, colors.accent],
+    start: { x: 0, y: 0.5 },
+    end: { x: 1, y: 0.5 },
+  },
+  homeHeroTop: {
+    colors: [scrim.top, scrim.clear, scrim.faint],
+    locations: [0, 0.5, 1],
+    start: { x: 0.5, y: 0 },
+    end: { x: 0.5, y: 1 },
+  },
+  homeHeroBottom: {
+    colors: [scrim.solid, scrim.strong, scrim.clear],
+    locations: [0, 0.5, 1],
+    start: { x: 0.5, y: 1 },
+    end: { x: 0.5, y: 0 },
+  },
+  homeHeroTint: 'rgba(100, 237, 247, 0.1)',
+  detailHero: {
+    colors: [scrim.solid, scrim.mid, scrim.clear],
+    locations: [0, 0.5, 1],
+    start: { x: 0.5, y: 1 },
+    end: { x: 0.5, y: 0 },
+  },
+  detailTopBar: {
+    colors: [scrim.strong, scrim.clear],
+    locations: [0, 1],
+    start: { x: 0.5, y: 0 },
+    end: { x: 0.5, y: 1 },
+    height: 96,
+  },
+} as const;
+
 export const layout = {
   marginScreen: 16,
   marginDetail: 20,

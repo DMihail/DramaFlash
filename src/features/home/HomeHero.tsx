@@ -1,11 +1,13 @@
 import { Image, type ImageSourcePropType, StyleSheet, View } from 'react-native';
 
+import { LinearGradient } from 'expo-linear-gradient';
+
 import { Play, Plus } from 'lucide-react-native';
 
 import { AppText } from '@/components/AppText';
 import { IconButton } from '@/components/IconButton';
 import { PrimaryButton } from '@/components/PrimaryButton';
-import { colors, layout, radius, space } from '@/theme/tokens';
+import { colors, gradient, layout, radius, space } from '@/theme/tokens';
 
 export function HomeHero({
   episodeLabel,
@@ -32,9 +34,21 @@ export function HomeHero({
         />
       ) : null}
       <View pointerEvents="none" style={styles.scrim}>
-        <View style={[styles.scrimBand, styles.scrimClear]} />
-        <View style={[styles.scrimBand, styles.scrimMid]} />
-        <View style={[styles.scrimBand, styles.scrimDeep]} />
+        <View style={styles.tint} />
+        <LinearGradient
+          colors={gradient.homeHeroTop.colors}
+          end={gradient.homeHeroTop.end}
+          locations={gradient.homeHeroTop.locations}
+          start={gradient.homeHeroTop.start}
+          style={StyleSheet.absoluteFill}
+        />
+        <LinearGradient
+          colors={gradient.homeHeroBottom.colors}
+          end={gradient.homeHeroBottom.end}
+          locations={gradient.homeHeroBottom.locations}
+          start={gradient.homeHeroBottom.start}
+          style={StyleSheet.absoluteFill}
+        />
       </View>
       <View style={styles.copy}>
         <View style={styles.spotlight}>
@@ -77,21 +91,14 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     left: 0,
-    justifyContent: 'flex-end',
   },
-  scrimBand: {
-    width: '100%',
-  },
-  scrimClear: {
-    flex: 1.2,
-  },
-  scrimMid: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.35)',
-  },
-  scrimDeep: {
-    flex: 1.3,
-    backgroundColor: 'rgba(0, 0, 0, 0.72)',
+  tint: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: gradient.homeHeroTint,
   },
   copy: {
     paddingHorizontal: layout.marginHero,
