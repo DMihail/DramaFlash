@@ -1,14 +1,14 @@
 import { episodeCountFor } from '@/data/catalog';
 import {
-  STARTING_BALANCE,
-  WALLET_STORAGE_KEY,
   coinPacks,
   freshWallet,
   isEpisodeInSeries,
   isEpisodeUnlocked,
   loadWallet,
   purchaseCoins,
+  STARTING_BALANCE,
   unlockEpisode,
+  WALLET_STORAGE_KEY,
 } from '@/domain/wallet';
 
 const seriesA = 'the-ceo-and-i';

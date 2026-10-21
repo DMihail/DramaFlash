@@ -54,7 +54,11 @@ export function createLoginTicket(input: {
   };
 }
 
-export function signIn(auth: DemoAuth, provider: DemoProvider, ticket: LoginTicket | null): DemoAuth {
+export function signIn(
+  auth: DemoAuth,
+  provider: DemoProvider,
+  ticket: LoginTicket | null,
+): DemoAuth {
   if (auth.provider) {
     return auth;
   }
@@ -125,7 +129,8 @@ function isAuthRecord(value: unknown): value is DemoAuth {
   const record = value as { provider?: unknown; savedSeriesIds?: unknown };
   return (
     (record.provider === null ||
-      (typeof record.provider === 'string' && providers.includes(record.provider as DemoProvider))) &&
+      (typeof record.provider === 'string' &&
+        providers.includes(record.provider as DemoProvider))) &&
     Array.isArray(record.savedSeriesIds) &&
     record.savedSeriesIds.every((id) => typeof id === 'string' && id.length > 0)
   );

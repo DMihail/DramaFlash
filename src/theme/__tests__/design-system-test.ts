@@ -1,11 +1,11 @@
-import { fontFaces, splashCanHide } from '@/theme/fonts';
-import { colors, fontFamily, layout } from '@/theme/tokens';
-import { resolveFontFamily, textRoles } from '@/theme/type';
-import { buttonFill } from '@/components/PrimaryButton';
-import { screenEdges } from '@/components/Screen';
 import { chipColors } from '@/components/GenreChip';
 import { iconButtonMetrics } from '@/components/IconButton';
 import { posterSize } from '@/components/PosterCard';
+import { buttonFill } from '@/components/PrimaryButton';
+import { screenEdges } from '@/components/Screen';
+import { fontFaces, splashCanHide } from '@/theme/fonts';
+import { colors, fontFamily, layout } from '@/theme/tokens';
+import { resolveFontFamily, textRoles } from '@/theme/type';
 
 describe('design system', () => {
   test('keeps the approved colors and both font families', () => {

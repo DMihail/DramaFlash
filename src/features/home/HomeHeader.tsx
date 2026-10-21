@@ -1,0 +1,108 @@
+import { Image, Pressable, StyleSheet, View } from 'react-native';
+
+import { Bell, Heart, Search } from 'lucide-react-native';
+
+import { AppText } from '@/components/AppText';
+import { IconButton } from '@/components/IconButton';
+import { homeAvatar } from '@/features/home/assets';
+import { colors, control, iconStroke, pressOpacity, radius, space } from '@/theme/tokens';
+
+export function HomeHeader({
+  onNotifications,
+  onProfile,
+  onSearch,
+}: {
+  onNotifications: () => void;
+  onProfile: () => void;
+  onSearch: () => void;
+}) {
+  return (
+    <View style={styles.header}>
+      <View accessibilityRole="header" style={styles.brand}>
+        <View style={styles.logo}>
+          <Heart
+            color={colors.onPrimary}
+            fill={colors.onPrimary}
+            size={18}
+            strokeWidth={iconStroke}
+          />
+        </View>
+        <AppText role="titleL">DramaFlash</AppText>
+      </View>
+      <View style={styles.actions}>
+        <IconButton
+          accessibilityLabel="Search dramas"
+          appearance="plain"
+          icon={Search}
+          onPress={onSearch}
+          size={control.iconHeader}
+        />
+        <View>
+          <IconButton
+            accessibilityLabel="Notifications"
+            appearance="plain"
+            icon={Bell}
+            onPress={onNotifications}
+            size={control.iconHeader}
+          />
+          <View pointerEvents="none" style={styles.dot} />
+        </View>
+        <Pressable
+          accessibilityLabel="Your profile"
+          accessibilityRole="button"
+          hitSlop={8}
+          onPress={onProfile}
+          style={({ pressed }) => (pressed ? styles.pressed : null)}
+        >
+          <Image accessibilityIgnoresInvertColors source={homeAvatar} style={styles.avatar} />
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  header: {
+    minHeight: 52,
+    paddingHorizontal: space[16],
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  brand: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space[8],
+    flexShrink: 1,
+  },
+  logo: {
+    width: 32,
+    height: 32,
+    borderRadius: radius.sm,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space[4],
+  },
+  dot: {
+    position: 'absolute',
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.primary,
+    top: 6,
+    right: 8,
+  },
+  avatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+  },
+  pressed: {
+    opacity: pressOpacity,
+  },
+});

@@ -1,0 +1,18 @@
+node_modules/
+assets/expo.icon/
+.expo/
+dist/
+coverage/
+ios/
+android/
+web-build/
+package-lock.json
+expo-env.d.ts
+High-Fidelity DramaFlash Prototype/
+High-Fidelity DramaFlash Prototype.zip
+references/
+docs/PROTOTYPE_AUDIT.md
+docs/ARCHITECTURE.md
+docs/DESIGN_SYSTEM.md
+docs/MIGRATION_MAP.md
+docs/IMPLEMENTATION_PLAN.md

@@ -1,4 +1,3 @@
-import { WALLET_STORAGE_KEY } from '@/domain/wallet';
 import {
   AUTH_STORAGE_KEY,
   cancelLogin,
@@ -7,11 +6,12 @@ import {
   isSeriesSaved,
   loadAuth,
   resetSavedSeries,
+  signedInScreen,
   signIn,
   signOut,
-  signedInScreen,
   toggleSavedSeries,
 } from '@/domain/auth';
+import { WALLET_STORAGE_KEY } from '@/domain/wallet';
 
 describe('demo auth', () => {
   test('starts as a guest', () => {

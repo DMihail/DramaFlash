@@ -22,6 +22,7 @@ export function SectionHeader({
       {actionLabel ? (
         <Pressable
           accessibilityRole="button"
+          hitSlop={{ top: 12, bottom: 12, left: 8, right: 8 }}
           onPress={onActionPress}
           style={({ pressed }) => (pressed ? styles.pressed : null)}
         >

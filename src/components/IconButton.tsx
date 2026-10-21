@@ -1,5 +1,6 @@
-import type { LucideIcon } from 'lucide-react-native';
 import { Pressable, StyleSheet } from 'react-native';
+
+import type { LucideIcon } from 'lucide-react-native';
 
 import { colors, control, iconSize, iconStroke, pressOpacity } from '@/theme/tokens';
 
@@ -13,11 +14,13 @@ export function iconButtonMetrics(size: IconButtonSize): { diameter: number; gly
 
 export function IconButton({
   accessibilityLabel,
+  appearance = 'surface',
   icon: Icon,
   onPress,
   size = control.icon,
 }: {
   accessibilityLabel: string;
+  appearance?: 'plain' | 'surface';
   icon: LucideIcon;
   onPress?: () => void;
   size?: IconButtonSize;
@@ -28,9 +31,11 @@ export function IconButton({
     <Pressable
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
+      hitSlop={8}
       onPress={onPress}
       style={({ pressed }) => [
         styles.button,
+        appearance === 'surface' ? styles.surface : null,
         {
           width: metrics.diameter,
           height: metrics.diameter,
@@ -48,6 +53,8 @@ const styles = StyleSheet.create({
   button: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  surface: {
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,

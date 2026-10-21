@@ -28,9 +28,12 @@
     "@types/react": "~19.3.0",
     "eslint": "^9.39.5",
     "eslint-config-expo": "~58.0.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-simple-import-sort": "^14.0.0",
     "expo-doctor": "^1.21.5",
     "jest": "~30.5.2",
     "jest-expo": "~58.0.11",
+    "prettier": "^3.9.10",
     "tsx": "^4.23.15",
     "typescript": "~6.0.3"
   },
@@ -40,11 +43,14 @@
     "ios": "APP_VARIANT=development expo start --ios",
     "web": "APP_VARIANT=development expo start --web",
     "lint": "expo lint",
+    "lint:fix": "expo lint --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "test": "jest --watchAll=false --watchman=false",
     "test:watch": "jest --watchAll",
     "doctor": "expo-doctor",
-    "validate": "npm run lint && npm run typecheck && npm test && npm run doctor",
+    "validate": "npm run lint && npm run format:check && npm run typecheck && npm test && npm run doctor",
     "eas-build-pre-install": "npm install --global npm@11.19.0"
   },
   "jest": {

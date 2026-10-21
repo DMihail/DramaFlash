@@ -1,3 +1,6 @@
+import { createContext, createElement, type ReactNode, useContext } from 'react';
+
+import { useFonts } from 'expo-font';
 import {
   Inter_400Regular,
   Inter_500Medium,
@@ -9,8 +12,6 @@ import {
   PlayfairDisplay_600SemiBold,
   PlayfairDisplay_700Bold,
 } from '@expo-google-fonts/playfair-display';
-import { useFonts } from 'expo-font';
-import { createContext, createElement, useContext, type ReactNode } from 'react';
 
 import { fontFamily } from '@/theme/tokens';
 
@@ -41,13 +42,7 @@ export function useAppFonts(): readonly [boolean, Error | null] {
 
 const FontReadyContext = createContext(false);
 
-export function FontsProvider({
-  ready,
-  children,
-}: {
-  ready: boolean;
-  children: ReactNode;
-}) {
+export function FontsProvider({ ready, children }: { ready: boolean; children: ReactNode }) {
   return createElement(FontReadyContext.Provider, { value: ready }, children);
 }
 

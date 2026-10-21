@@ -22,10 +22,22 @@ describe('project toolchain', () => {
 
   test('keeps TypeScript strict', () => {
     const tsconfig = JSON.parse(read('tsconfig.json')) as {
-      compilerOptions: { strict: boolean };
+      compilerOptions: {
+        strict: boolean;
+        exactOptionalPropertyTypes: boolean;
+        noImplicitAny: boolean;
+        noUncheckedIndexedAccess: boolean;
+        noFallthroughCasesInSwitch: boolean;
+        forceConsistentCasingInFileNames: boolean;
+      };
     };
 
     expect(tsconfig.compilerOptions.strict).toBe(true);
+    expect(tsconfig.compilerOptions.exactOptionalPropertyTypes).toBe(true);
+    expect(tsconfig.compilerOptions.noImplicitAny).toBe(true);
+    expect(tsconfig.compilerOptions.noUncheckedIndexedAccess).toBe(true);
+    expect(tsconfig.compilerOptions.noFallthroughCasesInSwitch).toBe(true);
+    expect(tsconfig.compilerOptions.forceConsistentCasingInFileNames).toBe(true);
   });
 
   test('uses the same Node.js version locally and on EAS', () => {
@@ -60,6 +72,7 @@ describe('project toolchain', () => {
     expect(workflow).toContain('npm run eas-build-pre-install');
     expect(workflow).toContain('npm ci');
     expect(workflow).toContain('npm run lint');
+    expect(workflow).toContain('npm run format:check');
     expect(workflow).toContain('npm run typecheck');
     expect(workflow).toContain('npm test');
     expect(workflow).toContain('npm run doctor');
