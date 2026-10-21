@@ -1,32 +1,35 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+
+import { AppText } from '@/components/AppText';
+import { Screen } from '@/components/Screen';
+import { space } from '@/theme/tokens';
 
 export function Placeholder({ title, detail }: { title: string; detail?: string }) {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
-      {detail ? <Text style={styles.detail}>{detail}</Text> : null}
-    </View>
+    <Screen>
+      <View style={styles.content}>
+        <AppText role="displayM" style={styles.center}>
+          {title}
+        </AppText>
+        {detail ? (
+          <AppText role="body" style={styles.center}>
+            {detail}
+          </AppText>
+        ) : null}
+      </View>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  content: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#000000',
-    padding: 24,
+    padding: space[24],
+    gap: space[8],
   },
-  title: {
-    color: '#ffffff',
-    fontSize: 24,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  detail: {
-    color: '#ffffff',
-    fontSize: 16,
-    marginTop: 8,
+  center: {
     textAlign: 'center',
   },
 });
