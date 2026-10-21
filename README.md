@@ -1,56 +1,130 @@
-# Welcome to your Expo app 👋
+# DramaFlash
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Expo SDK 58 app for iOS and Android. This repository is set up for development builds, unit tests, and pull-request checks. Application screens are still the Expo starter.
 
-## Get started
+## Prerequisites
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+- Node.js `22.22.0` (see `.nvmrc`). Expo SDK 58 supports Node.js `22.13` and newer on the 22 line.
+- npm `11.19.0`, which is the npm version bundled with that Node.js release.
+- An Expo account before the first EAS build.
+- Xcode and Android Studio only if you compile development builds on this machine. EAS Build does not need them.
 
 ```bash
-npm run reset-project
+nvm use
+node -v
+npm -v
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+## Install
 
-### Other setup steps
+```bash
+npm ci
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+`npm ci` installs the lockfile exactly. `.npmrc` sets `engine-strict=true`, so npm refuses a Node.js or npm version outside the range in `package.json`.
 
-## Learn more
+Copy `.env.example` to `.env.local` when you need machine-local public configuration. `.env.local` is gitignored. Do not put credentials in `EXPO_PUBLIC_` variables; those values are embedded in the app. Create EAS secrets with `eas env:create` after the project is linked.
 
-To learn more about developing your project with Expo, look at the following resources:
+## Scripts
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+| Script | Purpose |
+| --- | --- |
+| `npm run start` | Development server for the development app variant |
+| `npm run ios` / `npm run android` | Open the development server on a simulator or emulator |
+| `npm run lint` | `expo lint` |
+| `npm run typecheck` | `tsc --noEmit` with strict TypeScript |
+| `npm test` | Jest unit tests once, without watch mode |
+| `npm run test:watch` | Jest in watch mode |
+| `npm run doctor` | `expo-doctor` |
+| `npm run validate` | Lint, typecheck, unit tests, and Expo Doctor |
 
-## Join the community
+## App variants
 
-Join our community of developers creating universal apps.
+`src/config/app-variant.ts` selects the display name, URL scheme, iOS bundle identifier, and Android package. `app.config.ts` loads that module with `tsx`, which is a dev dependency, because Expo's config loader does not compile imported TypeScript files on its own.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+| Variant | Name | Application id | Scheme |
+| --- | --- | --- | --- |
+| development | drama-flash (Dev) | `com.dramaflash.app.dev` | `dramaflash-dev` |
+| production | drama-flash | `com.dramaflash.app` | `dramaflash` |
+
+`npm run start` sets `APP_VARIANT=development`. An unset variant resolves to production so a store build cannot silently pick up the development id. An unknown value throws.
+
+Confirm the resolved config with:
+
+```bash
+APP_VARIANT=development npx expo config --type public
+APP_VARIANT=production npx expo config --type public
+```
+
+## Development builds
+
+`expo-dev-client` is installed. `eas.json` has three build profiles:
+
+- `development` — dev client, internal distribution, for Android devices or emulators and for iOS devices.
+- `development-simulator` — same development variant, with an iOS Simulator build.
+- `production` — store build. It does not include the dev client.
+
+Native `ios/` and `android/` directories are generated by Continuous Native Generation and are gitignored. Do not commit them.
+
+Link the Expo project once, from a machine where you are logged in:
+
+```bash
+npx eas-cli@latest login
+npx eas-cli@latest init
+```
+
+`eas.json` uses remote app versioning. `eas init` creates the EAS project that stores those version numbers. Build signing credentials also stay on EAS. Do not commit keystores, provisioning profiles, or `credentials.json`.
+
+Build when you are ready. These commands are not part of GitHub Actions.
+
+```bash
+npx eas-cli@latest build --platform android --profile development
+npx eas-cli@latest build --platform ios --profile development-simulator
+npx eas-cli@latest build --platform ios --profile development
+npx eas-cli@latest build --platform all --profile production
+```
+
+iOS device and production builds need an Apple Developer account. Android production builds need a Google Play signing key, which EAS can generate and store. After a native config or native dependency change, create a new development build. JavaScript-only changes use `npm run start`.
+
+## Tests
+
+Jest uses the `jest-expo` preset for SDK 58, which requires Jest 30. `passWithNoTests` is off, so a run with zero tests fails.
+
+Current tests cover the app variant config, the EAS and CI toolchain, the existing theme tokens, and `ThemedText`.
+
+Add future domain tests next to the modules they cover. Jest already runs files under `__tests__` whose names end in `test.ts` or `test.tsx`:
+
+- `src/domain/wallet/__tests__/balance-test.ts` for coin balance
+- `src/domain/entitlements/__tests__/entitlements-test.ts` for episode entitlements
+- `src/domain/unlock/__tests__/unlock-test.ts` for unlock logic
+
+Do not add tests that assert `true` in place of that behavior.
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on pull requests to `main` and on pushes to `main`. The job has `contents: read`, checks out the repo without persisted credentials, and does not receive secrets. It runs `npm ci`, lint, TypeScript, unit tests, and Expo Doctor. It does not create native builds.
+
+Fork pull requests use the `pull_request` event, so repository secrets are not exposed to them. Do not switch this workflow to `pull_request_target`.
+
+## Branch protection
+
+Configure this on GitHub for `main`. This repository cannot turn the setting on by itself, and the checks must not be bypassed.
+
+1. Open **Settings → Branches → Add branch ruleset** (or a classic branch protection rule) for `main`.
+2. Restrict direct pushes to `main`. Changes enter through a pull request.
+3. Require a pull request before merging.
+4. Require status checks to pass. Select the check named **Lint, types, tests, and Expo Doctor**. GitHub lists that check after it has run once on this repository.
+5. Require the branch to be up to date before merging.
+6. Block force pushes and branch deletion.
+7. Leave bypass permissions disabled, including for administrators.
+
+Do not merge by disabling the required check.
+
+## Manual setup still required
+
+- Install Node.js `22.22.0` locally if `nvm use` cannot find it.
+- Create an Expo account, run `eas login`, and run `eas init` so the project id and remote version numbers exist.
+- Enroll in the Apple Developer Program before an iOS device or App Store build.
+- Let EAS create or upload the Android upload key before a Play Store build.
+- Add the branch protection rule above after the CI check has run once.
+- Store any future API secrets in EAS environments (`development` and `production`), not in git.

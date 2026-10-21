@@ -6,6 +6,7 @@
     "@expo/ui": "~58.0.21",
     "expo": "~58.0.16",
     "expo-constants": "~58.0.12",
+    "expo-dev-client": "~58.0.14",
     "expo-device": "~58.0.5",
     "expo-font": "~58.0.9",
     "expo-glass-effect": "~58.0.4",
@@ -28,16 +29,42 @@
     "react-native-worklets": "0.13.0"
   },
   "devDependencies": {
+    "@testing-library/react-native": "^14.1.0",
+    "@types/jest": "30.0.0",
+    "@types/node": "^22.19.0",
     "@types/react": "~19.3.0",
+    "eslint": "^9.39.5",
+    "eslint-config-expo": "~58.0.4",
+    "expo-doctor": "^1.21.5",
+    "jest": "~30.5.2",
+    "jest-expo": "~58.0.11",
+    "tsx": "^4.23.15",
     "typescript": "~6.0.3"
   },
   "scripts": {
-    "start": "expo start",
+    "start": "APP_VARIANT=development expo start",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
-    "lint": "expo lint"
+    "android": "APP_VARIANT=development expo start --android",
+    "ios": "APP_VARIANT=development expo start --ios",
+    "web": "APP_VARIANT=development expo start --web",
+    "lint": "expo lint",
+    "typecheck": "tsc --noEmit",
+    "test": "jest --watchAll=false --watchman=false",
+    "test:watch": "jest --watchAll",
+    "doctor": "expo-doctor",
+    "validate": "npm run lint && npm run typecheck && npm test && npm run doctor"
   },
+  "jest": {
+    "preset": "jest-expo",
+    "passWithNoTests": false,
+    "moduleNameMapper": {
+      "\\.(css)$": "<rootDir>/jest/style-mock.js"
+    }
+  },
+  "engines": {
+    "node": ">=22.13.0 <23",
+    "npm": ">=11.19.0 <12"
+  },
+  "packageManager": "npm@11.19.0",
   "private": true
 }
