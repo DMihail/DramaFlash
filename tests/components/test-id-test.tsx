@@ -11,11 +11,11 @@ import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
 import { Skeleton } from '@/components/Skeleton';
-import { type WalletStorage } from '@/domain/wallet';
 import { CoinStoreScreen } from '@/features/coins/CoinStoreScreen';
 import { demoPurchaseNote } from '@/features/coins/model';
 import { WalletProvider } from '@/features/wallet/WalletProvider';
 import { Placeholder } from '@/navigation/placeholder';
+import { type LocalStorage } from '@/storage/persistence';
 import { testIds } from '@/testing/testIds';
 
 jest.mock('lucide-react-native', () => {
@@ -142,21 +142,23 @@ describe('shared test IDs', () => {
   test('coin store screen uses the store test ID', async () => {
     let renderer: TestRenderer.ReactTestRenderer | undefined;
 
-    const storage: WalletStorage = {
-      getItem: async () => null,
-      setItem: async () => undefined,
-      removeItem: async () => undefined,
+    const storage: LocalStorage = {
+      getString: async () => undefined,
+      setString: async () => undefined,
+      delete: async () => undefined,
     };
 
     await act(async () => {
       renderer = TestRenderer.create(
         <SafeAreaProvider initialMetrics={metrics}>
-          <WalletProvider storage={storage}>
+          <WalletProvider local={storage}>
             <CoinStoreScreen />
           </WalletProvider>
         </SafeAreaProvider>,
       );
-      await Promise.resolve();
+      for (let step = 0; step < 10; step += 1) {
+        await Promise.resolve();
+      }
     });
 
     const screen = renderer;
