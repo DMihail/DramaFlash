@@ -11,6 +11,7 @@ module.exports = defineConfig([
     'android/*',
     'references/*',
     'node_modules/*',
+    'High-Fidelity DramaFlash Prototype/*',
   ]),
   expoConfig,
   {
