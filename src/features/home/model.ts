@@ -1,7 +1,12 @@
 import type { Href } from 'expo-router';
 
 import { findSeries } from '@/data/catalog';
-import { type DemoAuth, toggleSavedSeries } from '@/domain/auth';
+import {
+  createLoginTicket,
+  type DemoAuth,
+  type LoginTicket,
+  toggleSavedSeries,
+} from '@/domain/auth';
 
 export const homeGenres = ['All', 'Romance', 'Drama', 'Action', 'Mystery'] as const;
 
@@ -20,11 +25,19 @@ export type HomePoster = {
   episodeCount: number | null;
 };
 
-export type SaveResult =
-  | { type: 'login' }
+export type SaveRequest =
+  | { type: 'login'; ticket: LoginTicket }
   | { type: 'saved'; seriesId: string }
   | { type: 'removed'; seriesId: string }
   | { type: 'unavailable' };
+
+export type HomeSpotlight = {
+  seriesId: string;
+  title: string;
+  episodeLabel: string;
+};
+
+const featuredSeriesId = 'the-ceo-and-i';
 
 const romanceIds = ['the-ceo-and-i', 'my-secret-life', 'love-on-detours'] as const;
 const dramaIds = ['bloody-roses', 'shadow-kiss', 'dark-desire'] as const;
@@ -51,19 +64,21 @@ const watchedRail: HomeRail = {
   seriesIds: actionIds,
 };
 
-// The spotlight copy comes from the prototype. It is not a catalog series.
-export const homeHero = {
-  title: 'Forbidden Love',
-  tagline: 'A CEO’s dangerous secret contract.',
-  ratingLabel: '4.8',
-  episodeLabel: '72 Episodes',
-  tags: ['Romance', 'Drama', 'Billionaire'],
-  seriesId: null,
-} as const;
-
 export const caughtUpMessage = 'You’re all caught up. Your next obsession awaits.';
-export const spotlightMessage = 'This spotlight is not in the catalog yet.';
 export const emptyCategoryMessage = 'No dramas in this category yet.';
+
+export function homeSpotlight(): HomeSpotlight | null {
+  const series = findSeries(featuredSeriesId);
+  if (!series || series.episodeCount === null) {
+    return null;
+  }
+
+  return {
+    seriesId: series.id,
+    title: series.title,
+    episodeLabel: `${series.episodeCount} Episodes`,
+  };
+}
 
 export function visibleRails(genre: HomeGenre): readonly HomeRail[] {
   switch (genre) {
@@ -139,13 +154,21 @@ export function watchNowDestination(seriesId: string | null): Href | null {
   return seriesDestination(seriesId);
 }
 
-export function saveSeries(auth: DemoAuth, seriesId: string | null): SaveResult {
-  if (!auth.provider) {
-    return { type: 'login' };
+export function requestSeriesSave(auth: DemoAuth | null, seriesId: string | null): SaveRequest {
+  if (!seriesId || !findSeries(seriesId)) {
+    return { type: 'unavailable' };
   }
 
-  if (!seriesId) {
-    return { type: 'unavailable' };
+  if (!auth?.provider) {
+    return {
+      type: 'login',
+      ticket: createLoginTicket({
+        currentScreen: 'home',
+        destination: 'home',
+        wasPlaying: false,
+        seriesIdToSave: seriesId,
+      }),
+    };
   }
 
   const next = toggleSavedSeries(auth, seriesId);

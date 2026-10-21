@@ -1,18 +1,20 @@
-import { catalog } from '@/data/catalog';
-import { guestAuth } from '@/domain/auth';
+import { catalog, findSeries } from '@/data/catalog';
+import { posterArt } from '@/features/home/assets';
 import {
   discoverDestination,
   episodeMeta,
+  homeSpotlight,
   loginDestination,
   postersFor,
   profileDestination,
+  requestSeriesSave,
   romanceDestination,
-  saveSeries,
   searchDestination,
   seriesDestination,
   visibleRails,
   watchNowDestination,
 } from '@/features/home/model';
+import { clearLoginTicket, holdLoginTicket, readLoginTicket } from '@/navigation/pendingLogin';
 
 describe('home catalog', () => {
   test('shows the nine home series from the catalog, in rail order', () => {
@@ -80,26 +82,60 @@ describe('home catalog', () => {
     expect(watchNowDestination('the-ceo-and-i')).toEqual(seriesDestination('the-ceo-and-i'));
   });
 
-  test('sends a guest to login and does not mark a series saved', () => {
-    const guest = guestAuth();
+  test('features a catalog series whose title and episode count match that record', () => {
+    const series = findSeries('the-ceo-and-i');
+    const spotlight = homeSpotlight();
 
-    expect(saveSeries(guest, 'the-ceo-and-i')).toEqual({ type: 'login' });
-    expect(saveSeries(guest, null)).toEqual({ type: 'login' });
-    expect(guest.savedSeriesIds).toEqual([]);
-    expect(loginDestination()).toBe('/login');
+    expect(series?.episodeCount).toBe(50);
+    expect(spotlight).toEqual({
+      seriesId: 'the-ceo-and-i',
+      title: 'The CEO and I',
+      episodeLabel: '50 Episodes',
+    });
+    expect(spotlight && watchNowDestination(spotlight.seriesId)).toEqual(
+      seriesDestination('the-ceo-and-i'),
+    );
+    expect(spotlight ? posterArt(spotlight.seriesId) : undefined).toBeTruthy();
   });
 
-  test('saves only when the viewer is signed in and the series id exists', () => {
+  test('keeps the series id for login and does not mark it saved', () => {
+    clearLoginTicket();
+    const result = requestSeriesSave(null, 'the-ceo-and-i');
+
+    expect(result).toEqual({
+      type: 'login',
+      ticket: {
+        origin: 'home',
+        destination: 'home',
+        wasPlaying: false,
+        seriesIdToSave: 'the-ceo-and-i',
+      },
+    });
+    expect(requestSeriesSave({ provider: null, savedSeriesIds: [] }, 'missing-series')).toEqual({
+      type: 'unavailable',
+    });
+    if (result.type !== 'login') {
+      throw new Error('expected a login ticket');
+    }
+
+    holdLoginTicket(result.ticket);
+    expect(readLoginTicket()?.seriesIdToSave).toBe('the-ceo-and-i');
+    expect(loginDestination()).toBe('/login');
+    clearLoginTicket();
+    expect(readLoginTicket()).toBeNull();
+  });
+
+  test('saves only when a signed-in session and a catalog series are both present', () => {
     const signedIn = { provider: 'email' as const, savedSeriesIds: [] as string[] };
 
-    expect(saveSeries(signedIn, null)).toEqual({ type: 'unavailable' });
-    expect(saveSeries(signedIn, 'the-ceo-and-i')).toEqual({
+    expect(requestSeriesSave(signedIn, null)).toEqual({ type: 'unavailable' });
+    expect(requestSeriesSave(signedIn, 'the-ceo-and-i')).toEqual({
       type: 'saved',
       seriesId: 'the-ceo-and-i',
     });
     expect(signedIn.savedSeriesIds).toEqual([]);
     expect(
-      saveSeries({ provider: 'google', savedSeriesIds: ['the-ceo-and-i'] }, 'the-ceo-and-i'),
+      requestSeriesSave({ provider: 'google', savedSeriesIds: ['the-ceo-and-i'] }, 'the-ceo-and-i'),
     ).toEqual({ type: 'removed', seriesId: 'the-ceo-and-i' });
   });
 });

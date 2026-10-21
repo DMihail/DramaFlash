@@ -1,7 +1,6 @@
 import { type ImageSourcePropType } from 'react-native';
 
 import avatarHomeHeader from '../../../assets/drama/avatar-home-header.jpg';
-import heroHomeSpotlight from '../../../assets/drama/hero-home-spotlight-verbotene-liebe.jpg';
 import posterAvengingAngel from '../../../assets/drama/poster-avenging-angel.jpg';
 import posterBandOfFate from '../../../assets/drama/poster-band-of-fate.jpg';
 import posterBloodyRoses from '../../../assets/drama/poster-bloody-roses.jpg';
@@ -26,7 +25,6 @@ const posters = {
 
 type PosterId = keyof typeof posters;
 
-export const homeHeroArt: ImageSourcePropType = heroHomeSpotlight;
 export const homeAvatar: ImageSourcePropType = avatarHomeHeader;
 
 function isPosterId(seriesId: string): seriesId is PosterId {

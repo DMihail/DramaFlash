@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 
 import { AppText } from '@/components/AppText';
 import { Screen } from '@/components/Screen';
-import { guestAuth } from '@/domain/auth';
+import { posterArt } from '@/features/home/assets';
 import { HomeCatalog } from '@/features/home/HomeCatalog';
 import { HomeHeader } from '@/features/home/HomeHeader';
 import { HomeHero } from '@/features/home/HomeHero';
@@ -13,20 +13,20 @@ import {
   caughtUpMessage,
   discoverDestination,
   type HomeGenre,
-  homeHero,
+  homeSpotlight,
   loginDestination,
   profileDestination,
-  saveSeries,
+  requestSeriesSave,
   searchDestination,
   seriesDestination,
-  spotlightMessage,
-  watchNowDestination,
 } from '@/features/home/model';
+import { holdLoginTicket } from '@/navigation/pendingLogin';
 import { colors, radius, space } from '@/theme/tokens';
 
 export function HomeScreen() {
   const [genre, setGenre] = useState<HomeGenre>('All');
   const [notice, setNotice] = useState<string | null>(null);
+  const spotlight = homeSpotlight();
 
   useEffect(() => {
     if (!notice) {
@@ -45,23 +45,23 @@ export function HomeScreen() {
           onProfile={() => router.navigate(profileDestination())}
           onSearch={() => router.navigate(searchDestination())}
         />
-        <HomeHero
-          onSave={() => {
-            const result = saveSeries(guestAuth(), homeHero.seriesId);
-            if (result.type === 'login') {
-              router.push(loginDestination());
-            }
-          }}
-          onWatch={() => {
-            const destination = watchNowDestination(homeHero.seriesId);
-            if (!destination) {
-              setNotice(spotlightMessage);
-              return;
-            }
+        {spotlight ? (
+          <HomeHero
+            episodeLabel={spotlight.episodeLabel}
+            image={posterArt(spotlight.seriesId)}
+            onSave={() => {
+              const result = requestSeriesSave(null, spotlight.seriesId);
+              if (result.type !== 'login') {
+                return;
+              }
 
-            router.push(destination);
-          }}
-        />
+              holdLoginTicket(result.ticket);
+              router.push(loginDestination());
+            }}
+            onWatch={() => router.push(seriesDestination(spotlight.seriesId))}
+            title={spotlight.title}
+          />
+        ) : null}
         <HomeCatalog
           genre={genre}
           onGenreChange={setGenre}

@@ -1,58 +1,51 @@
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, type ImageSourcePropType, StyleSheet, View } from 'react-native';
 
-import { Play, Plus, Star } from 'lucide-react-native';
+import { Play, Plus } from 'lucide-react-native';
 
 import { AppText } from '@/components/AppText';
 import { IconButton } from '@/components/IconButton';
 import { PrimaryButton } from '@/components/PrimaryButton';
-import { homeHeroArt } from '@/features/home/assets';
-import { homeHero } from '@/features/home/model';
-import { colors, iconSize, iconStroke, layout, radius, space } from '@/theme/tokens';
+import { colors, layout, radius, space } from '@/theme/tokens';
 
-export function HomeHero({ onSave, onWatch }: { onSave: () => void; onWatch: () => void }) {
+export function HomeHero({
+  episodeLabel,
+  image,
+  onSave,
+  onWatch,
+  title,
+}: {
+  episodeLabel: string;
+  image: ImageSourcePropType | undefined;
+  onSave: () => void;
+  onWatch: () => void;
+  title: string;
+}) {
   return (
     <View style={styles.hero}>
-      <Image
-        accessibilityIgnoresInvertColors
-        accessibilityLabel="Forbidden Love spotlight artwork"
-        resizeMode="cover"
-        source={homeHeroArt}
-        style={styles.art}
-      />
+      {image ? (
+        <Image
+          accessibilityIgnoresInvertColors
+          accessibilityLabel={`${title} artwork`}
+          resizeMode="cover"
+          source={image}
+          style={styles.art}
+        />
+      ) : null}
       <View pointerEvents="none" style={styles.scrim}>
         <View style={[styles.scrimBand, styles.scrimClear]} />
         <View style={[styles.scrimBand, styles.scrimMid]} />
         <View style={[styles.scrimBand, styles.scrimDeep]} />
       </View>
       <View style={styles.copy}>
-        <View style={styles.tags}>
-          <View style={styles.spotlight}>
-            <AppText role="caption" style={styles.spotlightLabel}>
-              Spotlight
-            </AppText>
-          </View>
-          {homeHero.tags.map((tag) => (
-            <AppText key={tag} role="bodySmall" style={styles.tag}>
-              {tag}
-            </AppText>
-          ))}
+        <View style={styles.spotlight}>
+          <AppText role="caption" style={styles.spotlightLabel}>
+            Spotlight
+          </AppText>
         </View>
-        <AppText role="displayXL">{homeHero.title}</AppText>
-        <AppText role="bodySmall" style={styles.tagline}>
-          {homeHero.tagline}
+        <AppText role="displayXL">{title}</AppText>
+        <AppText role="bodySmall" style={styles.metaText}>
+          {episodeLabel}
         </AppText>
-        <View style={styles.meta}>
-          <Star color={colors.textOnMedia} size={iconSize.header} strokeWidth={iconStroke} />
-          <AppText role="bodySmall" style={styles.metaText}>
-            {homeHero.ratingLabel}
-          </AppText>
-          <AppText role="bodySmall" style={styles.metaText}>
-            ·
-          </AppText>
-          <AppText role="bodySmall" style={styles.metaText}>
-            {homeHero.episodeLabel}
-          </AppText>
-        </View>
         <View style={styles.actions}>
           <View style={styles.watch}>
             <PrimaryButton fill icon={Play} label="Watch now" onPress={onWatch} />
@@ -105,13 +98,8 @@ const styles = StyleSheet.create({
     paddingBottom: space[20],
     gap: space[8],
   },
-  tags: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    gap: space[8],
-  },
   spotlight: {
+    alignSelf: 'flex-start',
     minHeight: 22,
     borderRadius: radius.lg,
     paddingHorizontal: space[8],
@@ -124,17 +112,6 @@ const styles = StyleSheet.create({
   spotlightLabel: {
     color: colors.accent,
     fontWeight: '700',
-  },
-  tag: {
-    color: colors.textOnMedia,
-  },
-  tagline: {
-    color: colors.textOnMedia,
-  },
-  meta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space[4],
   },
   metaText: {
     color: colors.textOnMedia,
