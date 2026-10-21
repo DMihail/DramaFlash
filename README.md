@@ -23,6 +23,8 @@ npm ci
 
 `npm ci` installs the lockfile exactly. `.npmrc` sets `engine-strict=true`, so npm refuses a Node.js or npm version outside the range in `package.json`.
 
+Node.js `22.22.0` bundles npm `10.9.4`. EAS Build can set the Node.js version and enable Corepack, but it has no npm version field, and `corepack enable` does not replace the npm binary that ships with Node. The `eas-build-pre-install` script installs npm `11.19.0` before EAS runs `npm ci`. GitHub Actions runs that same script. `engine-strict` stays enabled.
+
 Copy `.env.example` to `.env.local` when you need machine-local public configuration. `.env.local` is gitignored. Do not put credentials in `EXPO_PUBLIC_` variables; those values are embedded in the app. Create EAS secrets with `eas env:create` after the project is linked.
 
 ## Scripts
@@ -85,6 +87,14 @@ npx eas-cli@latest build --platform all --profile production
 ```
 
 iOS device and production builds need an Apple Developer account. Android production builds need a Google Play signing key, which EAS can generate and store. After a native config or native dependency change, create a new development build. JavaScript-only changes use `npm run start`.
+
+After this npm pin is on the branch you build, confirm the Android development build gets past dependency installation:
+
+```bash
+npx eas-cli@latest build --platform android --profile development
+```
+
+In the build log, `eas-build-pre-install` should install npm `11.19.0`, and the following `npm ci` should finish without `EBADENGINE`.
 
 ## Tests
 
