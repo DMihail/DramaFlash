@@ -35,7 +35,7 @@ appId: com.dramaflash.app.dev
 - assertVisible:
     id: player.locked
 - assertVisible:
-    text: 10 coins
+    text: "Episode 4 is locked. It costs 10 coins. Opening unlock does not charge coins."
 - assertVisible:
     id: player.unlock
 - assertNotVisible:

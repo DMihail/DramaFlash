@@ -50,4 +50,13 @@ describe('maestro flows', () => {
       }
     }
   });
+
+  test('asserts the locked player message instead of the series coin label', () => {
+    const source = readFileSync(path.join(flowDirectory, 'locked-episode.yaml'), 'utf8');
+    const playerMessage =
+      'Episode 4 is locked. It costs 10 coins. Opening unlock does not charge coins.';
+
+    expect(source).toContain(playerMessage);
+    expect(source).not.toMatch(/^\s*text:\s*10 coins\s*$/m);
+  });
 });
