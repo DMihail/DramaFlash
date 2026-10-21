@@ -28,6 +28,7 @@ import {
   unavailableMediaMessage,
 } from '@/features/player/model';
 import { type EpisodeAccess } from '@/features/series/model';
+import { testIds } from '@/testing/testIds';
 import {
   colors,
   control,
@@ -120,14 +121,14 @@ export function PlayerStage({
           accessibilityLabel="Go back"
           icon={ChevronLeft}
           onPress={onBack}
-          testID="player.back"
+          testID={testIds.player.back}
         />
         <AppText role="titleS">DramaFlash</AppText>
         <IconButton
           accessibilityLabel="Episodes"
           icon={ListVideo}
           onPress={onEpisodes}
-          testID="player.episodes"
+          testID={testIds.player.episodes}
         />
       </View>
       {locked ? (
@@ -135,7 +136,7 @@ export function PlayerStage({
           accessibilityRole="button"
           onPress={onUnlock}
           style={styles.lockCard}
-          testID="player.locked"
+          testID={testIds.player.locked}
         >
           <Lock color={colors.coin} size={iconSize.button} strokeWidth={iconStroke} />
           <AppText role="titleS">{`Unlock Episode ${episode}`}</AppText>
@@ -151,27 +152,27 @@ export function PlayerStage({
             icon={Heart}
             label="Save"
             onPress={onSave}
-            testID="player.save"
+            testID={testIds.player.save}
           />
           <SideAction
             accessibilityLabel="Comments"
             icon={MessageCircle}
             label="Comments"
             onPress={onComments}
-            testID="player.comments"
+            testID={testIds.player.comments}
           />
           <SideAction
             accessibilityLabel="Share episode"
             icon={Share2}
             label="Share"
             onPress={onShare}
-            testID="player.share"
+            testID={testIds.player.share}
           />
         </View>
         <AppText accessibilityRole="header" role="displayM">
           {title}
         </AppText>
-        <AppText role="bodySmall" testID="player.episode">
+        <AppText role="bodySmall" testID={testIds.player.episode}>
           {`Episode ${episode}`}
         </AppText>
         <AppText accessibilityLiveRegion="polite" role="bodySmall">
@@ -182,7 +183,7 @@ export function PlayerStage({
             icon={Lock}
             label="Unlock"
             onPress={onUnlock}
-            testID="player.unlock"
+            testID={testIds.player.unlock}
             variant="player"
           />
         ) : null}
@@ -191,7 +192,7 @@ export function PlayerStage({
             icon={playing ? Pause : Play}
             label={playing ? 'Pause' : 'Watch'}
             onPress={handleTogglePlayback}
-            testID={playing ? 'player.pause' : 'player.play'}
+            testID={playing ? testIds.player.pause : testIds.player.play}
             variant="player"
           />
         ) : null}
@@ -202,7 +203,7 @@ export function PlayerStage({
             icon={ChevronLeft}
             label="Previous"
             onPress={onPrevious}
-            testID="player.previous"
+            testID={testIds.player.previous}
           />
           <TransportButton
             accessibilityLabel={
@@ -212,7 +213,7 @@ export function PlayerStage({
             icon={ChevronRight}
             label="Next"
             onPress={onNext}
-            testID="player.next"
+            testID={testIds.player.next}
           />
         </View>
       </View>

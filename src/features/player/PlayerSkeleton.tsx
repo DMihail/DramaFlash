@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 
 import { Skeleton } from '@/components/Skeleton';
+import { testIds } from '@/testing/testIds';
 import { layout, space } from '@/theme/tokens';
 
 export function PlayerSkeleton() {
@@ -9,7 +10,7 @@ export function PlayerSkeleton() {
       accessibilityLabel="Loading episode"
       accessibilityState={{ busy: true }}
       accessible
-      testID="player.loading"
+      testID={testIds.player.loading}
     >
       <Skeleton height={640} radius={0} width="100%" />
       <View style={styles.copy}>

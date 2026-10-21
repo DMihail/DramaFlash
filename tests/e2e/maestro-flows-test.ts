@@ -1,20 +1,37 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
+import { testIds } from '@/testing/testIds';
+
 const flowDirectory = path.join(__dirname, 'maestro');
 
 const flows = [
   {
     file: 'home-to-series.yaml',
-    ids: ['home.screen', 'home.poster.the-ceo-and-i', 'series.screen', 'series.title'],
+    ids: [
+      testIds.home.screen,
+      testIds.home.poster('the-ceo-and-i'),
+      testIds.series.screen,
+      testIds.series.title,
+    ],
   },
   {
     file: 'episode-navigation.yaml',
-    ids: ['series.episode.1', 'player.screen', 'player.episode', 'player.next'],
+    ids: [
+      testIds.series.episode(1),
+      testIds.player.screen,
+      testIds.player.episode,
+      testIds.player.next,
+    ],
   },
   {
     file: 'locked-episode.yaml',
-    ids: ['series.episode.4', 'player.locked', 'player.unlock', 'player.play'],
+    ids: [
+      testIds.series.episode(4),
+      testIds.player.locked,
+      testIds.player.unlock,
+      testIds.player.play,
+    ],
   },
 ] as const;
 

@@ -13,6 +13,7 @@ import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
 import { Skeleton } from '@/components/Skeleton';
 import { Placeholder } from '@/navigation/placeholder';
+import { testIds } from '@/testing/testIds';
 
 jest.mock('lucide-react-native', () => {
   const Icon = () => null;
@@ -56,24 +57,32 @@ describe('shared test IDs', () => {
     await act(async () => {
       renderer = TestRenderer.create(
         <SafeAreaProvider initialMetrics={metrics}>
-          <Screen safeArea="tabs" testID="home.screen">
-            <PrimaryButton label="Watch now" testID="home.watchNow" />
-            <IconButton accessibilityLabel="Add to library" icon={Heart} testID="home.save" />
-            <GenreChip label="Romance" onPress={() => undefined} testID="home.genre.romance" />
+          <Screen safeArea="tabs" testID={testIds.home.screen}>
+            <PrimaryButton label="Watch now" testID={testIds.home.watchNow} />
+            <IconButton
+              accessibilityLabel="Add to library"
+              icon={Heart}
+              testID={testIds.home.save}
+            />
+            <GenreChip
+              label="Romance"
+              onPress={() => undefined}
+              testID={testIds.home.genre('Romance')}
+            />
             <SectionHeader
               actionLabel="See all"
               onActionPress={() => undefined}
-              testID="home.seeAll.trending-romance"
+              testID={testIds.home.seeAll('trending-romance')}
               title="Trending Romance"
             />
             <PosterCard
               onPress={() => undefined}
-              testID="home.poster.the-ceo-and-i"
+              testID={testIds.home.poster('the-ceo-and-i')}
               title="The CEO and I"
             />
-            <PosterCard testID="series.recommendation.band-of-fate" title="Band of Fate" />
-            <Skeleton height={16} testID="player.loading" width={80} />
-            <Placeholder safeArea="stack" testID="coins.store" title="Coin store" />
+            <PosterCard testID={testIds.series.episode(2)} title="Band of Fate" />
+            <Skeleton height={16} testID={testIds.player.loading} width={80} />
+            <Placeholder safeArea="stack" testID={testIds.coins.store} title="Coin store" />
           </Screen>
         </SafeAreaProvider>,
       );
@@ -85,16 +94,16 @@ describe('shared test IDs', () => {
       throw new Error('expected a screen');
     }
 
-    const watch = hosts(screen, 'home.watchNow')[0];
-    const save = hosts(screen, 'home.save')[0];
-    const genre = hosts(screen, 'home.genre.romance')[0];
-    const seeAll = hosts(screen, 'home.seeAll.trending-romance')[0];
-    const poster = hosts(screen, 'home.poster.the-ceo-and-i')[0];
-    const staticPoster = hosts(screen, 'series.recommendation.band-of-fate')[0];
+    const watch = hosts(screen, testIds.home.watchNow)[0];
+    const save = hosts(screen, testIds.home.save)[0];
+    const genre = hosts(screen, testIds.home.genre('Romance'))[0];
+    const seeAll = hosts(screen, testIds.home.seeAll('trending-romance'))[0];
+    const poster = hosts(screen, testIds.home.poster('the-ceo-and-i'))[0];
+    const staticPoster = hosts(screen, testIds.series.episode(2))[0];
 
-    expect(hosts(screen, 'home.screen')).toHaveLength(1);
-    expect(hosts(screen, 'coins.store')).toHaveLength(1);
-    expect(hosts(screen, 'player.loading')).toHaveLength(1);
+    expect(hosts(screen, testIds.home.screen)).toHaveLength(1);
+    expect(hosts(screen, testIds.coins.store)).toHaveLength(1);
+    expect(hosts(screen, testIds.player.loading)).toHaveLength(1);
     expect(watch?.props.accessibilityLabel).toBe('Watch now');
     expect(watch?.props.accessibilityRole).toBe('button');
     expect(save?.props.accessibilityLabel).toBe('Add to library');
@@ -132,7 +141,7 @@ describe('shared test IDs', () => {
       throw new Error('expected the coin store');
     }
 
-    expect(hosts(screen, 'coins.store')).toHaveLength(1);
+    expect(hosts(screen, testIds.coins.store)).toHaveLength(1);
     expect(
       screen.root.findAll((node) => node.props.children === 'Coin store').length,
     ).toBeGreaterThan(0);

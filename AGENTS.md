@@ -161,6 +161,8 @@ All application tests must be located in the root tests/ directory. Do not place
 
 Use stable testID props for important interactive elements and UI states. Keep test IDs consistent, unique, and independent of visible text. Preserve accessibility labels. Put all unit, component, and E2E tests under the root tests/ directory. Prefer user-facing interaction tests and maintain a small set of reliable Maestro flows for critical navigation paths. Do not claim E2E verification without executing the flows on a real simulator or emulator.
 
+All React Native testID values must be defined in src/testing/testIds.ts. Components and TypeScript tests must import identifiers from this registry. Dynamic test IDs must use typed factory functions. Never hardcode testID strings inside screen or component JSX. Maestro YAML selectors must stay synchronized with the registry.
+
 Maestro flows live in `tests/e2e/maestro` and use the development app id `com.dramaflash.app.dev`. Jest only collects TypeScript tests, so the YAML flows stay out of `npm test`. Run `npm run e2e` on a booted iOS simulator or Android emulator with the development build open and Metro running. Do not point these flows at the production app id. GitHub CI does not run Maestro, because that job has no emulator. EAS Workflows can run Maestro later. Leave that optional.
 
 ## Commands

@@ -31,6 +31,7 @@ import { PlayerStage } from '@/features/player/PlayerStage';
 import { type PlayerLoader, usePlayerEpisode } from '@/features/player/usePlayerEpisode';
 import { seriesNotFoundTitle, sharingUnavailableMessage } from '@/features/series/model';
 import { holdLoginTicket } from '@/navigation/pendingLogin';
+import { testIds } from '@/testing/testIds';
 import { colors, layout, radius, space } from '@/theme/tokens';
 
 export function PlayerScreen({
@@ -87,7 +88,7 @@ export function PlayerScreen({
             accessibilityLabel="Go back"
             icon={ChevronLeft}
             onPress={handleBack}
-            testID="player.back"
+            testID={testIds.player.back}
           />
         </View>
       </Screen>
@@ -100,7 +101,7 @@ export function PlayerScreen({
         bottomInset={insets.bottom}
         onBack={handleBack}
         onRetry={handleRetry}
-        testID="player.error"
+        testID={testIds.player.error}
         title={playerErrorMessage}
         topInset={insets.top}
       />
@@ -180,7 +181,7 @@ export function PlayerScreen({
   };
 
   return (
-    <Screen safeArea="full" testID="player.screen">
+    <Screen safeArea="full" testID={testIds.player.screen}>
       <PlayerStage
         access={access}
         bottomInset={insets.bottom}
@@ -238,7 +239,7 @@ function PlayerMessage({
           accessibilityLabel="Go back"
           icon={ChevronLeft}
           onPress={onBack}
-          testID="player.back"
+          testID={testIds.player.back}
         />
       </View>
       <View style={[styles.statusBody, { paddingBottom: bottomInset }]}>
@@ -250,7 +251,9 @@ function PlayerMessage({
             {detail}
           </AppText>
         ) : null}
-        {onRetry ? <PrimaryButton label="Retry" onPress={onRetry} testID="player.retry" /> : null}
+        {onRetry ? (
+          <PrimaryButton label="Retry" onPress={onRetry} testID={testIds.player.retry} />
+        ) : null}
       </View>
     </Screen>
   );

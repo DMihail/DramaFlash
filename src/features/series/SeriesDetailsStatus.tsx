@@ -7,6 +7,7 @@ import { IconButton } from '@/components/IconButton';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
 import { SeriesDetailsSkeleton } from '@/features/series/SeriesDetailsSkeleton';
+import { testIds } from '@/testing/testIds';
 import { layout, space } from '@/theme/tokens';
 
 export function SeriesDetailsLoading({
@@ -24,7 +25,7 @@ export function SeriesDetailsLoading({
           accessibilityLabel="Go back"
           icon={ChevronLeft}
           onPress={onBack}
-          testID="series.back"
+          testID={testIds.series.back}
         />
       </View>
     </Screen>
@@ -51,7 +52,7 @@ export function SeriesDetailsMessage({
           accessibilityLabel="Go back"
           icon={ChevronLeft}
           onPress={onBack}
-          testID="series.back"
+          testID={testIds.series.back}
         />
       </View>
       <View style={styles.statusBody}>
@@ -63,7 +64,9 @@ export function SeriesDetailsMessage({
             {detail}
           </AppText>
         ) : null}
-        {onRetry ? <PrimaryButton label="Retry" onPress={onRetry} testID="series.retry" /> : null}
+        {onRetry ? (
+          <PrimaryButton label="Retry" onPress={onRetry} testID={testIds.series.retry} />
+        ) : null}
       </View>
     </Screen>
   );

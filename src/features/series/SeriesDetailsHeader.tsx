@@ -8,6 +8,7 @@ import { AppText } from '@/components/AppText';
 import { IconButton } from '@/components/IconButton';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { episodeCountLabel } from '@/features/series/model';
+import { testIds } from '@/testing/testIds';
 import { colors, control, gradient, iconSize, iconStroke, layout, space } from '@/theme/tokens';
 
 export function SeriesDetailsHeader({
@@ -66,26 +67,26 @@ export function SeriesDetailsHeader({
             accessibilityLabel="Go back"
             icon={ChevronLeft}
             onPress={onBack}
-            testID="series.back"
+            testID={testIds.series.back}
           />
           <View style={styles.heroActions}>
             <IconButton
               accessibilityLabel="Share series"
               icon={Share2}
               onPress={onShare}
-              testID="series.share"
+              testID={testIds.series.share}
             />
             <IconButton
               accessibilityLabel="Save series"
               icon={Heart}
               onPress={onSave}
-              testID="series.save"
+              testID={testIds.series.save}
             />
           </View>
         </View>
       </View>
       <View style={styles.copy}>
-        <AppText accessibilityRole="header" role="displayL" testID="series.title">
+        <AppText accessibilityRole="header" role="displayL" testID={testIds.series.title}>
           {title}
         </AppText>
         <AppText role="bodySmall">{episodeCountLabel(episodeCount)}</AppText>
@@ -95,7 +96,7 @@ export function SeriesDetailsHeader({
             icon={Play}
             label="Play Ep 1"
             onPress={onPlay}
-            testID="series.play"
+            testID={testIds.series.play}
             variant="player"
           />
         ) : null}
@@ -111,7 +112,7 @@ export function SeriesDetailsHeader({
             accessibilityRole="button"
             onPress={onSort}
             style={styles.sortButton}
-            testID="series.sort"
+            testID={testIds.series.sort}
           >
             <ArrowUpDown color={colors.primary} size={iconSize.header} strokeWidth={iconStroke} />
             <AppText color="primary" role="caption">

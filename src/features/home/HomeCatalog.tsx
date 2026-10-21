@@ -13,6 +13,7 @@ import {
   postersFor,
   visibleRails,
 } from '@/features/home/model';
+import { testIds } from '@/testing/testIds';
 import { colors, layout, space } from '@/theme/tokens';
 
 export function HomeCatalog({
@@ -42,7 +43,7 @@ export function HomeCatalog({
             label={item}
             onPress={() => onGenreChange(item)}
             selected={item === genre}
-            testID={`home.genre.${item.toLowerCase()}`}
+            testID={testIds.home.genre(item)}
           />
         ))}
       </ScrollView>
@@ -64,7 +65,7 @@ export function HomeCatalog({
             <SectionHeader
               actionLabel="See all"
               onActionPress={() => onSeeAll(rail.title)}
-              testID={`home.seeAll.${rail.id}`}
+              testID={testIds.home.seeAll(rail.id)}
               title={rail.title}
             />
             <ScrollView
@@ -81,7 +82,7 @@ export function HomeCatalog({
                   <PosterCard
                     key={poster.id}
                     onPress={() => onOpenSeries(poster.id)}
-                    testID={`home.poster.${poster.id}`}
+                    testID={testIds.home.poster(poster.id)}
                     title={poster.title}
                     variant="rail"
                     {...(image ? { image } : {})}

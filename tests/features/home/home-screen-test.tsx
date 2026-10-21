@@ -5,6 +5,7 @@ import TestRenderer, { act } from 'react-test-renderer';
 
 import { HomeScreen } from '@/features/home/HomeScreen';
 import { emptyCategoryMessage } from '@/features/home/model';
+import { testIds } from '@/testing/testIds';
 
 const mockRouter = {
   navigate: jest.fn(),
@@ -133,39 +134,39 @@ describe('home screen', () => {
     const ids = ownedTestIds(screen);
     const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index);
     expect(duplicates).toEqual([]);
-    expect(hasTestId(screen, 'home.screen')).toBe(true);
-    expect(hasTestId(screen, 'home.watchNow')).toBe(true);
-    expect(hasTestId(screen, 'home.poster.the-ceo-and-i')).toBe(true);
-    expect(hasTestId(screen, 'home.genre.romance')).toBe(true);
-    expect(hasTestId(screen, 'home.seeAll.trending-romance')).toBe(true);
-    expect(hasTestId(screen, 'home.search')).toBe(true);
+    expect(hasTestId(screen, testIds.home.screen)).toBe(true);
+    expect(hasTestId(screen, testIds.home.watchNow)).toBe(true);
+    expect(hasTestId(screen, testIds.home.poster('the-ceo-and-i'))).toBe(true);
+    expect(hasTestId(screen, testIds.home.genre('Romance'))).toBe(true);
+    expect(hasTestId(screen, testIds.home.seeAll('trending-romance'))).toBe(true);
+    expect(hasTestId(screen, testIds.home.search)).toBe(true);
 
-    const poster = host(screen, 'home.poster.the-ceo-and-i');
-    const watch = host(screen, 'home.watchNow');
-    const romance = host(screen, 'home.genre.romance');
+    const poster = host(screen, testIds.home.poster('the-ceo-and-i'));
+    const watch = host(screen, testIds.home.watchNow);
+    const romance = host(screen, testIds.home.genre('Romance'));
     expect(poster.props.accessibilityLabel).toBe('The CEO and I');
     expect(watch.props.accessibilityLabel).toBe('Watch now');
     expect(romance.props.accessibilityLabel).toBe('Romance');
 
     await act(async () => {
-      pressTestId(screen, 'home.watchNow')();
+      pressTestId(screen, testIds.home.watchNow)();
     });
 
     expect(mockRouter.push).toHaveBeenCalledWith(seriesRoute);
 
     await act(async () => {
-      pressTestId(screen, 'home.poster.the-ceo-and-i')();
+      pressTestId(screen, testIds.home.poster('the-ceo-and-i'))();
     });
 
     expect(mockRouter.push).toHaveBeenCalledTimes(2);
     expect(mockRouter.push).toHaveBeenLastCalledWith(seriesRoute);
 
     await act(async () => {
-      pressTestId(screen, 'home.genre.mystery')();
+      pressTestId(screen, testIds.home.genre('Mystery'))();
     });
 
     expect(textOf(screen)).toContain(emptyCategoryMessage);
-    expect(hasTestId(screen, 'home.poster.the-ceo-and-i')).toBe(false);
-    expect(hasTestId(screen, 'home.screen')).toBe(true);
+    expect(hasTestId(screen, testIds.home.poster('the-ceo-and-i'))).toBe(false);
+    expect(hasTestId(screen, testIds.home.screen)).toBe(true);
   });
 });

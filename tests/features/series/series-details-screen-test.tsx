@@ -11,6 +11,7 @@ import {
 } from '@/api/series';
 import { seriesErrorMessage } from '@/features/series/model';
 import { SeriesDetailsScreen } from '@/features/series/SeriesDetailsScreen';
+import { testIds } from '@/testing/testIds';
 
 jest.mock('lucide-react-native', () => {
   const Icon = () => null;
@@ -144,8 +145,8 @@ describe('series details screen', () => {
     expect(renderer).toBeDefined();
     const screen = renderer as TestRenderer.ReactTestRenderer;
     expect(hasLabel(screen, 'Loading series')).toBe(true);
-    expect(hasTestId(screen, 'series.loading')).toBe(true);
-    expect(hasTestId(screen, 'series.screen')).toBe(false);
+    expect(hasTestId(screen, testIds.series.loading)).toBe(true);
+    expect(hasTestId(screen, testIds.series.screen)).toBe(false);
     expect(textOf(screen)).not.toContain('The CEO and I');
   });
 
@@ -170,8 +171,8 @@ describe('series details screen', () => {
 
     const screen = renderer as TestRenderer.ReactTestRenderer;
     expect(textOf(screen)).toContain(seriesErrorMessage);
-    expect(hasTestId(screen, 'series.retry')).toBe(true);
-    expect(hasTestId(screen, 'series.screen')).toBe(false);
+    expect(hasTestId(screen, testIds.series.retry)).toBe(true);
+    expect(hasTestId(screen, testIds.series.screen)).toBe(false);
     expect(hasLabel(screen, 'Go back')).toBe(true);
 
     const onRetry = readPress(screen.root.findAll((node) => isRetryButton(node))[0]);
@@ -185,18 +186,18 @@ describe('series details screen', () => {
 
     expect(textOf(screen)).toContain('The CEO and I');
     expect(textOf(screen)).toContain('50 episodes');
-    expect(hasTestId(screen, 'series.screen')).toBe(true);
-    expect(hasTestId(screen, 'series.title')).toBe(true);
-    expect(hasTestId(screen, 'series.loading')).toBe(false);
-    expect(hasTestId(screen, 'series.retry')).toBe(false);
-    expect(hasTestId(screen, 'series.episode.1')).toBe(true);
-    expect(hasTestId(screen, 'series.episode.4')).toBe(true);
+    expect(hasTestId(screen, testIds.series.screen)).toBe(true);
+    expect(hasTestId(screen, testIds.series.title)).toBe(true);
+    expect(hasTestId(screen, testIds.series.loading)).toBe(false);
+    expect(hasTestId(screen, testIds.series.retry)).toBe(false);
+    expect(hasTestId(screen, testIds.series.episode(1))).toBe(true);
+    expect(hasTestId(screen, testIds.series.episode(4))).toBe(true);
     expect(hasLabel(screen, 'Episode 1, free')).toBe(true);
     expect(hasLabel(screen, 'Episode 4, locked, 10 coins')).toBe(true);
     expect(new Set(ownedTestIds(screen)).size).toBe(ownedTestIds(screen).length);
 
     await act(async () => {
-      pressTestId(screen, 'series.episode.4')();
+      pressTestId(screen, testIds.series.episode(4))();
     });
 
     expect(mockRouter.push).toHaveBeenCalledWith({
