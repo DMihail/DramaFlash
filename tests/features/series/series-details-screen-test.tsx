@@ -1,4 +1,5 @@
 import { type ReactElement } from 'react';
+import { Animated } from 'react-native';
 
 import { type Metrics, SafeAreaProvider } from 'react-native-safe-area-context';
 import TestRenderer, { act } from 'react-test-renderer';
@@ -78,6 +79,18 @@ function hasLabel(renderer: TestRenderer.ReactTestRenderer, label: string): bool
 }
 
 describe('series details screen', () => {
+  beforeEach(() => {
+    jest.spyOn(Animated, 'loop').mockReturnValue({
+      start: jest.fn(),
+      stop: jest.fn(),
+      reset: jest.fn(),
+    });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   test('shows the loading skeleton while the request is open', async () => {
     const load = () => new Promise<SeriesDetailsResult>(() => undefined);
     let renderer: TestRenderer.ReactTestRenderer | undefined;
