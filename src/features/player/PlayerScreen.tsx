@@ -31,6 +31,7 @@ import { PlayerStage } from '@/features/player/PlayerStage';
 import { type PlayerLoader, usePlayerEpisode } from '@/features/player/usePlayerEpisode';
 import { seriesNotFoundTitle, sharingUnavailableMessage } from '@/features/series/model';
 import { holdLoginTicket } from '@/navigation/pendingLogin';
+import { testIds } from '@/testing/testIds';
 import { colors, layout, radius, space } from '@/theme/tokens';
 
 export function PlayerScreen({
@@ -83,7 +84,12 @@ export function PlayerScreen({
       <Screen safeArea="full">
         <PlayerSkeleton />
         <View style={[styles.overlayBack, { top: insets.top + space.sm }]}>
-          <IconButton accessibilityLabel="Go back" icon={ChevronLeft} onPress={handleBack} />
+          <IconButton
+            accessibilityLabel="Go back"
+            icon={ChevronLeft}
+            onPress={handleBack}
+            testID={testIds.player.back}
+          />
         </View>
       </Screen>
     );
@@ -95,6 +101,7 @@ export function PlayerScreen({
         bottomInset={insets.bottom}
         onBack={handleBack}
         onRetry={handleRetry}
+        testID={testIds.player.error}
         title={playerErrorMessage}
         topInset={insets.top}
       />
@@ -174,7 +181,7 @@ export function PlayerScreen({
   };
 
   return (
-    <Screen safeArea="full">
+    <Screen safeArea="full" testID={testIds.player.screen}>
       <PlayerStage
         access={access}
         bottomInset={insets.bottom}
@@ -213,6 +220,7 @@ function PlayerMessage({
   detail,
   onBack,
   onRetry,
+  testID,
   title,
   topInset,
 }: {
@@ -220,13 +228,19 @@ function PlayerMessage({
   detail?: string;
   onBack: () => void;
   onRetry?: () => void;
+  testID?: string;
   title: string;
   topInset: number;
 }) {
   return (
-    <Screen safeArea="full">
+    <Screen safeArea="full" {...(testID ? { testID } : {})}>
       <View style={[styles.statusBar, { paddingTop: topInset + space.sm }]}>
-        <IconButton accessibilityLabel="Go back" icon={ChevronLeft} onPress={onBack} />
+        <IconButton
+          accessibilityLabel="Go back"
+          icon={ChevronLeft}
+          onPress={onBack}
+          testID={testIds.player.back}
+        />
       </View>
       <View style={[styles.statusBody, { paddingBottom: bottomInset }]}>
         <AppText role="displayM" style={styles.center}>
@@ -237,7 +251,9 @@ function PlayerMessage({
             {detail}
           </AppText>
         ) : null}
-        {onRetry ? <PrimaryButton label="Retry" onPress={onRetry} /> : null}
+        {onRetry ? (
+          <PrimaryButton label="Retry" onPress={onRetry} testID={testIds.player.retry} />
+        ) : null}
       </View>
     </Screen>
   );

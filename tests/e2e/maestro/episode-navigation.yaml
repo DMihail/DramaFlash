@@ -1,0 +1,47 @@
+appId: com.dramaflash.app.dev
+---
+- launchApp:
+    clearState: false
+- extendedWaitUntil:
+    visible:
+      id: home.screen
+    timeout: 30000
+- scrollUntilVisible:
+    element:
+      id: home.poster.the-ceo-and-i
+    direction: DOWN
+    timeout: 20000
+    visibilityPercentage: 100
+    centerElement: true
+- tapOn:
+    id: home.poster.the-ceo-and-i
+- extendedWaitUntil:
+    visible:
+      id: series.screen
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      id: series.episode.1
+    direction: DOWN
+    timeout: 20000
+    visibilityPercentage: 100
+    centerElement: true
+- tapOn:
+    id: series.episode.1
+- extendedWaitUntil:
+    visible:
+      id: player.screen
+    timeout: 20000
+- assertVisible:
+    id: player.episode
+    text: Episode 1
+- tapOn:
+    id: player.next
+- extendedWaitUntil:
+    visible:
+      id: player.episode
+      text: Episode 2
+    timeout: 20000
+- assertVisible:
+    id: player.episode
+    text: Episode 2

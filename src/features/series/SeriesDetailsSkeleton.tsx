@@ -1,13 +1,19 @@
 import { StyleSheet, View } from 'react-native';
 
 import { Skeleton } from '@/components/Skeleton';
+import { testIds } from '@/testing/testIds';
 import { layout, radius, space } from '@/theme/tokens';
 
 const episodePlaceholders = [0, 1, 2, 3, 4, 5] as const;
 
 export function SeriesDetailsSkeleton() {
   return (
-    <View accessibilityLabel="Loading series" accessibilityState={{ busy: true }} accessible>
+    <View
+      accessibilityLabel="Loading series"
+      accessibilityState={{ busy: true }}
+      accessible
+      testID={testIds.series.loading}
+    >
       <Skeleton height={420} radius={0} width="100%" />
       <View style={styles.copy}>
         <Skeleton height={32} width="72%" />

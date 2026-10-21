@@ -7,6 +7,7 @@ import { Play, Plus } from 'lucide-react-native';
 import { AppText } from '@/components/AppText';
 import { IconButton } from '@/components/IconButton';
 import { PrimaryButton } from '@/components/PrimaryButton';
+import { testIds } from '@/testing/testIds';
 import { colors, gradient, layout, radius, space } from '@/theme/tokens';
 
 export function HomeHero({
@@ -62,9 +63,20 @@ export function HomeHero({
         </AppText>
         <View style={styles.actions}>
           <View style={styles.watch}>
-            <PrimaryButton fill icon={Play} label="Watch now" onPress={onWatch} />
+            <PrimaryButton
+              fill
+              icon={Play}
+              label="Watch now"
+              onPress={onWatch}
+              testID={testIds.home.watchNow}
+            />
           </View>
-          <IconButton accessibilityLabel="Add to library" icon={Plus} onPress={onSave} />
+          <IconButton
+            accessibilityLabel="Add to library"
+            icon={Plus}
+            onPress={onSave}
+            testID={testIds.home.save}
+          />
         </View>
       </View>
     </View>

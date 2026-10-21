@@ -21,6 +21,7 @@ import {
   seriesDestination,
 } from '@/features/home/model';
 import { holdLoginTicket } from '@/navigation/pendingLogin';
+import { testIds } from '@/testing/testIds';
 import { colors, radius, space } from '@/theme/tokens';
 
 export function HomeScreen() {
@@ -76,7 +77,7 @@ export function HomeScreen() {
   };
 
   return (
-    <Screen safeArea="tabs">
+    <Screen safeArea="tabs" testID={testIds.home.screen}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <HomeHeader
           onNotifications={() => setNotice(caughtUpMessage)}

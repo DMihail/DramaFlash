@@ -1,0 +1,44 @@
+appId: com.dramaflash.app.dev
+---
+- launchApp:
+    clearState: false
+- extendedWaitUntil:
+    visible:
+      id: home.screen
+    timeout: 30000
+- scrollUntilVisible:
+    element:
+      id: home.poster.the-ceo-and-i
+    direction: DOWN
+    timeout: 20000
+    visibilityPercentage: 100
+    centerElement: true
+- tapOn:
+    id: home.poster.the-ceo-and-i
+- extendedWaitUntil:
+    visible:
+      id: series.screen
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      id: series.episode.4
+    direction: DOWN
+    timeout: 20000
+    visibilityPercentage: 100
+    centerElement: true
+- tapOn:
+    id: series.episode.4
+- extendedWaitUntil:
+    visible:
+      id: player.screen
+    timeout: 20000
+- assertVisible:
+    id: player.locked
+- assertVisible:
+    text: 'Episode 4 is locked. It costs 10 coins. Opening unlock does not charge coins.'
+- assertVisible:
+    id: player.unlock
+- assertNotVisible:
+    id: player.play
+- assertNotVisible:
+    id: coins.store

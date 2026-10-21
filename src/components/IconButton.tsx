@@ -18,12 +18,14 @@ export function IconButton({
   icon: Icon,
   onPress,
   size = control.icon,
+  testID,
 }: {
   accessibilityLabel: string;
   appearance?: 'plain' | 'surface';
   icon: LucideIcon;
   onPress?: () => void;
   size?: IconButtonSize;
+  testID?: string;
 }) {
   const metrics = iconButtonMetrics(size);
 
@@ -33,6 +35,7 @@ export function IconButton({
       accessibilityRole="button"
       hitSlop={8}
       onPress={onPress}
+      {...(testID ? { testID } : {})}
       style={({ pressed }) => [
         styles.button,
         appearance === 'surface' ? styles.surface : null,

@@ -7,6 +7,7 @@ import { IconButton } from '@/components/IconButton';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
 import { SeriesDetailsSkeleton } from '@/features/series/SeriesDetailsSkeleton';
+import { testIds } from '@/testing/testIds';
 import { layout, space } from '@/theme/tokens';
 
 export function SeriesDetailsLoading({
@@ -20,7 +21,12 @@ export function SeriesDetailsLoading({
     <Screen safeArea="full">
       <SeriesDetailsSkeleton />
       <View style={[styles.overlayBack, { top: topInset + space.sm }]}>
-        <IconButton accessibilityLabel="Go back" icon={ChevronLeft} onPress={onBack} />
+        <IconButton
+          accessibilityLabel="Go back"
+          icon={ChevronLeft}
+          onPress={onBack}
+          testID={testIds.series.back}
+        />
       </View>
     </Screen>
   );
@@ -42,7 +48,12 @@ export function SeriesDetailsMessage({
   return (
     <Screen safeArea="full">
       <View style={[styles.statusBar, { paddingTop: topInset + space.sm }]}>
-        <IconButton accessibilityLabel="Go back" icon={ChevronLeft} onPress={onBack} />
+        <IconButton
+          accessibilityLabel="Go back"
+          icon={ChevronLeft}
+          onPress={onBack}
+          testID={testIds.series.back}
+        />
       </View>
       <View style={styles.statusBody}>
         <AppText role="displayM" style={styles.center}>
@@ -53,7 +64,9 @@ export function SeriesDetailsMessage({
             {detail}
           </AppText>
         ) : null}
-        {onRetry ? <PrimaryButton label="Retry" onPress={onRetry} /> : null}
+        {onRetry ? (
+          <PrimaryButton label="Retry" onPress={onRetry} testID={testIds.series.retry} />
+        ) : null}
       </View>
     </Screen>
   );

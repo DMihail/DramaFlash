@@ -5,6 +5,7 @@ import { Lock, Play } from 'lucide-react-native';
 import { type SeriesEpisode } from '@/api/series';
 import { AppText } from '@/components/AppText';
 import { accessLabel, type EpisodeAccess, episodeActionLabel } from '@/features/series/model';
+import { testIds } from '@/testing/testIds';
 import { colors, control, iconSize, iconStroke, layout, radius, space } from '@/theme/tokens';
 
 export function SeriesEpisodeRow({
@@ -31,6 +32,7 @@ export function SeriesEpisodeRow({
       accessibilityRole="button"
       onPress={handlePress}
       style={styles.episodeRow}
+      testID={testIds.series.episode(episode.number)}
     >
       <View style={[styles.episodeBadge, access === 'locked' ? styles.episodeLocked : null]}>
         {access === 'locked' ? (

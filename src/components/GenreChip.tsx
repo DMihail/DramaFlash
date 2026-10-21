@@ -13,18 +13,22 @@ export function GenreChip({
   label,
   selected = false,
   onPress,
+  testID,
 }: {
   label: string;
   selected?: boolean;
   onPress?: () => void;
+  testID?: string;
 }) {
   const palette = chipColors(selected);
 
   return (
     <Pressable
+      accessibilityLabel={label}
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onPress}
+      {...(testID ? { testID } : {})}
       style={({ pressed }) => [
         styles.chip,
         { backgroundColor: palette.backgroundColor },

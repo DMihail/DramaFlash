@@ -34,6 +34,7 @@ import { SeriesDetailsLoading, SeriesDetailsMessage } from '@/features/series/Se
 import { SeriesEpisodeRow } from '@/features/series/SeriesEpisodeRow';
 import { type SeriesDetailsLoader, useSeriesDetails } from '@/features/series/useSeriesDetails';
 import { holdLoginTicket } from '@/navigation/pendingLogin';
+import { testIds } from '@/testing/testIds';
 import { colors, layout, radius, space } from '@/theme/tokens';
 
 // wallet and auth stay optional until the app has one shared store.
@@ -182,7 +183,7 @@ export function SeriesDetailsScreen({
   const sortLabel = sort === 'asc' ? 'Sort episodes, oldest first' : 'Sort episodes, newest first';
 
   return (
-    <Screen safeArea="full">
+    <Screen safeArea="full" testID={testIds.series.screen}>
       <FlatList
         contentContainerStyle={{ paddingBottom: insets.bottom + space.xxxl }}
         data={rows}

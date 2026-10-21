@@ -5,6 +5,7 @@ import { Bell, Heart, Search } from 'lucide-react-native';
 import { AppText } from '@/components/AppText';
 import { IconButton } from '@/components/IconButton';
 import { homeAvatar } from '@/features/home/assets';
+import { testIds } from '@/testing/testIds';
 import { colors, control, iconStroke, pressOpacity, radius, space } from '@/theme/tokens';
 
 export function HomeHeader({
@@ -36,6 +37,7 @@ export function HomeHeader({
           icon={Search}
           onPress={onSearch}
           size={control.iconHeader}
+          testID={testIds.home.search}
         />
         <View>
           <IconButton
@@ -44,6 +46,7 @@ export function HomeHeader({
             icon={Bell}
             onPress={onNotifications}
             size={control.iconHeader}
+            testID={testIds.home.notifications}
           />
           <View pointerEvents="none" style={styles.dot} />
         </View>
@@ -53,6 +56,7 @@ export function HomeHeader({
           hitSlop={8}
           onPress={onProfile}
           style={({ pressed }) => (pressed ? styles.pressed : null)}
+          testID={testIds.home.profile}
         >
           <Image accessibilityIgnoresInvertColors source={homeAvatar} style={styles.avatar} />
         </Pressable>

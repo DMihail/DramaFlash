@@ -89,5 +89,25 @@ module.exports = defineConfig([
       globals: globals.node,
     },
   },
+  {
+    files: ['app.config.ts'],
+    rules: {
+      // tsx/cjs must stay the first import. Expo turns this file into CommonJS,
+      // and the TypeScript app-variant module cannot load before tsx registers.
+      'simple-import-sort/imports': [
+        'error',
+        {
+          groups: [
+            ['^\\u0000'],
+            ['^react$', '^react-native$', '^react-dom$'],
+            ['^expo$', '^expo-', '^expo/', '^@expo/', '^@expo-google-fonts/'],
+            ['^@?\\w'],
+            ['^@/'],
+            ['^\\.'],
+          ],
+        },
+      ],
+    },
+  },
   eslintConfigPrettier,
 ]);
