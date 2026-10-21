@@ -115,6 +115,10 @@ Write components and hooks that follow the Rules of React:
 - Do not add `useMemo`, `useCallback`, or `React.memo` unless a measurement or an integration requires it.
 - Do not use a compiler directive such as `'use no memo'` to hide incorrect React code.
 
+Use modern React 19.3 APIs and hooks when they improve clarity, performance, or user experience. Prefer the simplest correct React pattern. Do not force new hooks into code where basic hooks or plain functions are better. Follow the Rules of React and keep all components compatible with React Compiler.
+
+Series details loads with `useEffect` and `AbortSignal`. That request is read-only, so it does not use `use`, Suspense, `useOptimistic`, or `useActionState`.
+
 ## Navigation
 
 - Use Expo Router for all navigation.
