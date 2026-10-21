@@ -4,8 +4,8 @@ Expo SDK 58 app for iOS and Android. This repository is set up for development b
 
 ## Prerequisites
 
-- Node.js `22.22.0` (see `.nvmrc`). Expo SDK 58 supports Node.js `22.13` and newer on the 22 line.
-- npm `11.19.0`, which is the npm version bundled with that Node.js release.
+- Node.js `22.22.0` (see `.nvmrc`). Expo SDK 58 supports Node.js `22.13` and newer on the 22 line. That Node.js release bundles npm `10.9.4`.
+- npm `11.19.0`. This repository's lockfile was written with that version. If `npm -v` prints `10.x`, install the pinned version with `npm install --global npm@11.19.0`.
 - An Expo account before the first EAS build.
 - Xcode and Android Studio only if you compile development builds on this machine. EAS Build does not need them.
 

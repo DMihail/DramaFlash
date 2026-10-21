@@ -54,6 +54,7 @@ describe('project toolchain', () => {
     const workflow = read('.github/workflows/ci.yml');
 
     expect(workflow).toContain('contents: read');
+    expect(workflow).toContain('npm install --global npm@11.19.0');
     expect(workflow).toContain('npm ci');
     expect(workflow).toContain('npm run lint');
     expect(workflow).toContain('npm run typecheck');
