@@ -1,22 +1,12 @@
 import { useLocalSearchParams } from 'expo-router';
 
-import { findSeries } from '@/data/catalog';
-import { parseEpisodeNumber, readParam } from '@/navigation/params';
-import { Placeholder } from '@/navigation/placeholder';
+import { PlayerScreen } from '@/features/player/PlayerScreen';
+import { readParam } from '@/navigation/params';
 
-export default function PlayerScreen() {
+export default function PlayerRoute() {
   const params = useLocalSearchParams<{ seriesId: string; episode?: string }>();
-  const seriesId = readParam(params.seriesId);
-  const series = seriesId ? findSeries(seriesId) : undefined;
-  const episode = parseEpisodeNumber(params.episode, series?.episodeCount ?? null);
 
-  if (!series) {
-    return seriesId ? (
-      <Placeholder detail={seriesId} safeArea="full" title="Series not found" />
-    ) : (
-      <Placeholder safeArea="full" title="Series not found" />
-    );
-  }
-
-  return <Placeholder detail={`Episode ${episode}`} safeArea="full" title={series.title} />;
+  return (
+    <PlayerScreen episodeParam={readParam(params.episode)} seriesId={readParam(params.seriesId)} />
+  );
 }

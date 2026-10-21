@@ -101,6 +101,24 @@ A simple one-line callback may stay inline when the name would not make the JSX 
 
 Prefer official Expo and React Native APIs over custom implementations for nontrivial platform features. Before adding a dependency, check existing packages and official SDK support. Use maintained libraries when they clearly reduce complexity, improve reliability, or provide native capabilities. Keep simple domain logic as pure TypeScript functions. Avoid reinventing platform functionality, unnecessary dependencies, and premature abstractions. Follow DRY, KISS, modern React patterns, and React Compiler requirements.
 
+## Loading and performance
+
+Prefer native Expo and React Native capabilities over custom platform code when they provide a clear benefit.
+
+Use lazy loading and list virtualization when the content size or a measured performance problem justifies them.
+
+Every asynchronous screen must handle loading, success, empty, error, retry, and cancellation when those states apply.
+
+Prefer accessible animated skeletons for full-screen loading. Use React Native Animated for a simple animation. Use Reanimated when an advanced animation or gesture needs it.
+
+Respect Reduced Motion. Stop animations when the component unmounts.
+
+Evaluate React `Activity` before using it on a native screen. Do not assume DOM behavior works in React Native. Do not use it only to try the API, and do not hide a video player with it unless playback and resource cleanup are verified.
+
+Choose `ScrollView`, `FlatList`, or `SectionList` from the data shape and the rendering need. Do not force `SectionList` onto horizontal groups.
+
+Follow the React Compiler, strict TypeScript, DRY, and KISS rules in this file. Keep tests in the root `tests/` directory.
+
 ## React Compiler
 
 React Compiler is enabled with `experiments.reactCompiler` in `app.json`. Expo SDK 58 configures Babel for it. Do not add a custom Babel config or a second compiler plugin.
