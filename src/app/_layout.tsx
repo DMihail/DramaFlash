@@ -8,27 +8,34 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { isDevelopmentRuntime } from '@/config/runtimeVariant';
 import { asyncWalletStorage } from '@/data/walletStorage';
-import { useWallet, WalletProvider } from '@/features/wallet/WalletProvider';
+import { useWalletSelector, WalletProvider } from '@/features/wallet/WalletProvider';
+import { createMmkvStorage } from '@/storage/mmkv';
 import { FontsProvider, splashCanHide, useAppFonts } from '@/theme/fonts';
+
+const walletStorage = createMmkvStorage();
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
 export default function RootLayout() {
   return (
-    <WalletProvider allowReset={isDevelopmentRuntime()} storage={asyncWalletStorage}>
+    <WalletProvider
+      allowReset={isDevelopmentRuntime()}
+      legacy={asyncWalletStorage}
+      local={walletStorage}
+    >
       <RootNavigator />
     </WalletProvider>
   );
 }
 
 function RootNavigator() {
-  const wallet = useWallet();
+  const walletStatus = useWalletSelector((state) => state.status);
   const [loaded, error] = useAppFonts();
   const [opened, setOpened] = useState(false);
-  if (!opened && wallet.status !== 'loading') {
+  if (!opened && walletStatus !== 'loading') {
     setOpened(true);
   }
-  const canHideSplash = splashCanHide(loaded, error) && (opened || wallet.status !== 'loading');
+  const canHideSplash = splashCanHide(loaded, error) && (opened || walletStatus !== 'loading');
 
   useEffect(() => {
     if (!canHideSplash) {

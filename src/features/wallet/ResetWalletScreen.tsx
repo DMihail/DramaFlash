@@ -4,25 +4,26 @@ import { StyleSheet, View } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { Screen } from '@/components/Screen';
 import { Skeleton } from '@/components/Skeleton';
-import { useWallet } from '@/features/wallet/WalletProvider';
+import { useWalletSelector } from '@/features/wallet/WalletProvider';
 import { testIds } from '@/testing/testIds';
 import { layout, space } from '@/theme/tokens';
 
 export function ResetWalletScreen() {
-  const wallet = useWallet();
+  const status = useWalletSelector((state) => state.status);
+  const resetDemo = useWalletSelector((state) => state.resetDemo);
   const [phase, setPhase] = useState<'working' | 'done' | 'failed'>('working');
   const started = useRef(false);
 
   useEffect(() => {
-    if (started.current || wallet.status === 'loading') {
+    if (started.current || status === 'loading') {
       return;
     }
 
     started.current = true;
-    void wallet.resetDemo().then((result) => {
+    void resetDemo().then((result) => {
       setPhase(result === 'reset' ? 'done' : 'failed');
     });
-  }, [wallet]);
+  }, [resetDemo, status]);
 
   if (phase !== 'done') {
     return (

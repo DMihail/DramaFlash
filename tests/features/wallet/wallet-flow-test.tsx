@@ -12,18 +12,17 @@ import {
   STARTING_BALANCE,
   unlockEpisode,
   type Wallet,
-  type WalletStorage,
 } from '@/domain/wallet';
 import { CoinStoreScreen } from '@/features/coins/CoinStoreScreen';
 import { demoPurchaseSuccess } from '@/features/coins/model';
 import { PlayerScreen } from '@/features/player/PlayerScreen';
 import { SeriesDetailsScreen } from '@/features/series/SeriesDetailsScreen';
-import {
-  useWallet,
-  type WalletContextValue,
-  WalletProvider,
-} from '@/features/wallet/WalletProvider';
+import { useWallet, WalletProvider } from '@/features/wallet/WalletProvider';
+import { type LocalStorage, MMKV_WALLET_KEY } from '@/storage/persistence';
+import { type WalletState } from '@/stores/walletStore';
 import { testIds } from '@/testing/testIds';
+
+import { memoryLocal } from '../../support/storage';
 
 const mockRouter = {
   back: jest.fn(),
@@ -56,21 +55,14 @@ const metrics: Metrics = {
   insets: { top: 0, left: 0, right: 0, bottom: 0 },
 };
 
-function memoryStorage(
-  initial: string | null = null,
-): WalletStorage & { snapshot: () => string | null } {
-  let value = initial;
+function memoryStorage(initial: string | null = null) {
+  return memoryLocal(initial === null ? {} : { [MMKV_WALLET_KEY]: initial });
+}
 
-  return {
-    snapshot: () => value,
-    getItem: async () => value,
-    setItem: async (_key, next) => {
-      value = next;
-    },
-    removeItem: async () => {
-      value = null;
-    },
-  };
+async function settle() {
+  for (let step = 0; step < 10; step += 1) {
+    await Promise.resolve();
+  }
 }
 
 function textOf(renderer: TestRenderer.ReactTestRenderer): string {
@@ -96,7 +88,7 @@ function press(renderer: TestRenderer.ReactTestRenderer, testID: string) {
   throw new Error(`missing press for ${testID}`);
 }
 
-function Probe({ onReady }: { onReady: (wallet: WalletContextValue) => void }) {
+function Probe({ onReady }: { onReady: (wallet: WalletState) => void }) {
   const wallet = useWallet();
   onReady(wallet);
 
@@ -107,11 +99,11 @@ function Probe({ onReady }: { onReady: (wallet: WalletContextValue) => void }) {
   return null;
 }
 
-function asApi(value: WalletContextValue | null): WalletContextValue | null {
+function asApi(value: WalletState | null): WalletState | null {
   return value;
 }
 
-function requireWallet(value: WalletContextValue | null): Wallet {
+function requireWallet(value: WalletState | null): Wallet {
   if (!value || value.wallet === null) {
     throw new Error('expected a wallet');
   }
@@ -126,7 +118,7 @@ async function renderTree(ui: ReactElement) {
     renderer = TestRenderer.create(
       <SafeAreaProvider initialMetrics={metrics}>{ui}</SafeAreaProvider>,
     );
-    await Promise.resolve();
+    await settle();
   });
 
   if (!renderer) {
@@ -161,9 +153,9 @@ describe('wallet flow', () => {
 
   test('hydrates a new install to 15 coins and keeps that balance after restart', async () => {
     const storage = memoryStorage();
-    let wallet: WalletContextValue | null = null;
+    let wallet: WalletState | null = null;
     const screen = await renderTree(
-      <WalletProvider storage={storage}>
+      <WalletProvider local={storage}>
         <Probe onReady={(value) => (wallet = value)} />
       </WalletProvider>,
     );
@@ -174,17 +166,17 @@ describe('wallet flow', () => {
 
     const saved = unlockEpisode(freshWallet(), 'the-ceo-and-i', 4);
     const restored = memoryStorage(serializeWallet(saved));
-    let again: WalletContextValue | null = null;
+    let again: WalletState | null = null;
 
     await act(async () => {
       screen.update(
         <SafeAreaProvider initialMetrics={metrics}>
-          <WalletProvider storage={restored}>
+          <WalletProvider local={restored}>
             <Probe onReady={(value) => (again = value)} />
           </WalletProvider>
         </SafeAreaProvider>,
       );
-      await Promise.resolve();
+      await settle();
     });
 
     expect(requireWallet(again)).toEqual(saved);
@@ -192,18 +184,23 @@ describe('wallet flow', () => {
   });
 
   test('shows loading, then an error for corrupt storage without granting 15 coins', async () => {
-    let resolveRead: (value: string | null) => void = () => undefined;
-    const storage: WalletStorage = {
-      getItem: () =>
-        new Promise((resolve) => {
+    let resolveRead: (value: string | undefined) => void = () => undefined;
+    const storage: LocalStorage = {
+      getString: (key) => {
+        if (key !== MMKV_WALLET_KEY) {
+          return undefined;
+        }
+
+        return new Promise((resolve) => {
           resolveRead = resolve;
-        }),
-      setItem: async () => undefined,
-      removeItem: async () => undefined,
+        });
+      },
+      setString: async () => undefined,
+      delete: async () => undefined,
     };
-    let wallet: WalletContextValue | null = null;
+    let wallet: WalletState | null = null;
     const screen = await renderTree(
-      <WalletProvider storage={storage}>
+      <WalletProvider local={storage}>
         <Probe onReady={(value) => (wallet = value)} />
       </WalletProvider>,
     );
@@ -212,7 +209,7 @@ describe('wallet flow', () => {
 
     await act(async () => {
       resolveRead('{');
-      await Promise.resolve();
+      await settle();
     });
 
     expect(asApi(wallet)?.status).toBe('error');
@@ -223,20 +220,20 @@ describe('wallet flow', () => {
   test('retries a failed read and refuses a demo reset in production', async () => {
     let fail = true;
     const storage = memoryStorage();
-    const reading: WalletStorage = {
-      getItem: async () => {
+    const reading: LocalStorage = {
+      getString: (key) => {
         if (fail) {
           throw new Error('unreadable');
         }
 
-        return storage.snapshot();
+        return storage.getString(key);
       },
-      setItem: storage.setItem,
-      removeItem: storage.removeItem,
+      setString: (key, value) => storage.setString(key, value),
+      delete: (key) => storage.delete(key),
     };
-    const holder: { api: WalletContextValue | null } = { api: null };
+    const holder: { api: WalletState | null } = { api: null };
     await renderTree(
-      <WalletProvider allowReset={false} storage={reading}>
+      <WalletProvider allowReset={false} local={reading}>
         <Probe
           onReady={(value) => {
             holder.api = value;
@@ -253,8 +250,8 @@ describe('wallet flow', () => {
     fail = false;
 
     await act(async () => {
-      holder.api?.retry();
-      await Promise.resolve();
+      await holder.api?.retry();
+      await settle();
     });
 
     if (!holder.api) {
@@ -269,22 +266,26 @@ describe('wallet flow', () => {
 
   test('charges 10 coins once when two unlocks race, and keeps the old balance if saving fails', async () => {
     const held: (() => void)[] = [];
-    let saved: string | null = null;
-    const storage: WalletStorage = {
-      getItem: async () => saved,
-      setItem: () =>
+    let saved: string | undefined;
+    const storage: LocalStorage = {
+      getString: (key) => (key === MMKV_WALLET_KEY ? saved : undefined),
+      setString: (key, value) =>
         new Promise((resolve) => {
           held.push(() => {
+            if (key === MMKV_WALLET_KEY) {
+              saved = value;
+            }
+
             resolve();
           });
         }),
-      removeItem: async () => {
-        saved = null;
+      delete: async () => {
+        saved = undefined;
       },
     };
-    let wallet: WalletContextValue | null = null;
+    let wallet: WalletState | null = null;
     await renderTree(
-      <WalletProvider storage={storage}>
+      <WalletProvider local={storage}>
         <Probe onReady={(value) => (wallet = value)} />
       </WalletProvider>,
     );
@@ -302,7 +303,6 @@ describe('wallet flow', () => {
       throw new Error('expected the save to wait');
     }
 
-    saved = serializeWallet(unlockEpisode(freshWallet(), 'the-ceo-and-i', 4));
     await act(async () => {
       release();
       await first;
@@ -311,16 +311,16 @@ describe('wallet flow', () => {
     expect(requireWallet(wallet).balance).toBe(5);
     expect(requireWallet(wallet).unlocks).toEqual([{ seriesId: 'the-ceo-and-i', episode: 4 }]);
 
-    const failing: WalletStorage = {
-      getItem: async () => null,
-      setItem: async () => {
+    const failing: LocalStorage = {
+      getString: async () => undefined,
+      setString: async () => {
         throw new Error('disk full');
       },
-      removeItem: async () => undefined,
+      delete: async () => undefined,
     };
-    let failed: WalletContextValue | null = null;
+    let failed: WalletState | null = null;
     await renderTree(
-      <WalletProvider storage={failing}>
+      <WalletProvider local={failing}>
         <Probe onReady={(value) => (failed = value)} />
       </WalletProvider>,
     );
@@ -336,17 +336,26 @@ describe('wallet flow', () => {
 
   test('lets an unlock and a coin grant compete without applying both', async () => {
     const held: (() => void)[] = [];
-    const storage: WalletStorage = {
-      getItem: async () => null,
-      setItem: () =>
+    let saved: string | undefined;
+    const storage: LocalStorage = {
+      getString: (key) => (key === MMKV_WALLET_KEY ? saved : undefined),
+      setString: (key, value) =>
         new Promise((resolve) => {
-          held.push(() => resolve());
+          held.push(() => {
+            if (key === MMKV_WALLET_KEY) {
+              saved = value;
+            }
+
+            resolve();
+          });
         }),
-      removeItem: async () => undefined,
+      delete: async () => {
+        saved = undefined;
+      },
     };
-    let wallet: WalletContextValue | null = null;
+    let wallet: WalletState | null = null;
     await renderTree(
-      <WalletProvider storage={storage}>
+      <WalletProvider local={storage}>
         <Probe onReady={(value) => (wallet = value)} />
       </WalletProvider>,
     );
@@ -376,7 +385,7 @@ describe('wallet flow', () => {
   test('adds a demo pack once and returns to the same episode', async () => {
     const storage = memoryStorage();
     const screen = await renderTree(
-      <WalletProvider storage={storage}>
+      <WalletProvider local={storage}>
         <CoinStoreScreen episode="4" seriesId="the-ceo-and-i" />
       </WalletProvider>,
     );
@@ -387,7 +396,7 @@ describe('wallet flow', () => {
     await act(async () => {
       press(screen, testIds.coins.package('coins-300'));
       press(screen, testIds.coins.purchaseConfirm);
-      await Promise.resolve();
+      await settle();
     });
 
     expect(textOf(screen)).toContain(demoPurchaseSuccess);
@@ -395,23 +404,32 @@ describe('wallet flow', () => {
 
     await act(async () => {
       press(screen, testIds.coins.purchaseConfirm);
-      await Promise.resolve();
+      await settle();
     });
 
     expect(textOf(screen)).toContain('615 coins');
 
     const blocked: (() => void)[] = [];
-    const slow: WalletStorage = {
-      getItem: async () => null,
-      setItem: () =>
+    let saved: string | undefined;
+    const slow: LocalStorage = {
+      getString: (key) => (key === MMKV_WALLET_KEY ? saved : undefined),
+      setString: (key, value) =>
         new Promise((resolve) => {
-          blocked.push(resolve);
+          blocked.push(() => {
+            if (key === MMKV_WALLET_KEY) {
+              saved = value;
+            }
+
+            resolve();
+          });
         }),
-      removeItem: async () => undefined,
+      delete: async () => {
+        saved = undefined;
+      },
     };
-    let current: WalletContextValue | null = null;
+    let current: WalletState | null = null;
     await renderTree(
-      <WalletProvider storage={slow}>
+      <WalletProvider local={slow}>
         <Probe onReady={(value) => (current = value)} />
       </WalletProvider>,
     );
@@ -448,7 +466,7 @@ describe('wallet flow', () => {
     const loadSeries = (seriesId: string, options?: SeriesRequestOptions) =>
       loadSeriesDetails(seriesId, { ...options, delayMs: 0 });
     const screen = await renderTree(
-      <WalletProvider storage={storage}>
+      <WalletProvider local={storage}>
         <PlayerScreen episodeParam="4" loadEpisode={loadEpisode} seriesId="the-ceo-and-i" />
       </WalletProvider>,
     );
@@ -464,7 +482,7 @@ describe('wallet flow', () => {
 
     await act(async () => {
       press(screen, testIds.player.unlockConfirm);
-      await Promise.resolve();
+      await settle();
     });
 
     expect(textOf(screen)).toContain('5 coins');
@@ -474,12 +492,12 @@ describe('wallet flow', () => {
     await act(async () => {
       screen.update(
         <SafeAreaProvider initialMetrics={metrics}>
-          <WalletProvider storage={storage}>
+          <WalletProvider local={storage}>
             <SeriesDetailsScreen loadSeries={loadSeries} seriesId="the-ceo-and-i" />
           </WalletProvider>
         </SafeAreaProvider>,
       );
-      await Promise.resolve();
+      await settle();
     });
 
     expect(

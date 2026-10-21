@@ -101,6 +101,12 @@ A simple one-line callback may stay inline when the name would not make the JSX 
 
 Prefer official Expo and React Native APIs over custom implementations for nontrivial platform features. Before adding a dependency, check existing packages and official SDK support. Use maintained libraries when they clearly reduce complexity, improve reliability, or provide native capabilities. Keep simple domain logic as pure TypeScript functions. Avoid reinventing platform functionality, unnecessary dependencies, and premature abstractions. Follow DRY, KISS, modern React patterns, and React Compiler requirements.
 
+## State
+
+Use Zustand for shared client state and MMKV for persistent local state. Keep screen-local state in React components and domain logic in pure TypeScript. Use typed selectors, validated persistence, explicit schema migrations, and feature-focused stores. Do not add Context providers for general application state without a clear reason. Preserve persisted user data during storage migrations. Do not show a successful wallet transaction before its storage write succeeds.
+
+The demo wallet is the shared persistent state: coin balance and paid episode unlocks. Keep saved series, demo authentication, and viewing progress in their domain functions until those features are built. Do not add empty stores for them. Filters, notices, the unlock sheet, the selected coin pack, and the player session stay in the screen. Episode labels are derived. Series and player requests stay in their screen hooks.
+
 ## Loading and performance
 
 Prefer native Expo and React Native capabilities over custom platform code when they provide a clear benefit.
@@ -165,7 +171,7 @@ All React Native testID values must be defined in src/testing/testIds.ts. Compon
 
 Maestro flows live in `tests/e2e/maestro` and use the development app id `com.dramaflash.app.dev`. Jest only collects TypeScript tests, so the YAML flows stay out of `npm test`. Run `npm run e2e` on a booted iOS simulator or Android emulator with the development build open and Metro running. Do not point these flows at the production app id. GitHub CI does not run Maestro, because that job has no emulator. EAS Workflows can run Maestro later. Leave that optional.
 
-The demo wallet is stored on the device. A development build can open `dramaflash-dev:///dev/reset-wallet` to restore 15 coins and lock paid episodes again. That route does nothing in production, and it is not a normal user action. Maestro flows that need a known balance open it first. The flow that checks an unlock after restart must not open it between the unlock and the restart.
+The demo wallet is stored in MMKV. The first launch copies a valid AsyncStorage wallet into MMKV and does not replace a wallet that is already there. A development build can open `dramaflash-dev:///dev/reset-wallet` to restore 15 coins and lock paid episodes again. That route does nothing in production, and it is not a normal user action. Maestro flows that need a known balance open it first. The flow that checks an unlock after restart must not open it between the unlock and the restart.
 
 ## Commands
 

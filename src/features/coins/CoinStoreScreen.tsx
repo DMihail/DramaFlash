@@ -21,13 +21,17 @@ import {
   demoPurchaseSuccess,
   walletReadErrorMessage,
 } from '@/features/coins/model';
-import { useWallet } from '@/features/wallet/WalletProvider';
+import { useWalletSelector } from '@/features/wallet/WalletProvider';
 import { testIds } from '@/testing/testIds';
 import { colors, gradient, iconSize, iconStroke, layout, radius, space } from '@/theme/tokens';
 
 export function CoinStoreScreen({ episode, seriesId }: { episode?: string; seriesId?: string }) {
   const insets = useSafeAreaInsets();
-  const walletState = useWallet();
+  const status = useWalletSelector((state) => state.status);
+  const wallet = useWalletSelector((state) => state.wallet);
+  const busy = useWalletSelector((state) => state.busy);
+  const retry = useWalletSelector((state) => state.retry);
+  const grantPack = useWalletSelector((state) => state.grantPack);
   const [selectedId, setSelectedId] = useState<(typeof coinPacks)[number]['id']>(coinPacks[0].id);
   const [notice, setNotice] = useState<string | null>(null);
   const selected = coinPacks.find((pack) => pack.id === selectedId) ?? coinPacks[0];
@@ -55,11 +59,11 @@ export function CoinStoreScreen({ episode, seriesId }: { episode?: string; serie
   };
 
   const handleGrant = () => {
-    if (walletState.busy || walletState.status !== 'ready') {
+    if (busy || status !== 'ready') {
       return;
     }
 
-    void walletState.grantPack(selected.id).then((result) => {
+    void grantPack(selected.id).then((result) => {
       if (result.status === 'saved') {
         setNotice(demoPurchaseSuccess);
         return;
@@ -71,7 +75,7 @@ export function CoinStoreScreen({ episode, seriesId }: { episode?: string; serie
     });
   };
 
-  if (walletState.status === 'loading') {
+  if (status === 'loading') {
     return (
       <Screen safeArea="stack" testID={testIds.wallet.loading}>
         <View style={styles.loading}>
@@ -83,22 +87,18 @@ export function CoinStoreScreen({ episode, seriesId }: { episode?: string; serie
     );
   }
 
-  if (walletState.status === 'error' || walletState.wallet === null) {
+  if (status === 'error' || wallet === null) {
     return (
       <Screen safeArea="stack" testID={testIds.wallet.error}>
         <View style={styles.loading}>
           <AppText role="titleS">{walletReadErrorMessage}</AppText>
-          <PrimaryButton
-            label="Try again"
-            onPress={walletState.retry}
-            testID={testIds.wallet.retry}
-          />
+          <PrimaryButton label="Try again" onPress={retry} testID={testIds.wallet.retry} />
         </View>
       </Screen>
     );
   }
 
-  const balance = walletState.wallet.balance;
+  const balance = wallet.balance;
 
   return (
     <Screen safeArea="full" testID={testIds.coins.store}>
@@ -164,9 +164,9 @@ export function CoinStoreScreen({ episode, seriesId }: { episode?: string; serie
             <AppText role="caption">Simulated purchase. No charge.</AppText>
           </View>
           <PrimaryButton
-            disabled={walletState.busy}
+            disabled={busy}
             fill
-            label={walletState.busy ? 'Adding demo coins' : `Add ${selected.coins} demo coins`}
+            label={busy ? 'Adding demo coins' : `Add ${selected.coins} demo coins`}
             onPress={handleGrant}
             testID={testIds.coins.purchaseConfirm}
           />
