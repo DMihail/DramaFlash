@@ -43,6 +43,8 @@ jest.mock('lucide-react-native', () => {
     ListVideo: Icon,
     Lock: Icon,
     MessageCircle: Icon,
+    X: Icon,
+    Zap: Icon,
     Pause: Icon,
     Play: Icon,
     Share2: Icon,
@@ -273,6 +275,7 @@ describe('player screen', () => {
     expect(textOf(screen)).toContain('Episode 4');
     expect(textOf(screen)).toContain('does not charge coins');
     expect(textOf(screen)).toContain('10 coins');
+    expect(textOf(screen)).toContain('15 coins');
     expect(textOf(screen)).not.toContain('Watch');
     expect(hasTestId(screen, testIds.player.locked)).toBe(true);
     expect(hasTestId(screen, testIds.player.unlock)).toBe(true);
@@ -287,11 +290,72 @@ describe('player screen', () => {
       pressBy(screen, 'Unlock', 'text')();
     });
 
+    expect(mockRouter.push).not.toHaveBeenCalled();
+    expect(hasTestId(screen, testIds.player.unlockConfirm)).toBe(true);
+    expect(hasTestId(screen, testIds.wallet.balance)).toBe(true);
+    expect(wallet.balance).toBe(15);
+    expect(wallet.unlocks).toEqual([]);
+
+    await act(async () => {
+      pressBy(screen, 'Confirm unlock · 10 coins', 'text')();
+    });
+
+    expect(textOf(screen)).toContain('5 coins');
+    expect(textOf(screen)).toContain('Episode unlocked');
+    expect(hasTestId(screen, testIds.player.unlockSuccess)).toBe(true);
+    expect(hasTestId(screen, testIds.player.play)).toBe(true);
+    expect(hasTestId(screen, testIds.player.locked)).toBe(false);
+    expect(wallet.balance).toBe(15);
+    expect(wallet.unlocks).toEqual([]);
+
+    await act(async () => {
+      screen.unmount();
+    });
+  });
+
+  test('opens the coin store when the balance cannot pay for the episode', async () => {
+    let renderer: TestRenderer.ReactTestRenderer | undefined;
+    const wallet = { balance: 5, unlocks: [] };
+
+    await act(async () => {
+      renderer = renderScreen(
+        <PlayerScreen
+          episodeParam="4"
+          loadEpisode={(seriesId, episode, options) =>
+            loadPlayerEpisode(seriesId, episode, { ...options, delayMs: 0 })
+          }
+          seriesId="the-ceo-and-i"
+          wallet={wallet}
+        />,
+      );
+    });
+
+    const screen = renderer;
+    if (!screen) {
+      throw new Error('expected a screen');
+    }
+
+    await act(async () => {
+      pressBy(screen, 'Unlock', 'text')();
+    });
+
+    expect(hasTestId(screen, testIds.player.getCoins)).toBe(true);
+    expect(textOf(screen)).toContain('You need 5 more coins');
+
+    await act(async () => {
+      pressBy(screen, 'Get coins', 'text')();
+    });
+
     expect(mockRouter.push).toHaveBeenCalledWith({
       pathname: '/coins',
       params: { seriesId: 'the-ceo-and-i', episode: '4' },
     });
-    expect(wallet.balance).toBe(15);
+    expect(wallet.balance).toBe(5);
+    expect(wallet.unlocks).toEqual([]);
+
+    await act(async () => {
+      screen.unmount();
+    });
   });
 
   test('plays an episode that the wallet already unlocked', async () => {

@@ -2,6 +2,12 @@ appId: com.dramaflash.app.dev
 ---
 - launchApp:
     clearState: false
+- openLink: dramaflash-dev:///dev/reset-wallet
+- extendedWaitUntil:
+    visible:
+      id: wallet.reset
+    timeout: 20000
+- openLink: dramaflash-dev:///
 - extendedWaitUntil:
     visible:
       id: home.screen

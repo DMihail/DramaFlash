@@ -31,6 +31,29 @@ const flows = [
       testIds.player.locked,
       testIds.player.unlock,
       testIds.player.play,
+      testIds.wallet.reset,
+    ],
+  },
+  {
+    file: 'unlock-persistence.yaml',
+    ids: [
+      testIds.wallet.reset,
+      testIds.wallet.balance,
+      testIds.player.unlockConfirm,
+      testIds.player.play,
+      testIds.player.locked,
+    ],
+  },
+  {
+    file: 'coin-top-up.yaml',
+    ids: [
+      testIds.player.getCoins,
+      testIds.coins.store,
+      testIds.coins.balance,
+      testIds.coins.package('coins-300'),
+      testIds.coins.purchaseConfirm,
+      testIds.coins.purchaseSuccess,
+      testIds.coins.back,
     ],
   },
 ] as const;

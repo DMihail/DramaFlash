@@ -12,7 +12,16 @@ import { IconButton } from '@/components/IconButton';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
 import { type DemoAuth } from '@/domain/auth';
-import { type Wallet } from '@/domain/wallet';
+import { confirmUnlock, EPISODE_COST, type Wallet } from '@/domain/wallet';
+import {
+  coinBalanceLabel,
+  insufficientCoinsDetail,
+  unlockConfirmDetail,
+  unlockRejectedMessage,
+  unlockSavedMessage,
+  unlockSaveFailedMessage,
+  walletReadErrorMessage,
+} from '@/features/coins/model';
 import { posterArt } from '@/features/home/assets';
 import { loginDestination, requestSeriesSave, seriesDestination } from '@/features/home/model';
 import {
@@ -28,8 +37,11 @@ import {
 } from '@/features/player/model';
 import { PlayerSkeleton } from '@/features/player/PlayerSkeleton';
 import { PlayerStage } from '@/features/player/PlayerStage';
+import { PlayerUnlockSheet } from '@/features/player/PlayerUnlockSheet';
 import { type PlayerLoader, usePlayerEpisode } from '@/features/player/usePlayerEpisode';
 import { seriesNotFoundTitle, sharingUnavailableMessage } from '@/features/series/model';
+import { resolveScreenWallet } from '@/features/wallet/resolveWallet';
+import { useOptionalWallet } from '@/features/wallet/WalletProvider';
 import { holdLoginTicket } from '@/navigation/pendingLogin';
 import { testIds } from '@/testing/testIds';
 import { colors, layout, radius, space } from '@/theme/tokens';
@@ -48,9 +60,14 @@ export function PlayerScreen({
   wallet?: Wallet;
 }) {
   const insets = useSafeAreaInsets();
+  const shared = useOptionalWallet();
   const episode = requestedEpisode(episodeParam);
   const { retry, state } = usePlayerEpisode(seriesId, episode, loadEpisode);
   const [notice, setNotice] = useState<string | null>(null);
+  const [confirmedWallet, setConfirmedWallet] = useState<Wallet | null>(null);
+  const [unlockOpen, setUnlockOpen] = useState(false);
+  const [unlockError, setUnlockError] = useState<string | null>(null);
+  const resolved = resolveScreenWallet(confirmedWallet ?? wallet, wallet ? null : shared);
 
   useEffect(() => {
     if (!notice) {
@@ -78,6 +95,28 @@ export function PlayerScreen({
   const handleRetry = () => {
     retry();
   };
+
+  if (resolved.kind === 'loading') {
+    return (
+      <Screen safeArea="full" testID={testIds.wallet.loading}>
+        <PlayerSkeleton />
+      </Screen>
+    );
+  }
+
+  if (resolved.kind === 'error') {
+    return (
+      <PlayerMessage
+        bottomInset={insets.bottom}
+        detail={walletReadErrorMessage}
+        onBack={handleBack}
+        testID={testIds.wallet.error}
+        {...(shared ? { onRetry: shared.retry } : {})}
+        title="Coins are unavailable"
+        topInset={insets.top}
+      />
+    );
+  }
 
   if (state.status === 'loading') {
     return (
@@ -134,7 +173,8 @@ export function PlayerScreen({
   const { data } = state;
   const artwork = posterArt(data.series.id);
   const preview = previewFor(data, artwork !== undefined);
-  const access = playerAccess(wallet, data.series.id, data.episode, data.series.episodeCount);
+  const activeWallet = resolved.wallet;
+  const access = playerAccess(activeWallet, data.series.id, data.episode, data.series.episodeCount);
   const previous = adjacentEpisode(data.episode, data.series.episodeCount, -1);
   const next = adjacentEpisode(data.episode, data.series.episodeCount, 1);
 
@@ -159,7 +199,65 @@ export function PlayerScreen({
   };
 
   const handleUnlock = () => {
+    setUnlockError(null);
+    setUnlockOpen(true);
+  };
+
+  const handleCloseUnlock = () => {
+    setUnlockOpen(false);
+  };
+
+  const handleGetCoins = () => {
     router.push(unlockDestination(data.series.id, data.episode));
+  };
+
+  const handleConfirmUnlock = () => {
+    if (wallet) {
+      const decision = confirmUnlock(activeWallet, data.series.id, data.episode);
+      if (decision.type === 'unlocked') {
+        setConfirmedWallet(decision.wallet);
+        setUnlockOpen(false);
+        setNotice(unlockSavedMessage);
+        return;
+      }
+
+      if (decision.type === 'already-open') {
+        setUnlockOpen(false);
+        return;
+      }
+
+      if (decision.type === 'rejected') {
+        setUnlockError(unlockRejectedMessage);
+      }
+
+      return;
+    }
+
+    if (!shared) {
+      return;
+    }
+
+    void shared.unlock(data.series.id, data.episode).then((result) => {
+      if (result.status === 'saved') {
+        setUnlockOpen(false);
+        setNotice(unlockSavedMessage);
+        return;
+      }
+
+      if (result.status === 'unchanged') {
+        setUnlockOpen(false);
+        return;
+      }
+
+      if (result.status === 'save-failed') {
+        setUnlockError(unlockSaveFailedMessage);
+        return;
+      }
+
+      if (result.status === 'rejected') {
+        setUnlockError(unlockRejectedMessage);
+      }
+    });
   };
 
   const handleSave = () => {
@@ -194,8 +292,10 @@ export function PlayerScreen({
         onPrevious={handlePrevious}
         onSave={handleSave}
         onShare={handleShare}
+        balanceLabel={coinBalanceLabel(activeWallet.balance)}
         onUnlock={handleUnlock}
         preview={preview}
+        showBalanceId={!unlockOpen}
         previousEpisode={previous}
         title={data.series.title}
         topInset={insets.top}
@@ -206,10 +306,37 @@ export function PlayerScreen({
           accessibilityLiveRegion="polite"
           style={[styles.notice, { bottom: insets.bottom + space.lg }]}
         >
-          <AppText role="bodySmall" style={styles.noticeText}>
+          <AppText
+            role="bodySmall"
+            style={styles.noticeText}
+            {...(notice === unlockSavedMessage ? { testID: testIds.player.unlockSuccess } : {})}
+          >
             {notice}
           </AppText>
         </View>
+      ) : null}
+      {unlockOpen ? (
+        <PlayerUnlockSheet
+          balanceLabel={coinBalanceLabel(activeWallet.balance)}
+          busy={shared?.busy ?? false}
+          canAfford={activeWallet.balance >= EPISODE_COST}
+          confirmLabel={
+            activeWallet.balance >= EPISODE_COST
+              ? `Confirm unlock · ${EPISODE_COST} coins`
+              : 'Get coins'
+          }
+          detail={
+            activeWallet.balance >= EPISODE_COST
+              ? unlockConfirmDetail(activeWallet.balance)
+              : insufficientCoinsDetail(activeWallet.balance)
+          }
+          episode={data.episode}
+          error={unlockError}
+          onCancel={handleCloseUnlock}
+          onConfirm={handleConfirmUnlock}
+          onGetCoins={handleGetCoins}
+          title={data.series.title}
+        />
       ) : null}
     </Screen>
   );

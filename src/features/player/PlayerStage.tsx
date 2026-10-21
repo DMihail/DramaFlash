@@ -42,6 +42,7 @@ import {
 
 export function PlayerStage({
   access,
+  balanceLabel,
   episode,
   image,
   nextEpisode,
@@ -55,11 +56,13 @@ export function PlayerStage({
   onUnlock,
   preview,
   previousEpisode,
+  showBalanceId = false,
   title,
   topInset,
   bottomInset,
 }: {
   access: EpisodeAccess;
+  balanceLabel?: string;
   episode: number;
   image?: ImageSourcePropType;
   nextEpisode: number | null;
@@ -73,6 +76,7 @@ export function PlayerStage({
   onUnlock: () => void;
   preview: PlayerPreview;
   previousEpisode: number | null;
+  showBalanceId?: boolean;
   title: string;
   topInset: number;
   bottomInset: number;
@@ -175,6 +179,11 @@ export function PlayerStage({
         <AppText role="bodySmall" testID={testIds.player.episode}>
           {`Episode ${episode}`}
         </AppText>
+        {balanceLabel ? (
+          <AppText role="bodySmall" {...(showBalanceId ? { testID: testIds.wallet.balance } : {})}>
+            {balanceLabel}
+          </AppText>
+        ) : null}
         <AppText accessibilityLiveRegion="polite" role="bodySmall">
           {status}
         </AppText>

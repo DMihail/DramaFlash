@@ -7,9 +7,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { loadSeriesDetails } from '@/api/series';
 import { AppText } from '@/components/AppText';
+import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
 import { type DemoAuth } from '@/domain/auth';
 import { type Wallet } from '@/domain/wallet';
+import { walletReadErrorMessage } from '@/features/coins/model';
 import { posterArt } from '@/features/home/assets';
 import {
   continueEpisode,
@@ -26,19 +28,20 @@ import {
   sharePayload,
   sharingUnavailableMessage,
   visibleEpisodes,
-  walletForEpisodes,
 } from '@/features/series/model';
 import { SeriesDetailsFooter } from '@/features/series/SeriesDetailsFooter';
 import { SeriesDetailsHeader } from '@/features/series/SeriesDetailsHeader';
 import { SeriesDetailsLoading, SeriesDetailsMessage } from '@/features/series/SeriesDetailsStatus';
 import { SeriesEpisodeRow } from '@/features/series/SeriesEpisodeRow';
 import { type SeriesDetailsLoader, useSeriesDetails } from '@/features/series/useSeriesDetails';
+import { resolveScreenWallet } from '@/features/wallet/resolveWallet';
+import { useOptionalWallet } from '@/features/wallet/WalletProvider';
 import { holdLoginTicket } from '@/navigation/pendingLogin';
 import { testIds } from '@/testing/testIds';
 import { colors, layout, radius, space } from '@/theme/tokens';
 
-// wallet and auth stay optional until the app has one shared store.
 // A guest save opens Login. This screen does not mark a series as saved.
+// The shared wallet is used unless a test passes its own wallet.
 export function SeriesDetailsScreen({
   auth = null,
   loadSeries = loadSeriesDetails,
@@ -51,11 +54,12 @@ export function SeriesDetailsScreen({
   wallet?: Wallet;
 }) {
   const insets = useSafeAreaInsets();
+  const shared = useOptionalWallet();
   const { retry, state } = useSeriesDetails(seriesId, loadSeries);
   const [sort, setSort] = useState<EpisodeSort>('asc');
   const [expanded, setExpanded] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
-  const episodesWallet = walletForEpisodes(wallet);
+  const resolved = resolveScreenWallet(wallet, shared);
 
   useEffect(() => {
     if (!notice) {
@@ -77,6 +81,31 @@ export function SeriesDetailsScreen({
   const handleRetry = () => {
     retry();
   };
+
+  if (resolved.kind === 'loading') {
+    return (
+      <SeriesDetailsLoading
+        onBack={handleBack}
+        testID={testIds.wallet.loading}
+        topInset={insets.top}
+      />
+    );
+  }
+
+  if (resolved.kind === 'error') {
+    return (
+      <Screen safeArea="full" testID={testIds.wallet.error}>
+        <View style={styles.walletStatus}>
+          <AppText role="titleS">{walletReadErrorMessage}</AppText>
+          {shared ? (
+            <PrimaryButton label="Try again" onPress={shared.retry} testID={testIds.wallet.retry} />
+          ) : null}
+        </View>
+      </Screen>
+    );
+  }
+
+  const episodesWallet = resolved.wallet;
 
   const handleSort = () => {
     setSort((current) => (current === 'asc' ? 'desc' : 'asc'));
@@ -276,5 +305,12 @@ const styles = StyleSheet.create({
   },
   noticeText: {
     color: colors.text,
+  },
+  walletStatus: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: space.lg,
+    padding: layout.marginDetail,
   },
 });

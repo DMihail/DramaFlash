@@ -52,6 +52,10 @@ export const testIds = {
     share: 'player.share',
     episode: 'player.episode',
     unlock: 'player.unlock',
+    unlockConfirm: 'player.unlockConfirm',
+    unlockCancel: 'player.unlockCancel',
+    unlockSuccess: 'player.unlockSuccess',
+    getCoins: 'player.getCoins',
     play: 'player.play',
     pause: 'player.pause',
     previous: 'player.previous',
@@ -59,5 +63,17 @@ export const testIds = {
   },
   coins: {
     store: 'coins.store',
+    balance: 'coins.balance',
+    package: (packageId: string) => `coins.package.${packageId}`,
+    purchaseConfirm: 'coins.purchaseConfirm',
+    purchaseSuccess: 'coins.purchaseSuccess',
+    back: 'coins.back',
+  },
+  wallet: {
+    balance: 'wallet.balance',
+    loading: 'wallet.loading',
+    error: 'wallet.error',
+    retry: 'wallet.retry',
+    reset: 'wallet.reset',
   },
 } as const;

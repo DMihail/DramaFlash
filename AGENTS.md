@@ -165,6 +165,8 @@ All React Native testID values must be defined in src/testing/testIds.ts. Compon
 
 Maestro flows live in `tests/e2e/maestro` and use the development app id `com.dramaflash.app.dev`. Jest only collects TypeScript tests, so the YAML flows stay out of `npm test`. Run `npm run e2e` on a booted iOS simulator or Android emulator with the development build open and Metro running. Do not point these flows at the production app id. GitHub CI does not run Maestro, because that job has no emulator. EAS Workflows can run Maestro later. Leave that optional.
 
+The demo wallet is stored on the device. A development build can open `dramaflash-dev:///dev/reset-wallet` to restore 15 coins and lock paid episodes again. That route does nothing in production, and it is not a normal user action. Maestro flows that need a known balance open it first. The flow that checks an unlock after restart must not open it between the unlock and the restart.
+
 ## Commands
 
 ```bash

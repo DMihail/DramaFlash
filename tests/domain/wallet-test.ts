@@ -1,15 +1,29 @@
 import { episodeCountFor } from '@/data/catalog';
 import {
   coinPacks,
+  confirmUnlock,
   freshWallet,
+  grantCoinPack,
   isEpisodeInSeries,
   isEpisodeUnlocked,
   loadWallet,
   purchaseCoins,
+  serializeWallet,
   STARTING_BALANCE,
   unlockEpisode,
+  WALLET_SCHEMA_VERSION,
   WALLET_STORAGE_KEY,
+  type WalletLoadResult,
 } from '@/domain/wallet';
+
+function readyWallet(storage: { getItem: (key: string) => string | null }) {
+  const result = loadWallet(storage);
+  if (result.status !== 'ready') {
+    throw new Error('expected a saved wallet');
+  }
+
+  return result.wallet;
+}
 
 const seriesA = 'the-ceo-and-i';
 const seriesB = 'my-secret-life';
@@ -27,7 +41,7 @@ describe('wallet', () => {
     expect(unlockEpisode(unlocked, seriesA, 4)).toBe(unlocked);
 
     const stored = new Map([[WALLET_STORAGE_KEY, JSON.stringify(unlocked)]]);
-    const restored = loadWallet({ getItem: (key) => stored.get(key) ?? null });
+    const restored = readyWallet({ getItem: (key) => stored.get(key) ?? null });
 
     expect(restored).toEqual(unlocked);
     expect(unlockEpisode(restored, seriesA, 4)).toBe(restored);
@@ -122,24 +136,32 @@ describe('wallet', () => {
         unlocks: [{ seriesId, episode: episodeCount + 1 }],
       });
 
-      expect(loadWallet({ getItem: () => stored }).unlocks).toEqual([
+      expect(readyWallet({ getItem: () => stored }).unlocks).toEqual([
         { seriesId, episode: episodeCount },
       ]);
-      expect(loadWallet({ getItem: () => tooFar })).toEqual(freshWallet());
+      expect(loadWallet({ getItem: () => tooFar })).toEqual({ status: 'corrupt' });
     }
   });
 
-  test('recovers from missing or bad storage', () => {
+  test('starts a new install at 15 coins and keeps corrupt data unread', () => {
+    expect(loadWallet({ getItem: () => null })).toEqual({
+      status: 'ready',
+      wallet: freshWallet(),
+    });
+
+    const corrupt: WalletLoadResult = { status: 'corrupt' };
     for (const value of [
-      null,
+      '',
       '{',
       'null',
       '{"balance":-1,"unlocks":[]}',
+      '{"balance":15.5,"unlocks":[]}',
+      '{"version":2,"balance":15,"unlocks":[]}',
       '{"balance":15,"unlocks":[{"seriesId":"the-ceo-and-i","episode":99}]}',
       '{"balance":15,"unlocks":[{"seriesId":"missing-series","episode":4}]}',
       '{"balance":15,"unlockedEpisodes":[4]}',
     ]) {
-      expect(loadWallet({ getItem: () => value })).toEqual(freshWallet());
+      expect(loadWallet({ getItem: () => value })).toEqual(corrupt);
     }
 
     expect(
@@ -148,6 +170,41 @@ describe('wallet', () => {
           throw new Error('Unavailable');
         },
       }),
-    ).toEqual(freshWallet());
+    ).toEqual(corrupt);
+  });
+
+  test('saves a versioned wallet and does not charge a free or repeat unlock', () => {
+    const stored = JSON.parse(serializeWallet(freshWallet())) as {
+      version: number;
+      balance: number;
+    };
+
+    expect(stored.version).toBe(WALLET_SCHEMA_VERSION);
+    expect(stored.balance).toBe(STARTING_BALANCE);
+    expect(readyWallet({ getItem: () => serializeWallet(freshWallet()) })).toEqual(freshWallet());
+
+    const wallet = freshWallet();
+    expect(confirmUnlock(wallet, seriesA, 1)).toEqual({ type: 'already-open', wallet });
+    expect(confirmUnlock(wallet, seriesA, 3)).toEqual({ type: 'already-open', wallet });
+    expect(confirmUnlock(wallet, seriesA, 0).type).toBe('rejected');
+    expect(confirmUnlock(wallet, seriesA, 51).type).toBe('rejected');
+    expect(confirmUnlock(wallet, 'missing-series', 4).type).toBe('rejected');
+
+    const unlocked = confirmUnlock(wallet, seriesA, 4);
+    if (unlocked.type !== 'unlocked') {
+      throw new Error('expected the unlock');
+    }
+
+    expect(unlocked.wallet.balance).toBe(5);
+    expect(confirmUnlock(unlocked.wallet, seriesA, 4)).toEqual({
+      type: 'already-open',
+      wallet: unlocked.wallet,
+    });
+    expect(confirmUnlock({ balance: 5, unlocks: [] }, seriesA, 5)).toEqual({
+      type: 'insufficient',
+      wallet: { balance: 5, unlocks: [] },
+    });
+    expect(grantCoinPack(wallet, 'coins-800')?.balance).toBe(STARTING_BALANCE + 850);
+    expect(grantCoinPack(wallet, 'missing-pack')).toBeNull();
   });
 });
