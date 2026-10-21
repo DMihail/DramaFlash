@@ -30,10 +30,10 @@ export function HomeHero({
           accessibilityLabel={`${title} artwork`}
           resizeMode="cover"
           source={image}
-          style={styles.art}
+          style={StyleSheet.absoluteFill}
         />
       ) : null}
-      <View pointerEvents="none" style={styles.scrim}>
+      <View pointerEvents="none" style={StyleSheet.absoluteFill}>
         <View style={styles.tint} />
         <LinearGradient
           colors={gradient.homeHeroTop.colors}
@@ -78,26 +78,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     justifyContent: 'flex-end',
   },
-  art: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-  },
-  scrim: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-  },
   tint: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
+    ...StyleSheet.absoluteFill,
     backgroundColor: gradient.homeHeroTint,
   },
   copy: {

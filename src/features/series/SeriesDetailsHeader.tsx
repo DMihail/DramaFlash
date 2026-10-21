@@ -51,7 +51,7 @@ export function SeriesDetailsHeader({
           locations={gradient.detailHero.locations}
           pointerEvents="none"
           start={gradient.detailHero.start}
-          style={styles.heroScrim}
+          style={StyleSheet.absoluteFill}
         />
         <LinearGradient
           colors={gradient.detailTopBar.colors}
@@ -109,13 +109,6 @@ const styles = StyleSheet.create({
     width: '100%',
     aspectRatio: 3 / 4,
     backgroundColor: colors.surfaceMedia,
-  },
-  heroScrim: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
   },
   topBarScrim: {
     position: 'absolute',
