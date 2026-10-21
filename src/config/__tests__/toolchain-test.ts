@@ -34,6 +34,9 @@ describe('project toolchain', () => {
     expect(nodeVersion).toBe('22.22.0');
     expect(eas.build.base.node).toBe(nodeVersion);
     expect(packageJson.packageManager).toBe('npm@11.19.0');
+    expect(packageJson.engines.npm).toBe('>=11.19.0 <12');
+    expect(packageJson.scripts['eas-build-pre-install']).toBe('npm install --global npm@11.19.0');
+    expect(read('.npmrc')).toContain('engine-strict=true');
   });
 
   test('development and production EAS profiles select separate app variants', () => {
@@ -54,7 +57,7 @@ describe('project toolchain', () => {
     const workflow = read('.github/workflows/ci.yml');
 
     expect(workflow).toContain('contents: read');
-    expect(workflow).toContain('npm install --global npm@11.19.0');
+    expect(workflow).toContain('npm run eas-build-pre-install');
     expect(workflow).toContain('npm ci');
     expect(workflow).toContain('npm run lint');
     expect(workflow).toContain('npm run typecheck');
