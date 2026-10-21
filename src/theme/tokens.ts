@@ -110,6 +110,13 @@ export const gradient = {
     end: { x: 0.5, y: 1 },
     height: 96,
   },
+  playerScrim: {
+    colors: ['rgba(6, 21, 50, 0)', 'rgba(6, 21, 50, 0)', colors.playerScrim],
+    locations: [0, 0.5, 1],
+    start: { x: 0.5, y: 0 },
+    end: { x: 0.5, y: 1 },
+    opacity: 0.9,
+  },
 } as const;
 
 export const layout = {

@@ -77,6 +77,13 @@ describe('design system', () => {
     expect(gradient.detailHero.locations).toEqual([0, 0.5, 1]);
     expect(gradient.detailTopBar.colors).toEqual(['rgba(0, 0, 0, 0.8)', 'rgba(0, 0, 0, 0)']);
     expect(gradient.detailTopBar.height).toBe(96);
+    expect(gradient.playerScrim.colors).toEqual([
+      'rgba(6, 21, 50, 0)',
+      'rgba(6, 21, 50, 0)',
+      '#061532',
+    ]);
+    expect(gradient.playerScrim.locations).toEqual([0, 0.5, 1]);
+    expect(gradient.playerScrim.opacity).toBe(0.9);
   });
 
   test('keeps the spacing scale and corner radius', () => {
