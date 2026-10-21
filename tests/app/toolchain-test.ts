@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import eas from '../../eas.json';
@@ -8,6 +8,27 @@ const root = path.join(__dirname, '../..');
 
 function read(relativePath: string) {
   return readFileSync(path.join(root, relativePath), 'utf8');
+}
+
+function testFilesUnder(directory: string): string[] {
+  const matches: string[] = [];
+
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const fullPath = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name === '__tests__') {
+        matches.push(fullPath);
+      }
+      matches.push(...testFilesUnder(fullPath));
+      continue;
+    }
+
+    if (/(?:^|[-.])test\.tsx?$/.test(entry.name)) {
+      matches.push(fullPath);
+    }
+  }
+
+  return matches;
 }
 
 describe('project toolchain', () => {
@@ -79,6 +100,20 @@ describe('project toolchain', () => {
     expect(workflow).not.toContain('pull_request_target');
     expect(workflow).not.toContain('secrets.');
     expect(workflow).not.toContain('eas build');
+  });
+
+  test('keeps application tests in the root tests directory', () => {
+    expect(packageJson.jest.testMatch).toEqual([
+      '<rootDir>/tests/**/*-test.ts',
+      '<rootDir>/tests/**/*-test.tsx',
+    ]);
+    expect(packageJson.jest.testPathIgnorePatterns).toEqual([
+      '/node_modules/',
+      '/High-Fidelity DramaFlash Prototype/',
+      '/references/',
+    ]);
+    expect(testFilesUnder(path.join(root, 'src'))).toEqual([]);
+    expect(testFilesUnder(path.join(root, 'tests')).length).toBeGreaterThan(0);
   });
 
   test('gitignore excludes credentials and generated native projects', () => {

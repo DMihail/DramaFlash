@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: space[16],
+    paddingHorizontal: space.lg,
   },
   pressed: {
     opacity: pressOpacity,

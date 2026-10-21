@@ -64,7 +64,7 @@ export function HomeHeader({
 const styles = StyleSheet.create({
   header: {
     minHeight: 52,
-    paddingHorizontal: space[16],
+    paddingHorizontal: space.lg,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   brand: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: space[8],
+    gap: space.sm,
     flexShrink: 1,
   },
   logo: {
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: space[4],
+    gap: space.xs,
   },
   dot: {
     position: 'absolute',

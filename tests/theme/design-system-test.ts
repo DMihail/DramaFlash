@@ -4,7 +4,7 @@ import { posterSize } from '@/components/PosterCard';
 import { buttonFill } from '@/components/PrimaryButton';
 import { screenEdges } from '@/components/Screen';
 import { fontFaces, splashCanHide } from '@/theme/fonts';
-import { colors, fontFamily, layout } from '@/theme/tokens';
+import { colors, fontFamily, gradient, layout, radius, space } from '@/theme/tokens';
 import { resolveFontFamily, textRoles } from '@/theme/type';
 
 describe('design system', () => {
@@ -51,6 +51,54 @@ describe('design system', () => {
     expect(screenEdges.tabs).toEqual(['top', 'left', 'right']);
     expect(screenEdges.stack).toEqual(['top', 'right', 'bottom', 'left']);
     expect(screenEdges.full).toEqual([]);
+  });
+
+  test('keeps the approved Home and Series Details gradients', () => {
+    expect(gradient.brand.colors).toEqual(['#64EDF7', '#CB64F7']);
+    expect(gradient.brand.start).toEqual({ x: 0, y: 0.5 });
+    expect(gradient.brand.end).toEqual({ x: 1, y: 0.5 });
+    expect(gradient.homeHeroTop.colors).toEqual([
+      'rgba(0, 0, 0, 0.4)',
+      'rgba(0, 0, 0, 0)',
+      'rgba(0, 0, 0, 0.1)',
+    ]);
+    expect(gradient.homeHeroTop.locations).toEqual([0, 0.5, 1]);
+    expect(gradient.homeHeroBottom.colors).toEqual([
+      'rgba(0, 0, 0, 1)',
+      'rgba(0, 0, 0, 0.8)',
+      'rgba(0, 0, 0, 0)',
+    ]);
+    expect(gradient.homeHeroTint).toBe('rgba(100, 237, 247, 0.1)');
+    expect(gradient.detailHero.colors).toEqual([
+      'rgba(0, 0, 0, 1)',
+      'rgba(0, 0, 0, 0.6)',
+      'rgba(0, 0, 0, 0)',
+    ]);
+    expect(gradient.detailHero.locations).toEqual([0, 0.5, 1]);
+    expect(gradient.detailTopBar.colors).toEqual(['rgba(0, 0, 0, 0.8)', 'rgba(0, 0, 0, 0)']);
+    expect(gradient.detailTopBar.height).toBe(96);
+  });
+
+  test('keeps the spacing scale and corner radius', () => {
+    expect(space).toEqual({
+      xs: 4,
+      sm: 8,
+      md: 12,
+      lg: 16,
+      xl: 20,
+      xxl: 24,
+      xxxl: 32,
+      section: 48,
+    });
+    expect(radius).toEqual({
+      xs: 4,
+      sm: 6,
+      md: 10,
+      lg: 12,
+      card: 14,
+      sheetInner: 18,
+      sheet: 24,
+    });
   });
 
   test('uses the series length for poster, chip, and button variants', () => {
