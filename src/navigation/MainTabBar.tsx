@@ -42,22 +42,24 @@ export function MainTabBar({
         const color = selected ? colors.primary : colors.textSecondary;
         const Icon = item.icon;
 
+        const handlePress = () => {
+          if (!route) {
+            router.navigate(romanceDestination());
+            return;
+          }
+
+          if (!selected) {
+            navigateToTab(route.key);
+          }
+        };
+
         return (
           <Pressable
             key={item.label}
             accessibilityLabel={item.label}
             accessibilityRole="tab"
             accessibilityState={{ selected }}
-            onPress={() => {
-              if (!route) {
-                router.navigate(romanceDestination());
-                return;
-              }
-
-              if (!selected) {
-                navigateToTab(route.key);
-              }
-            }}
+            onPress={handlePress}
             style={({ pressed }) => [styles.item, pressed ? styles.pressed : null]}
           >
             <Icon color={color} size={iconSize.tab} strokeWidth={iconStroke} />
