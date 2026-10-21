@@ -96,25 +96,25 @@ export function HomeCatalog({
 
 const styles = StyleSheet.create({
   catalog: {
-    paddingTop: space[16],
-    gap: space[32],
-    paddingBottom: space[32],
+    paddingTop: space.lg,
+    gap: space.xxxl,
+    paddingBottom: space.xxxl,
   },
   chips: {
     paddingHorizontal: layout.marginScreen,
-    gap: space[8],
+    gap: space.sm,
   },
   empty: {
     paddingHorizontal: layout.marginScreen,
     color: colors.textSecondary,
   },
   section: {
-    gap: space[12],
+    gap: space.md,
   },
   group: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: space[8],
+    gap: space.sm,
     paddingHorizontal: layout.marginScreen,
   },
   marker: {
@@ -128,6 +128,6 @@ const styles = StyleSheet.create({
   },
   rail: {
     paddingHorizontal: layout.marginScreen,
-    gap: space[12],
+    gap: space.md,
   },
 });

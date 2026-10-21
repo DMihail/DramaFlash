@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: space[12],
+    gap: space.md,
   },
   title: {
     flexShrink: 1,

@@ -112,19 +112,19 @@ export function HomeScreen() {
 
 const styles = StyleSheet.create({
   content: {
-    paddingBottom: space[16],
+    paddingBottom: space.lg,
   },
   notice: {
     position: 'absolute',
-    left: space[16],
-    right: space[16],
-    bottom: space[16],
+    left: space.lg,
+    right: space.lg,
+    bottom: space.lg,
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.border,
-    paddingHorizontal: space[16],
-    paddingVertical: space[12],
+    paddingHorizontal: space.lg,
+    paddingVertical: space.md,
   },
   noticeText: {
     color: colors.text,

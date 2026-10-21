@@ -14,6 +14,7 @@ import {
   sharePayload,
   shouldApplySeriesResult,
   visibleEpisodes,
+  walletForEpisodes,
 } from '@/features/series/model';
 import { clearLoginTicket, holdLoginTicket, readLoginTicket } from '@/navigation/pendingLogin';
 
@@ -137,7 +138,7 @@ describe('series details', () => {
   });
 
   test('sends a guest to login and keeps the series id', () => {
-    const result = seriesSaveRequest('love-on-detours');
+    const result = seriesSaveRequest('love-on-detours', null);
 
     expect(result).toMatchObject({
       type: 'login',
@@ -151,6 +152,23 @@ describe('series details', () => {
     expect(readLoginTicket()?.seriesIdToSave).toBe('love-on-detours');
     expect(seriesLoginDestination()).toBe('/login');
     expect(result).not.toMatchObject({ type: 'saved' });
+  });
+
+  test('reads a passed wallet and does not store a signed-in save', () => {
+    const persisted = {
+      balance: STARTING_BALANCE,
+      unlocks: [{ seriesId: 'the-ceo-and-i', episode: 4 }],
+    };
+    const signedIn = { provider: 'email' as const, savedSeriesIds: [] as string[] };
+
+    expect(walletForEpisodes(persisted)).toBe(persisted);
+    expect(walletForEpisodes()).toEqual(freshWallet());
+    expect(episodeAccess(walletForEpisodes(persisted), 'the-ceo-and-i', 4, 50)).toBe('unlocked');
+    expect(seriesSaveRequest('the-ceo-and-i', signedIn)).toEqual({
+      type: 'saved',
+      seriesId: 'the-ceo-and-i',
+    });
+    expect(signedIn.savedSeriesIds).toEqual([]);
   });
 
   test('shares the title without claiming a link was copied', () => {

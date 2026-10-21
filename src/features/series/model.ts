@@ -1,9 +1,11 @@
 import { type Href } from 'expo-router';
 
 import { type SeriesDetailsData, type SeriesEpisode } from '@/api/series';
+import { type DemoAuth } from '@/domain/auth';
 import {
   EPISODE_COST,
   FREE_EPISODE_LIMIT,
+  freshWallet,
   isEpisodeInSeries,
   isEpisodeUnlocked,
   type Wallet,
@@ -56,8 +58,13 @@ export function shouldApplySeriesResult(
   return !aborted && request.seriesId === current.seriesId && request.attempt === current.attempt;
 }
 
-export function seriesSaveRequest(seriesId: string) {
-  return requestSeriesSave(null, seriesId);
+// A missing wallet is the 15-coin demo. The screen reads it and does not store it.
+export function walletForEpisodes(wallet?: Wallet): Wallet {
+  return wallet ?? freshWallet();
+}
+
+export function seriesSaveRequest(seriesId: string, auth: DemoAuth | null) {
+  return requestSeriesSave(auth, seriesId);
 }
 
 export function seriesLoginDestination(): Href {

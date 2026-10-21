@@ -64,10 +64,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceMedia,
   },
   title: {
-    marginTop: space[12],
+    marginTop: space.md,
   },
   meta: {
-    marginTop: space[4],
+    marginTop: space.xs,
     color: colors.textMeta,
   },
 });

@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     borderRadius: control.button / 2,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: space[24],
+    paddingHorizontal: space.xxl,
   },
   fill: {
     flexGrow: 1,
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: space[8],
+    gap: space.sm,
   },
   glow: {
     shadowColor: colors.primary,

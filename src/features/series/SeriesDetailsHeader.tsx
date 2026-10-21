@@ -1,0 +1,134 @@
+import { Image, type ImageSourcePropType, Pressable, StyleSheet, View } from 'react-native';
+
+import { ArrowUpDown, ChevronLeft, Heart, Play, Share2 } from 'lucide-react-native';
+
+import { AppText } from '@/components/AppText';
+import { IconButton } from '@/components/IconButton';
+import { PrimaryButton } from '@/components/PrimaryButton';
+import { episodeCountLabel } from '@/features/series/model';
+import { colors, control, iconSize, iconStroke, layout, space } from '@/theme/tokens';
+
+export function SeriesDetailsHeader({
+  episodeCount,
+  image,
+  onBack,
+  onPlay,
+  onSave,
+  onShare,
+  onSort,
+  showPlay,
+  showSort,
+  sortLabel,
+  title,
+  topInset,
+}: {
+  episodeCount: number | null;
+  image?: ImageSourcePropType;
+  onBack: () => void;
+  onPlay: () => void;
+  onSave: () => void;
+  onShare: () => void;
+  onSort: () => void;
+  showPlay: boolean;
+  showSort: boolean;
+  sortLabel: string;
+  title: string;
+  topInset: number;
+}) {
+  return (
+    <View>
+      <View>
+        {image ? (
+          <Image accessibilityIgnoresInvertColors source={image} style={styles.hero} />
+        ) : (
+          <View style={[styles.hero, styles.heroFallback]} />
+        )}
+        <View style={[styles.heroBar, { paddingTop: topInset + space.sm }]}>
+          <IconButton accessibilityLabel="Go back" icon={ChevronLeft} onPress={onBack} />
+          <View style={styles.heroActions}>
+            <IconButton accessibilityLabel="Share series" icon={Share2} onPress={onShare} />
+            <IconButton accessibilityLabel="Save series" icon={Heart} onPress={onSave} />
+          </View>
+        </View>
+      </View>
+      <View style={styles.copy}>
+        <AppText accessibilityRole="header" role="displayL">
+          {title}
+        </AppText>
+        <AppText role="bodySmall">{episodeCountLabel(episodeCount)}</AppText>
+        {showPlay ? (
+          <PrimaryButton fill icon={Play} label="Play Ep 1" onPress={onPlay} variant="player" />
+        ) : null}
+      </View>
+      <View style={styles.episodeHeading}>
+        <View style={styles.episodeTitle}>
+          <AppText role="titleM">Episodes</AppText>
+          {episodeCount !== null ? <AppText role="caption">{episodeCount}</AppText> : null}
+        </View>
+        {showSort ? (
+          <Pressable
+            accessibilityLabel={sortLabel}
+            accessibilityRole="button"
+            onPress={onSort}
+            style={styles.sortButton}
+          >
+            <ArrowUpDown color={colors.primary} size={iconSize.header} strokeWidth={iconStroke} />
+            <AppText color="primary" role="caption">
+              Sort
+            </AppText>
+          </Pressable>
+        ) : null}
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  hero: {
+    width: '100%',
+    aspectRatio: 3 / 4,
+    backgroundColor: colors.surfaceMedia,
+  },
+  heroFallback: {
+    backgroundColor: colors.surface,
+  },
+  heroBar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: layout.marginDetail,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  heroActions: {
+    flexDirection: 'row',
+    gap: space.sm,
+  },
+  copy: {
+    paddingHorizontal: layout.marginDetail,
+    paddingTop: space.xl,
+    gap: space.md,
+  },
+  episodeHeading: {
+    marginTop: space.xxl,
+    paddingHorizontal: layout.marginDetail,
+    paddingBottom: space.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  episodeTitle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.sm,
+  },
+  sortButton: {
+    minHeight: control.button,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.xs,
+    paddingHorizontal: space.sm,
+  },
+});

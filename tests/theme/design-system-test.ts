@@ -4,7 +4,7 @@ import { posterSize } from '@/components/PosterCard';
 import { buttonFill } from '@/components/PrimaryButton';
 import { screenEdges } from '@/components/Screen';
 import { fontFaces, splashCanHide } from '@/theme/fonts';
-import { colors, fontFamily, layout } from '@/theme/tokens';
+import { colors, fontFamily, layout, radius, space } from '@/theme/tokens';
 import { resolveFontFamily, textRoles } from '@/theme/type';
 
 describe('design system', () => {
@@ -51,6 +51,28 @@ describe('design system', () => {
     expect(screenEdges.tabs).toEqual(['top', 'left', 'right']);
     expect(screenEdges.stack).toEqual(['top', 'right', 'bottom', 'left']);
     expect(screenEdges.full).toEqual([]);
+  });
+
+  test('keeps the spacing scale and corner radius', () => {
+    expect(space).toEqual({
+      xs: 4,
+      sm: 8,
+      md: 12,
+      lg: 16,
+      xl: 20,
+      xxl: 24,
+      xxxl: 32,
+      section: 48,
+    });
+    expect(radius).toEqual({
+      xs: 4,
+      sm: 6,
+      md: 10,
+      lg: 12,
+      card: 14,
+      sheetInner: 18,
+      sheet: 24,
+    });
   });
 
   test('uses the series length for poster, chip, and button variants', () => {

@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 
 import { isMockRequestAborted } from '@/api/mockRequest';
-import { loadSeriesDetails } from '@/api/series';
+import {
+  loadSeriesDetails,
+  type SeriesDetailsResult,
+  type SeriesRequestOptions,
+} from '@/api/series';
 import {
   type SeriesDetailsState,
   type SeriesRequestIdentity,
@@ -12,7 +16,15 @@ import {
 // promise cache and still would not cover error, empty, retry, or cancellation.
 // useOptimistic and useActionState are for user actions that change data.
 
-export function useSeriesDetails(seriesId: string | undefined): {
+export type SeriesDetailsLoader = (
+  seriesId: string,
+  options?: SeriesRequestOptions,
+) => Promise<SeriesDetailsResult>;
+
+export function useSeriesDetails(
+  seriesId: string | undefined,
+  load: SeriesDetailsLoader = loadSeriesDetails,
+): {
   retry: () => void;
   state: SeriesDetailsState;
 } {
@@ -39,7 +51,7 @@ export function useSeriesDetails(seriesId: string | undefined): {
     const request: SeriesRequestIdentity = { seriesId, attempt };
     let aborted = false;
 
-    loadSeriesDetails(seriesId, { signal: controller.signal })
+    load(seriesId, { signal: controller.signal })
       .then((result) => {
         if (!shouldApplySeriesResult(request, { seriesId, attempt }, aborted)) {
           return;
@@ -63,7 +75,7 @@ export function useSeriesDetails(seriesId: string | undefined): {
       aborted = true;
       controller.abort();
     };
-  }, [attempt, seriesId]);
+  }, [attempt, load, seriesId]);
 
   const retry = () => {
     setAttempt((current) => current + 1);

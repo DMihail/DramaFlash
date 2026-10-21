@@ -95,14 +95,14 @@ const styles = StyleSheet.create({
   },
   copy: {
     paddingHorizontal: layout.marginHero,
-    paddingBottom: space[20],
-    gap: space[8],
+    paddingBottom: space.xl,
+    gap: space.sm,
   },
   spotlight: {
     alignSelf: 'flex-start',
     minHeight: 22,
     borderRadius: radius.lg,
-    paddingHorizontal: space[8],
+    paddingHorizontal: space.sm,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(203, 100, 247, 0.2)',
@@ -119,8 +119,8 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: space[12],
-    marginTop: space[8],
+    gap: space.md,
+    marginTop: space.sm,
   },
   watch: {
     flex: 1,

@@ -25,7 +25,7 @@ export function SeriesDetailsSkeleton() {
 const styles = StyleSheet.create({
   copy: {
     paddingHorizontal: layout.marginDetail,
-    paddingTop: space[20],
-    gap: space[12],
+    paddingTop: space.xl,
+    gap: space.md,
   },
 });

@@ -26,14 +26,14 @@ export const fontFamily = {
 } as const;
 
 export const space = {
-  4: 4,
-  8: 8,
-  12: 12,
-  16: 16,
-  20: 20,
-  24: 24,
-  32: 32,
-  48: 48,
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  xxl: 24,
+  xxxl: 32,
+  section: 48,
 } as const;
 
 export const radius = {
