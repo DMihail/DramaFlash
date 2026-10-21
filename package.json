@@ -44,7 +44,11 @@
   },
   "jest": {
     "preset": "jest-expo",
-    "passWithNoTests": false
+    "passWithNoTests": false,
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/High-Fidelity DramaFlash Prototype/"
+    ]
   },
   "engines": {
     "node": ">=22.13.0 <23",
