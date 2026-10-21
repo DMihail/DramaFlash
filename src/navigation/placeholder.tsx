@@ -1,12 +1,20 @@
 import { StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/AppText';
-import { Screen } from '@/components/Screen';
+import { Screen, type ScreenSafeArea } from '@/components/Screen';
 import { space } from '@/theme/tokens';
 
-export function Placeholder({ title, detail }: { title: string; detail?: string }) {
+export function Placeholder({
+  title,
+  detail,
+  safeArea,
+}: {
+  title: string;
+  detail?: string;
+  safeArea: ScreenSafeArea;
+}) {
   return (
-    <Screen>
+    <Screen safeArea={safeArea}>
       <View style={styles.content}>
         <AppText role="displayM" style={styles.center}>
           {title}

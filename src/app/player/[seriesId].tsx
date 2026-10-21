@@ -11,8 +11,8 @@ export default function PlayerScreen() {
   const episode = parseEpisodeNumber(params.episode, series?.episodeCount ?? null);
 
   if (!series) {
-    return <Placeholder title="Series not found" detail={seriesId} />;
+    return <Placeholder detail={seriesId} safeArea="full" title="Series not found" />;
   }
 
-  return <Placeholder title={series.title} detail={`Episode ${episode}`} />;
+  return <Placeholder detail={`Episode ${episode}`} safeArea="full" title={series.title} />;
 }

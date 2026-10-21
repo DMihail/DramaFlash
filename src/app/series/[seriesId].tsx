@@ -10,9 +10,9 @@ export default function SeriesScreen() {
   const series = seriesId ? findSeries(seriesId) : undefined;
 
   if (!series) {
-    return <Placeholder title="Series not found" detail={seriesId} />;
+    return <Placeholder safeArea="stack" title="Series not found" detail={seriesId} />;
   }
 
   const count = series.episodeCount === null ? 'Episode count not confirmed' : `${series.episodeCount} episodes`;
-  return <Placeholder title={series.title} detail={count} />;
+  return <Placeholder detail={count} safeArea="stack" title={series.title} />;
 }

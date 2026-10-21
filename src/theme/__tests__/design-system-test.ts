@@ -2,6 +2,7 @@ import { fontFaces, splashCanHide } from '@/theme/fonts';
 import { colors, fontFamily, layout } from '@/theme/tokens';
 import { resolveFontFamily, textRoles } from '@/theme/type';
 import { buttonFill } from '@/components/PrimaryButton';
+import { screenEdges } from '@/components/Screen';
 import { chipColors } from '@/components/GenreChip';
 import { iconButtonMetrics } from '@/components/IconButton';
 import { posterSize } from '@/components/PosterCard';
@@ -44,6 +45,12 @@ describe('design system', () => {
     expect(splashCanHide(false, null)).toBe(false);
     expect(splashCanHide(true, null)).toBe(true);
     expect(splashCanHide(false, new Error('Font failed'))).toBe(true);
+  });
+
+  test('keeps the bottom inset off tab screens and the full-screen player', () => {
+    expect(screenEdges.tabs).toEqual(['top', 'left', 'right']);
+    expect(screenEdges.stack).toEqual(['top', 'right', 'bottom', 'left']);
+    expect(screenEdges.full).toEqual([]);
   });
 
   test('uses the series length for poster, chip, and button variants', () => {
