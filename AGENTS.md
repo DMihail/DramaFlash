@@ -15,6 +15,14 @@ Cursor also supports project rules in `.cursor/rules/` as `.mdc` files. A plain 
 | `AGENTS.md` | Every coding agent | App stack, Expo docs, git, checks, how to talk to the user, GitHub writing |
 | `.cursor/rules/github-communication.mdc` | Cursor only, every chat | Do not add Cursor signatures or automatic AI co-author lines |
 
+## Local plans
+
+Before building a screen, read the local plans. They are not in git:
+
+`docs/PROTOTYPE_AUDIT.md`, `docs/ARCHITECTURE.md`, `docs/DESIGN_SYSTEM.md`, `docs/MIGRATION_MAP.md`, and `docs/IMPLEMENTATION_PLAN.md`.
+
+`references/DESIGN_GUIDE.md` is local too. Do not commit these files.
+
 ## Expo has changed — do not trust your training data
 
 Follow the official docs for the Expo SDK installed in this repo. Expo changes APIs in every SDK release. Names you remember may be wrong.
