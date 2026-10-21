@@ -1,41 +1,98 @@
-This is an Expo/React Native mobile application. Prioritize mobile-first patterns, performance, and cross-platform compatibility.
+# DramaFlash
+
+DramaFlash is an Expo SDK 58 app for iOS and Android. Use React Native, TypeScript strict mode, and Expo Router.
+
+Prioritize iOS and Android compatibility, performance, and code that is easy to maintain.
+
+## Rule files
+
+Shared engineering rules live in this file. Cursor reads it from the repository root.
+
+Cursor also supports project rules in `.cursor/rules/` as `.mdc` files. A plain `.md` file in that folder is ignored. Use `.cursor/rules/` only for Cursor behavior. Do not copy these shared rules into a new `.mdc` file.
+
+| File | Who reads it | What it covers |
+| --- | --- | --- |
+| `AGENTS.md` | Every coding agent | App stack, Expo docs, git, checks, how to talk to the user, GitHub writing |
+| `.cursor/rules/github-communication.mdc` | Cursor only, every chat | Do not add Cursor signatures or automatic AI co-author lines |
 
 ## Expo has changed — do not trust your training data
 
-Expo ships breaking changes every SDK release. APIs you remember are likely renamed, moved, or removed. Before writing any code that touches an Expo, EAS, or React Native API:
+Follow the official docs for the Expo SDK installed in this repo. Expo changes APIs in every SDK release. Names you remember may be wrong.
+
+Before writing code that uses an Expo, EAS, or React Native API:
 
 1. Read the major version of the `expo` package in `package.json`.
-2. Fetch the matching versioned docs: `https://docs.expo.dev/versions/v<major>.0.0/`
-3. For anything else, fetch https://docs.expo.dev/llms.txt — an index of all Expo docs with corrections to common LLM misconceptions. Follow its links to the specific page you need; never answer from memory.
+2. Fetch the matching docs: `https://docs.expo.dev/versions/v<major>.0.0/`
+3. For anything else, fetch `https://docs.expo.dev/llms.txt` and open the page you need. Do not answer from memory.
 
-## Commands
+## Project
 
-Use `bunx` instead of `npx` if the project uses bun (`bun.lock` present).
+- Use native React Native components and Expo APIs.
+- Do not copy React DOM or CSS code from Figma Make.
+- Keep the architecture simple. Do not add abstractions you do not need.
+- Install packages with `npx expo install <package>` so the version matches the SDK. Do not use `npm install`, `yarn add`, `pnpm add`, or `bun add` for Expo packages.
+- This repo uses npm and `package-lock.json`. Use `bunx` only if `bun.lock` is present.
+- Never commit secrets, credentials, or generated native folders. Examples: `.env`, `credentials.json`, keystores, provisioning profiles, `ios/`, and `android/`.
+- If `ios/` and `android/` are missing, Expo generates them (Continuous Native Generation). Do not create or edit them by hand. Configure native behavior in `app.json` and config plugins.
+- Expo Go only includes its own native modules. After you add a library with native code, use a development build: `npx expo run:ios` or `npx expo run:android` locally, or `eas build --profile development`.
+- Prefer Expo modules over third-party libraries. Check project skills before you add a dependency. Docs: `https://docs.expo.dev/versions/latest/index.md`
 
-```bash
-npx expo install <package>  # ALWAYS use instead of npm/yarn/pnpm/bun add — resolves SDK-compatible versions
-npx expo start              # start the dev server
-npx expo lint               # lint
-npx tsc --noEmit            # typecheck
-npx expo-doctor             # diagnose dependency and config issues
-npx expo install --fix      # fix incompatible package versions
-```
+## Navigation
 
-Run lint and typecheck before declaring any task done.
-
-## Navigation & Routing
-
-- Use **Expo Router** for all navigation. Routes live in `src/app/` — every file there is a screen, `_layout.tsx` files define navigators. Keep non-route code (components, hooks, utils) outside `src/app/`.
+- Use Expo Router for all navigation.
+- Routes live in `src/app/`. Every file there is a screen. `_layout.tsx` files define navigators.
+- Keep components, hooks, and utils outside `src/app/`.
 - Import `Link`, `router`, and `useLocalSearchParams` from `expo-router`.
-- Docs: https://docs.expo.dev/router/introduction.md
+- Docs: `https://docs.expo.dev/router/introduction.md`
 
 ## Building with EAS
 
-Use EAS to build, sign, and submit the app in the cloud (`eas build`, `eas submit`) and to ship over-the-air updates (`eas update`) — no local Xcode or Android Studio required. Run EAS CLI as `bunx eas-cli <command>` in Bun projects, or `npx eas-cli@latest <command>` otherwise; substitute that for bare `eas` in docs examples.
-Docs: https://docs.expo.dev/eas/index.md
+Use EAS to build, sign, and submit the app in the cloud (`eas build`, `eas submit`) and to ship over-the-air updates (`eas update`). Run the CLI as `npx eas-cli@latest <command>`. If `bun.lock` is present, use `bunx eas-cli` instead. Do not rely on a global `eas` binary.
 
-## Rules
+Docs: `https://docs.expo.dev/eas/index.md`
 
-- If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
-- Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
-- Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
+## Commands
+
+```bash
+npx expo install <package>  # SDK-compatible install
+npx expo start              # dev server
+npx expo lint               # lint
+npx tsc --noEmit            # typecheck
+npx expo-doctor             # dependency and config checks
+npx expo install --fix      # fix incompatible package versions
+npm run validate            # lint, typecheck, unit tests, and Expo Doctor
+```
+
+Run `npm run validate` before you open a pull request.
+
+Do not say that lint, types, tests, or Expo Doctor passed unless that command actually ran in this task. If a check did not run, say that.
+
+Do not turn off tests, lint rules, or TypeScript checks to make CI pass.
+
+## Git
+
+- Always create a feature branch.
+- Never push directly to `main`.
+- Never bypass branch protection.
+- Open a pull request for review.
+- Never merge a pull request without the repository owner's approval.
+
+## Communication
+
+- Write to the repository owner in simple English (CEFR A2–B1).
+- Keep explanations short and clear.
+- Explain important technical decisions and blockers.
+
+## GitHub writing
+
+Use this for commit messages, pull request descriptions, and review comments.
+
+- Be professional and concise.
+- Describe the real changes, why they were made, which tests ran, and any known limits.
+- Do not add promotional text, product slogans, or automatic AI-tool signatures.
+- Do not add "Made with Cursor" or "Generated by Cursor".
+- Do not add an AI-tool co-author trailer unless the owner explicitly asks for it.
+- Do not rewrite or remove attribution that a license, policy, or project rule already requires.
+- If the owner asks whether AI helped, or if a policy requires disclosure, answer truthfully.
+
+Cursor-only enforcement of the signature rules is in `.cursor/rules/github-communication.mdc`.
