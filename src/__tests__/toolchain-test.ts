@@ -1,10 +1,10 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import eas from '../../../eas.json';
-import packageJson from '../../../package.json';
+import eas from '../../eas.json';
+import packageJson from '../../package.json';
 
-const root = path.join(__dirname, '../../..');
+const root = path.join(__dirname, '../..');
 
 function read(relativePath: string) {
   return readFileSync(path.join(root, relativePath), 'utf8');

@@ -14,7 +14,7 @@ module.exports = defineConfig([
   ]),
   expoConfig,
   {
-    files: ['scripts/**/*.js', 'jest/**/*.js', 'eslint.config.js'],
+    files: ['eslint.config.js'],
     languageOptions: {
       globals: globals.node,
     },
