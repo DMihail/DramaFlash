@@ -2,19 +2,49 @@ import { Pressable, Text } from 'react-native';
 
 import TestRenderer, { act } from 'react-test-renderer';
 
-import { freshWallet, serializeWallet, STARTING_BALANCE, unlockEpisode } from '@/domain/wallet';
+import {
+  freshWallet,
+  serializeWallet,
+  STARTING_BALANCE,
+  unlockEpisode,
+  WALLET_STORAGE_KEY,
+} from '@/domain/wallet';
 import { useWalletSelector, WalletProvider } from '@/features/wallet/WalletProvider';
 import {
   type LocalStorage,
   MMKV_MIGRATION_KEY,
   MMKV_WALLET_KEY,
   WALLET_MIGRATION_COMPLETE,
+  WALLET_RESET_MARKER,
 } from '@/storage/persistence';
 import { createWalletStore } from '@/stores/walletStore';
 
 import { memoryLegacy, memoryLocal, walletRecord } from '../support/storage';
 
 const saved = unlockEpisode(freshWallet(), 'the-ceo-and-i', 4);
+
+async function finishWrites(local: { release: () => void }, pending: Promise<unknown>) {
+  let settled = false;
+  void pending.then(
+    () => {
+      settled = true;
+    },
+    () => {
+      settled = true;
+    },
+  );
+
+  for (let step = 0; step < 8 && !settled; step += 1) {
+    await Promise.resolve();
+    try {
+      local.release();
+    } catch {
+      // The next saved-wallet marker is not queued yet.
+    }
+  }
+
+  await pending;
+}
 
 function deferredLocal(): LocalStorage & { release: () => void } {
   const values = new Map<string, string>();
@@ -133,8 +163,7 @@ describe('wallet store', () => {
     const first = store.getState().unlock('the-ceo-and-i', 4);
     const second = store.getState().unlock('the-ceo-and-i', 5);
     await expect(second).resolves.toEqual({ status: 'busy' });
-    local.release();
-    await expect(first).resolves.toMatchObject({ status: 'saved' });
+    await finishWrites(local, first);
     expect(store.getState().wallet).toEqual(saved);
 
     await expect(store.getState().unlock('the-ceo-and-i', 4)).resolves.toMatchObject({
@@ -144,8 +173,7 @@ describe('wallet store', () => {
     const grant = store.getState().grantPack('coins-300');
     const competing = store.getState().unlock('the-ceo-and-i', 5);
     await expect(competing).resolves.toEqual({ status: 'busy' });
-    local.release();
-    await grant;
+    await finishWrites(local, grant);
 
     expect(store.getState().wallet?.balance).toBe(STARTING_BALANCE - 10 + 300);
     expect(store.getState().wallet?.unlocks).toEqual([{ seriesId: 'the-ceo-and-i', episode: 4 }]);
@@ -191,14 +219,29 @@ describe('wallet store', () => {
     await expect(development.getState().resetDemo()).resolves.toBe('reset');
     expect(development.getState().wallet).toEqual(freshWallet());
     expect(local.snapshot()).toBeNull();
-    expect(local.snapshot(MMKV_MIGRATION_KEY)).toBe(WALLET_MIGRATION_COMPLETE);
+    expect(local.snapshot(MMKV_MIGRATION_KEY)).toBe(WALLET_RESET_MARKER);
     expect(legacy.snapshot()).toBeNull();
 
-    await legacy.setItem('ignored', serializeWallet(saved));
+    await legacy.setItem(WALLET_STORAGE_KEY, serializeWallet(saved));
     const restarted = createWalletStore({ allowReset: true, legacy, local });
     await restarted.getState().hydrate();
 
     expect(restarted.getState().wallet).toEqual(freshWallet());
+  });
+
+  test('reports a saved wallet that later disappears instead of granting 15 coins', async () => {
+    const local = memoryLocal();
+    const legacy = memoryLegacy();
+    const store = createWalletStore({ allowReset: false, legacy, local });
+    await store.getState().hydrate();
+    await store.getState().unlock('the-ceo-and-i', 4);
+    expect(local.snapshot(MMKV_MIGRATION_KEY)).toBe(WALLET_MIGRATION_COMPLETE);
+
+    await local.delete(MMKV_WALLET_KEY);
+    const restarted = createWalletStore({ allowReset: false, legacy, local });
+    await restarted.getState().hydrate();
+
+    expect(restarted.getState()).toMatchObject({ status: 'error', wallet: null });
   });
 
   test('updates a component through a balance selector', async () => {

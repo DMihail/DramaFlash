@@ -305,6 +305,9 @@ describe('wallet flow', () => {
 
     await act(async () => {
       release();
+      await settle();
+      held.shift();
+      held[0]?.();
       await first;
     });
 
@@ -375,6 +378,9 @@ describe('wallet flow', () => {
 
     await act(async () => {
       release();
+      await settle();
+      held.shift();
+      held[0]?.();
       await grant;
     });
 
@@ -443,6 +449,8 @@ describe('wallet flow', () => {
 
     await expect(second).resolves.toEqual({ status: 'busy' });
     await act(async () => {
+      blocked.shift()?.();
+      await settle();
       blocked[0]?.();
       await first;
     });

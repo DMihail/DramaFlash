@@ -9,8 +9,12 @@ import { loadPersistedWallet } from '@/storage/migrations';
 import {
   type LocalStorage,
   MMKV_MIGRATION_KEY,
+  MMKV_RECOVERY_STRATEGY,
   MMKV_WALLET_KEY,
+  WALLET_ESTABLISHED_KEY,
+  WALLET_ESTABLISHED_VALUE,
   WALLET_MIGRATION_COMPLETE,
+  WALLET_RESET_MARKER,
 } from '@/storage/persistence';
 
 import { memoryLegacy, memoryLocal, walletRecord } from '../support/storage';
@@ -78,6 +82,7 @@ describe('wallet storage migration', () => {
     expect(local.snapshot()).toBe(serializeWallet(saved));
     expect(local.snapshot(MMKV_MIGRATION_KEY)).toBe(WALLET_MIGRATION_COMPLETE);
     expect(legacy.snapshot()).toBe(serializeWallet(saved));
+    expect(legacy.snapshot(WALLET_ESTABLISHED_KEY)).toBe(WALLET_ESTABLISHED_VALUE);
   });
 
   test('keeps the MMKV wallet when an earlier copy finished before the migration mark', async () => {
@@ -146,5 +151,48 @@ describe('wallet storage migration', () => {
       reason: 'corrupt',
     });
     expect(legacy.snapshot()).toBe('{');
+  });
+
+  test('does not grant 15 coins when a completed migration has lost its wallet', async () => {
+    const local = memoryLocal({ [MMKV_MIGRATION_KEY]: WALLET_MIGRATION_COMPLETE });
+    const legacy = memoryLegacy(serializeWallet(saved));
+
+    await expect(loadPersistedWallet(local, legacy)).resolves.toEqual({
+      status: 'error',
+      reason: 'missing',
+    });
+    expect(local.snapshot()).toBeNull();
+    expect(legacy.snapshot()).toBe(serializeWallet(saved));
+  });
+
+  test('starts at 15 coins after an intentional development reset', async () => {
+    const local = memoryLocal({ [MMKV_MIGRATION_KEY]: WALLET_RESET_MARKER });
+    const legacy = memoryLegacy(serializeWallet(saved));
+    await legacy.setItem(WALLET_ESTABLISHED_KEY, WALLET_ESTABLISHED_VALUE);
+
+    await expect(loadPersistedWallet(local, legacy)).resolves.toEqual({
+      status: 'ready',
+      wallet: freshWallet(),
+    });
+    expect(local.snapshot()).toBeNull();
+    expect(legacy.snapshot()).toBe(serializeWallet(saved));
+  });
+
+  test('does not grant 15 coins when recovery drops a wallet that was already saved', async () => {
+    const droppedWallet = memoryLocal({ [MMKV_MIGRATION_KEY]: WALLET_MIGRATION_COMPLETE });
+    const clearedFile = memoryLocal();
+    const legacy = memoryLegacy(serializeWallet(saved));
+    await legacy.setItem(WALLET_ESTABLISHED_KEY, WALLET_ESTABLISHED_VALUE);
+
+    await expect(loadPersistedWallet(droppedWallet, legacy)).resolves.toEqual({
+      status: 'error',
+      reason: 'missing',
+    });
+    await expect(loadPersistedWallet(clearedFile, legacy)).resolves.toEqual({
+      status: 'error',
+      reason: 'missing',
+    });
+    expect(legacy.snapshot()).toBe(serializeWallet(saved));
+    expect(MMKV_RECOVERY_STRATEGY).toBe('recover-on-error');
   });
 });

@@ -10,12 +10,15 @@ import {
   type LocalStorage,
   MMKV_MIGRATION_KEY,
   MMKV_WALLET_KEY,
+  WALLET_ESTABLISHED_KEY,
+  WALLET_ESTABLISHED_VALUE,
   WALLET_MIGRATION_COMPLETE,
+  WALLET_RESET_MARKER,
 } from '@/storage/persistence';
 
 export type PersistedWalletResult =
   | { status: 'ready'; wallet: Wallet }
-  | { status: 'error'; reason: 'corrupt' | 'migration-failed' | 'unreadable' };
+  | { status: 'error'; reason: 'corrupt' | 'migration-failed' | 'missing' | 'unreadable' };
 
 // Schema 1 is the wallet JSON written by serializeWallet. Any other version is
 // rejected by loadWallet. A missing MMKV wallet is not a schema error.
@@ -41,12 +44,27 @@ export async function loadPersistedWallet(
     return { status: 'error', reason: 'unreadable' };
   }
 
-  if (mark === WALLET_MIGRATION_COMPLETE) {
+  if (mark === WALLET_RESET_MARKER) {
     return { status: 'ready', wallet: freshWallet() };
+  }
+
+  // A completed copy means a wallet was saved. A missing record after that is
+  // data loss, including when MMKV recovery keeps the marker and drops the wallet.
+  if (mark === WALLET_MIGRATION_COMPLETE) {
+    return { status: 'error', reason: 'missing' };
   }
 
   if (mark !== undefined) {
     return { status: 'error', reason: 'corrupt' };
+  }
+
+  const established = await readEstablished(legacy);
+  if (established === 'unreadable') {
+    return { status: 'error', reason: 'unreadable' };
+  }
+
+  if (established === 'yes') {
+    return { status: 'error', reason: 'missing' };
   }
 
   let legacyRaw: string | null;
@@ -79,10 +97,33 @@ export async function loadPersistedWallet(
       // The copied wallet is already verified. The next launch reads MMKV.
     }
 
+    try {
+      await legacy.setItem(WALLET_ESTABLISHED_KEY, WALLET_ESTABLISHED_VALUE);
+    } catch {
+      // The MMKV copy is already verified.
+    }
+
     return { status: 'ready', wallet: parsed.wallet };
   }
 
   return { status: 'error', reason: 'migration-failed' };
+}
+
+async function readEstablished(legacy: WalletStorage): Promise<'yes' | 'no' | 'unreadable'> {
+  try {
+    const value = await legacy.getItem(WALLET_ESTABLISHED_KEY);
+    if (value === null) {
+      return 'no';
+    }
+
+    if (value === WALLET_ESTABLISHED_VALUE) {
+      return 'yes';
+    }
+
+    return 'unreadable';
+  } catch {
+    return 'unreadable';
+  }
 }
 
 function acceptStoredWallet(stored: string): PersistedWalletResult {

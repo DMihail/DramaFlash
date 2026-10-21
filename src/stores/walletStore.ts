@@ -14,7 +14,10 @@ import {
   type LocalStorage,
   MMKV_MIGRATION_KEY,
   MMKV_WALLET_KEY,
+  WALLET_ESTABLISHED_KEY,
+  WALLET_ESTABLISHED_VALUE,
   WALLET_MIGRATION_COMPLETE,
+  WALLET_RESET_MARKER,
 } from '@/storage/persistence';
 
 export type WalletActionResult =
@@ -87,6 +90,7 @@ export function createWalletStore({ allowReset, legacy, local }: WalletStoreOpti
 
       try {
         await commitWallet(local, decision.wallet);
+        await rememberSavedWallet(local, legacy);
         set({ wallet: decision.wallet, status: 'ready' });
         return { status: 'saved', wallet: decision.wallet };
       } catch {
@@ -170,8 +174,9 @@ export function createWalletStore({ allowReset, legacy, local }: WalletStoreOpti
 
         try {
           await legacy.removeItem(WALLET_STORAGE_KEY);
+          await legacy.removeItem(WALLET_ESTABLISHED_KEY);
           await local.delete(MMKV_WALLET_KEY);
-          await local.setString(MMKV_MIGRATION_KEY, WALLET_MIGRATION_COMPLETE);
+          await local.setString(MMKV_MIGRATION_KEY, WALLET_RESET_MARKER);
           set({ status: 'ready', wallet: freshWallet() });
           return 'reset';
         } catch {
@@ -183,4 +188,21 @@ export function createWalletStore({ allowReset, legacy, local }: WalletStoreOpti
       },
     };
   });
+}
+
+// The wallet JSON is already verified. These markers stop a later missing file
+// from looking like a new 15-coin install. A failure here does not roll back
+// the verified wallet.
+async function rememberSavedWallet(local: LocalStorage, legacy: WalletStorage): Promise<void> {
+  try {
+    await local.setString(MMKV_MIGRATION_KEY, WALLET_MIGRATION_COMPLETE);
+  } catch {
+    // The next launch still reads the wallet key.
+  }
+
+  try {
+    await legacy.setItem(WALLET_ESTABLISHED_KEY, WALLET_ESTABLISHED_VALUE);
+  } catch {
+    // The MMKV record is the source of truth.
+  }
 }

@@ -4,6 +4,12 @@ export const STORAGE_NAMESPACE = 'dramaflash';
 export const MMKV_WALLET_KEY = 'wallet';
 export const MMKV_MIGRATION_KEY = 'wallet-migration';
 export const WALLET_MIGRATION_COMPLETE = 'complete';
+export const WALLET_RESET_MARKER = 'reset';
+export const WALLET_ESTABLISHED_KEY = 'dramaflash.wallet-established.v1';
+export const WALLET_ESTABLISHED_VALUE = '1';
+// Keep records MMKV can still read. discard-on-error deletes the file and can
+// look like a new install.
+export const MMKV_RECOVERY_STRATEGY = 'recover-on-error' as const;
 
 export type LocalStorage = {
   getString: (key: string) => string | undefined | Promise<string | undefined>;
