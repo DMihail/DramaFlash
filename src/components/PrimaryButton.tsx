@@ -1,7 +1,18 @@
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+
+import type { LucideIcon } from 'lucide-react-native';
 
 import { AppText } from '@/components/AppText';
-import { colors, control, disabledOpacity, glow, pressOpacity, space } from '@/theme/tokens';
+import {
+  colors,
+  control,
+  disabledOpacity,
+  glow,
+  iconSize,
+  iconStroke,
+  pressOpacity,
+  space,
+} from '@/theme/tokens';
 
 export type ButtonVariant = 'primary' | 'player';
 
@@ -10,15 +21,19 @@ export function buttonFill(variant: ButtonVariant): string {
 }
 
 export function PrimaryButton({
+  disabled = false,
+  fill = false,
+  icon: Icon,
   label,
   onPress,
   variant = 'primary',
-  disabled = false,
 }: {
+  disabled?: boolean;
+  fill?: boolean;
+  icon?: LucideIcon;
   label: string;
   onPress?: () => void;
   variant?: ButtonVariant;
-  disabled?: boolean;
 }) {
   return (
     <Pressable
@@ -28,15 +43,21 @@ export function PrimaryButton({
       onPress={onPress}
       style={({ pressed }) => [
         styles.button,
+        fill ? styles.fill : null,
         { backgroundColor: buttonFill(variant) },
         variant === 'primary' ? styles.glow : styles.playerGlow,
         pressed && !disabled ? styles.pressed : null,
         disabled ? styles.disabled : null,
       ]}
     >
-      <AppText color="onPrimary" role="bodyStrong">
-        {label}
-      </AppText>
+      <View style={styles.content}>
+        {Icon ? (
+          <Icon color={colors.onPrimary} size={iconSize.button} strokeWidth={iconStroke} />
+        ) : null}
+        <AppText color="onPrimary" role="bodyStrong">
+          {label}
+        </AppText>
+      </View>
     </Pressable>
   );
 }
@@ -48,6 +69,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: space[24],
+  },
+  fill: {
+    flexGrow: 1,
+    alignSelf: 'stretch',
+  },
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: space[8],
   },
   glow: {
     shadowColor: colors.primary,

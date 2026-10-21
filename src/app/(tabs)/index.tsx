@@ -1,5 +1,5 @@
-import { Placeholder } from '@/navigation/placeholder';
+import { HomeScreen } from '@/features/home/HomeScreen';
 
-export default function HomeScreen() {
-  return <Placeholder safeArea="tabs" title="Home" />;
+export default function HomeRoute() {
+  return <HomeScreen />;
 }
