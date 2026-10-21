@@ -1,0 +1,28 @@
+appId: com.dramaflash.app.dev
+---
+- launchApp:
+    clearState: false
+- openLink: dramaflash-dev:///dev/reset-library
+- extendedWaitUntil:
+    visible:
+      id: library.reset
+    timeout: 20000
+- openLink: dramaflash-dev:///
+- extendedWaitUntil:
+    visible:
+      id: home.screen
+    timeout: 30000
+- tapOn:
+    id: home.save
+- openLink: dramaflash-dev:///library
+- extendedWaitUntil:
+    visible:
+      id: library.poster.the-ceo-and-i
+    timeout: 20000
+- tapOn:
+    id: library.poster.the-ceo-and-i
+- extendedWaitUntil:
+    visible:
+      id: series.title
+      text: The CEO and I
+    timeout: 20000

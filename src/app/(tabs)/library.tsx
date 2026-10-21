@@ -1,5 +1,5 @@
-import { Placeholder } from '@/navigation/placeholder';
+import { LibraryScreen } from '@/features/library/LibraryScreen';
 
-export default function LibraryScreen() {
-  return <Placeholder safeArea="tabs" title="Library" />;
+export default function LibraryRoute() {
+  return <LibraryScreen />;
 }

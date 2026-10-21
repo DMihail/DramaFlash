@@ -1,0 +1,39 @@
+appId: com.dramaflash.app.dev
+---
+- launchApp:
+    clearState: false
+- openLink: dramaflash-dev:///dev/reset-library
+- extendedWaitUntil:
+    visible:
+      id: library.reset
+    timeout: 20000
+- openLink: dramaflash-dev:///
+- extendedWaitUntil:
+    visible:
+      id: home.screen
+    timeout: 30000
+- tapOn:
+    id: home.save
+- openLink: dramaflash-dev:///series/love-on-detours
+- extendedWaitUntil:
+    visible:
+      id: series.play
+    timeout: 20000
+- tapOn:
+    id: series.play
+- extendedWaitUntil:
+    visible:
+      id: player.play
+    timeout: 20000
+- stopApp
+- launchApp:
+    clearState: false
+- openLink: dramaflash-dev:///library
+- extendedWaitUntil:
+    visible:
+      id: library.poster.the-ceo-and-i
+    timeout: 30000
+- extendedWaitUntil:
+    visible:
+      id: library.resume.love-on-detours
+    timeout: 20000

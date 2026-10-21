@@ -18,6 +18,7 @@ export function SeriesDetailsHeader({
   onPlay,
   onSave,
   onShare,
+  saved = false,
   onSort,
   showPlay,
   showSort,
@@ -31,6 +32,7 @@ export function SeriesDetailsHeader({
   onPlay: () => void;
   onSave: () => void;
   onShare: () => void;
+  saved?: boolean;
   onSort: () => void;
   showPlay: boolean;
   showSort: boolean;
@@ -77,7 +79,8 @@ export function SeriesDetailsHeader({
               testID={testIds.series.share}
             />
             <IconButton
-              accessibilityLabel="Save series"
+              accessibilityLabel={saved ? 'Remove from library' : 'Save series'}
+              filled={saved}
               icon={Heart}
               onPress={onSave}
               testID={testIds.series.save}

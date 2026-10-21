@@ -20,6 +20,8 @@ import {
   searchDestination,
   seriesDestination,
 } from '@/features/home/model';
+import { useOptionalLibrarySelector } from '@/features/library/LibraryProvider';
+import { librarySaveFailedMessage } from '@/features/library/model';
 import { holdLoginTicket } from '@/navigation/pendingLogin';
 import { testIds } from '@/testing/testIds';
 import { colors, radius, space } from '@/theme/tokens';
@@ -28,6 +30,12 @@ export function HomeScreen() {
   const [genre, setGenre] = useState<HomeGenre>('All');
   const [notice, setNotice] = useState<string | null>(null);
   const spotlight = homeSpotlight();
+  const libraryStatus = useOptionalLibrarySelector((state) => state.status);
+  const savedSeriesIds = useOptionalLibrarySelector((state) => state.savedSeriesIds);
+  const toggleSave = useOptionalLibrarySelector((state) => state.toggleSave);
+  const spotlightSaved = spotlight
+    ? (savedSeriesIds?.includes(spotlight.seriesId) ?? false)
+    : false;
 
   useEffect(() => {
     if (!notice) {
@@ -59,13 +67,26 @@ export function HomeScreen() {
       return;
     }
 
-    const result = requestSeriesSave(null, spotlight.seriesId);
-    if (result.type !== 'login') {
+    if (!toggleSave) {
+      const result = requestSeriesSave(null, spotlight.seriesId);
+      if (result.type !== 'login') {
+        return;
+      }
+
+      holdLoginTicket(result.ticket);
+      router.push(loginDestination());
       return;
     }
 
-    holdLoginTicket(result.ticket);
-    router.push(loginDestination());
+    if (libraryStatus !== 'ready') {
+      return;
+    }
+
+    void toggleSave(spotlight.seriesId).then((result) => {
+      if (result.status === 'save-failed') {
+        setNotice(librarySaveFailedMessage);
+      }
+    });
   };
 
   const handleOpenSeries = (seriesId: string) => {
@@ -90,6 +111,7 @@ export function HomeScreen() {
             image={posterArt(spotlight.seriesId)}
             onSave={handleSave}
             onWatch={handleWatch}
+            saved={spotlightSaved}
             title={spotlight.title}
           />
         ) : null}

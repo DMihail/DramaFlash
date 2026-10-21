@@ -1,0 +1,23 @@
+appId: com.dramaflash.app.dev
+---
+- launchApp:
+    clearState: false
+- openLink: dramaflash-dev:///discover
+- extendedWaitUntil:
+    visible:
+      id: discover.screen
+    timeout: 30000
+- tapOn:
+    id: discover.search
+- inputText: Secret
+- extendedWaitUntil:
+    visible:
+      id: discover.poster.my-secret-life
+    timeout: 20000
+- tapOn:
+    id: discover.poster.my-secret-life
+- extendedWaitUntil:
+    visible:
+      id: series.title
+      text: My Secret Life
+    timeout: 20000

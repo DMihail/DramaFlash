@@ -66,6 +66,10 @@ describe('test id registry', () => {
       testIds.series.episode(1),
       testIds.series.episode(4),
       testIds.coins.package('coins-300'),
+      testIds.discover.poster('my-secret-life'),
+      testIds.library.poster('the-ceo-and-i'),
+      testIds.library.resume('shadow-kiss'),
+      testIds.library.resume('love-on-detours'),
     ]);
     const selectors = maestroIds();
 
@@ -94,6 +98,15 @@ describe('test id registry', () => {
         testIds.coins.package('coins-300'),
         testIds.wallet.balance,
         testIds.wallet.reset,
+        testIds.discover.screen,
+        testIds.discover.search,
+        testIds.discover.poster('my-secret-life'),
+        testIds.home.save,
+        testIds.library.reset,
+        testIds.library.poster('the-ceo-and-i'),
+        testIds.library.resume('shadow-kiss'),
+        testIds.library.resume('love-on-detours'),
+        testIds.series.play,
       ]),
     );
   });

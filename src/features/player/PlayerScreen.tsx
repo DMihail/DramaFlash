@@ -24,6 +24,8 @@ import {
 } from '@/features/coins/model';
 import { posterArt } from '@/features/home/assets';
 import { loginDestination, requestSeriesSave, seriesDestination } from '@/features/home/model';
+import { useOptionalLibrarySelector } from '@/features/library/LibraryProvider';
+import { librarySaveFailedMessage } from '@/features/library/model';
 import {
   adjacentEpisode,
   commentsUnavailableMessage,
@@ -61,6 +63,10 @@ export function PlayerScreen({
 }) {
   const insets = useSafeAreaInsets();
   const shared = useOptionalWallet();
+  const libraryStatus = useOptionalLibrarySelector((item) => item.status);
+  const savedSeriesIds = useOptionalLibrarySelector((item) => item.savedSeriesIds);
+  const toggleSave = useOptionalLibrarySelector((item) => item.toggleSave);
+  const rememberEpisode = useOptionalLibrarySelector((item) => item.rememberEpisode);
   const episode = requestedEpisode(episodeParam);
   const { retry, state } = usePlayerEpisode(seriesId, episode, loadEpisode);
   const [notice, setNotice] = useState<string | null>(null);
@@ -68,6 +74,23 @@ export function PlayerScreen({
   const [unlockOpen, setUnlockOpen] = useState(false);
   const [unlockError, setUnlockError] = useState<string | null>(null);
   const resolved = resolveScreenWallet(confirmedWallet ?? wallet, wallet ? null : shared);
+  const readyWallet = resolved.kind === 'ready' ? resolved.wallet : null;
+  const openedSeriesId = state.status === 'success' ? state.data.series.id : null;
+  const openedEpisode = state.status === 'success' ? state.data.episode : null;
+
+  useEffect(() => {
+    if (
+      !rememberEpisode ||
+      libraryStatus !== 'ready' ||
+      !readyWallet ||
+      openedSeriesId === null ||
+      openedEpisode === null
+    ) {
+      return;
+    }
+
+    void rememberEpisode(openedSeriesId, openedEpisode, readyWallet);
+  }, [libraryStatus, openedEpisode, openedSeriesId, readyWallet, rememberEpisode]);
 
   useEffect(() => {
     if (!notice) {
@@ -261,13 +284,26 @@ export function PlayerScreen({
   };
 
   const handleSave = () => {
-    const result = requestSeriesSave(auth, data.series.id);
-    if (result.type !== 'login') {
+    if (!toggleSave) {
+      const result = requestSeriesSave(auth, data.series.id);
+      if (result.type !== 'login') {
+        return;
+      }
+
+      holdLoginTicket(result.ticket);
+      router.push(loginDestination());
       return;
     }
 
-    holdLoginTicket(result.ticket);
-    router.push(loginDestination());
+    if (libraryStatus !== 'ready') {
+      return;
+    }
+
+    void toggleSave(data.series.id).then((result) => {
+      if (result.status === 'save-failed') {
+        setNotice(librarySaveFailedMessage);
+      }
+    });
   };
 
   const handleComments = () => {
@@ -292,6 +328,7 @@ export function PlayerScreen({
         onPrevious={handlePrevious}
         onSave={handleSave}
         onShare={handleShare}
+        saved={savedSeriesIds?.includes(data.series.id) ?? false}
         balanceLabel={coinBalanceLabel(activeWallet.balance)}
         onUnlock={handleUnlock}
         preview={preview}

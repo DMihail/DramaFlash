@@ -64,7 +64,7 @@ export function HomeCatalog({
             ) : null}
             <SectionHeader
               actionLabel="See all"
-              onActionPress={() => onSeeAll(rail.title)}
+              onActionPress={() => onSeeAll(rail.genre)}
               testID={testIds.home.seeAll(rail.id)}
               title={rail.title}
             />

@@ -2,6 +2,8 @@ import { loadWallet, serializeWallet, type Wallet } from '@/domain/wallet';
 
 export const STORAGE_NAMESPACE = 'dramaflash';
 export const MMKV_WALLET_KEY = 'wallet';
+export const MMKV_LIBRARY_KEY = 'library';
+export const MMKV_PROGRESS_KEY = 'progress';
 export const MMKV_MIGRATION_KEY = 'wallet-migration';
 export const WALLET_MIGRATION_COMPLETE = 'complete';
 export const WALLET_RESET_MARKER = 'reset';

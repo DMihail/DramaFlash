@@ -15,6 +15,7 @@ export function iconButtonMetrics(size: IconButtonSize): { diameter: number; gly
 export function IconButton({
   accessibilityLabel,
   appearance = 'surface',
+  filled = false,
   icon: Icon,
   onPress,
   size = control.icon,
@@ -22,6 +23,7 @@ export function IconButton({
 }: {
   accessibilityLabel: string;
   appearance?: 'plain' | 'surface';
+  filled?: boolean;
   icon: LucideIcon;
   onPress?: () => void;
   size?: IconButtonSize;
@@ -47,7 +49,12 @@ export function IconButton({
         pressed ? styles.pressed : null,
       ]}
     >
-      <Icon color={colors.text} size={metrics.glyph} strokeWidth={iconStroke} />
+      <Icon
+        color={colors.text}
+        size={metrics.glyph}
+        strokeWidth={iconStroke}
+        {...(filled ? { fill: colors.primary } : {})}
+      />
     </Pressable>
   );
 }

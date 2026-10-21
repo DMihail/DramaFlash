@@ -14,6 +14,7 @@ export function PosterCard({
   image,
   meta,
   variant = 'rail',
+  size,
   onPress,
   testID,
 }: {
@@ -21,17 +22,18 @@ export function PosterCard({
   image?: ImageSourcePropType;
   meta?: string;
   variant?: PosterVariant;
+  size?: { width: number; height: number };
   onPress?: () => void;
   testID?: string;
 }) {
-  const size = posterSize(variant);
+  const measured = size ?? posterSize(variant);
   const art = image ? (
-    <Image accessibilityIgnoresInvertColors source={image} style={[styles.image, size]} />
+    <Image accessibilityIgnoresInvertColors source={image} style={[styles.image, measured]} />
   ) : (
-    <View style={[styles.image, styles.placeholder, size]} />
+    <View style={[styles.image, styles.placeholder, measured]} />
   );
   const caption = (
-    <View style={{ width: size.width }} {...(!onPress && testID ? { testID } : {})}>
+    <View style={{ width: measured.width }} {...(!onPress && testID ? { testID } : {})}>
       {art}
       <AppText numberOfLines={2} role="titleXS" style={styles.title}>
         {title}
