@@ -55,3 +55,10 @@ coverage/
 .eas/
 .idea/
 /references/
+
+# Local planning notes. Keep them on disk for Cursor. Do not publish them.
+/docs/PROTOTYPE_AUDIT.md
+/docs/ARCHITECTURE.md
+/docs/DESIGN_SYSTEM.md
+/docs/MIGRATION_MAP.md
+/docs/IMPLEMENTATION_PLAN.md
