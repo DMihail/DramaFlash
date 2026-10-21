@@ -10,10 +10,10 @@ Shared engineering rules live in this file. Cursor reads it from the repository 
 
 Cursor also supports project rules in `.cursor/rules/` as `.mdc` files. A plain `.md` file in that folder is ignored. Use `.cursor/rules/` only for Cursor behavior. Do not copy these shared rules into a new `.mdc` file.
 
-| File                                     | Who reads it            | What it covers                                                             |
-| ---------------------------------------- | ----------------------- | -------------------------------------------------------------------------- |
-| `AGENTS.md`                              | Every coding agent      | App stack, Expo docs, git, checks, how to talk to the user, GitHub writing |
-| `.cursor/rules/github-communication.mdc` | Cursor only, every chat | Do not add Cursor signatures or automatic AI co-author lines               |
+| File                                     | Who reads it            | What it covers                                                                                                 |
+| ---------------------------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `AGENTS.md`                              | Every coding agent      | App stack, React code quality, React Compiler, Expo docs, git, checks, how to talk to the user, GitHub writing |
+| `.cursor/rules/github-communication.mdc` | Cursor only, every chat | Do not add Cursor signatures or automatic AI co-author lines                                                   |
 
 ## Local plans
 
@@ -44,6 +44,76 @@ Before writing code that uses an Expo, EAS, or React Native API:
 - If `ios/` and `android/` are missing, Expo generates them (Continuous Native Generation). Do not create or edit them by hand. Configure native behavior in `app.json` and config plugins.
 - Expo Go only includes its own native modules. After you add a library with native code, use a development build: `npx expo run:ios` or `npx expo run:android` locally, or `eas build --profile development`.
 - Prefer Expo modules over third-party libraries. Check project skills before you add a dependency. Docs: `https://docs.expo.dev/versions/latest/index.md`
+
+## React and React Native
+
+Follow modern React, React Native, TypeScript, and Expo practice.
+
+- DRY: do not duplicate business logic, styles, or data transformations.
+- KISS: prefer a simple, readable solution over a new abstraction.
+- Single responsibility: each component, hook, and function should have one clear purpose.
+- Separation of concerns: keep rendering, navigation, business rules, and persistence apart where that stays practical.
+- Prefer composition over inheritance.
+- Prefer pure functions for business rules and data transformations.
+- Prefer explicit TypeScript types and clear component props.
+- Keep Expo Router route files thin. Put screen UI in feature folders.
+- Do not add a dependency or an architectural layer you do not need.
+
+### JSX handlers
+
+Extract an event handler into a named function when it contains navigation, business logic, a conditional branch, more than one statement, a state change combined with another action, or repeated behavior.
+
+A simple one-line callback may stay inline when the name would not make the JSX clearer. Do not extract every callback.
+
+### Performance
+
+- Do not use `useCallback`, `useMemo`, or `React.memo` by default.
+- Use them only for a measured performance problem or a real identity requirement, such as a library that needs a stable function.
+- Do not store derived data in state when it can be calculated from props or state during render.
+- Do not use `useEffect` for work that belongs in an event handler.
+- Use an effect to synchronize with an external system, and keep that effect focused.
+- Do not store the same state in more than one place.
+- Avoid extra Context providers and global stores.
+- Keep data flowing in one direction.
+
+### Components
+
+- Keep a component focused on one responsibility.
+- Extract a component when it is reused, or when that makes a complex screen easier to read.
+- Do not create a component for every small `View` or `Text`.
+- Keep feature-specific components in that feature folder.
+- Move a component to shared UI only when more than one feature needs it.
+- Use composition and typed props.
+- Avoid a large component with many boolean props.
+- Do not add a custom hook unless it removes real duplication or hides a real external subscription.
+
+### React Native UI
+
+- Use native React Native components and Expo APIs.
+- Use the existing design tokens and shared UI components.
+- Keep styles next to the component with `StyleSheet.create`.
+- Avoid an inline style object when a named style can express it. A dynamic value may stay inline.
+- Respect safe areas, accessibility, and platform differences.
+- Use `FlatList` for a long or dynamic list.
+- Do not add an animation or gesture library without a clear need.
+
+## React Compiler
+
+React Compiler is enabled with `experiments.reactCompiler` in `app.json`. Expo SDK 58 configures Babel for it. Do not add a custom Babel config or a second compiler plugin.
+
+`eslint-config-expo` already includes the React Compiler lint rules through `eslint-plugin-react-hooks`. Do not add `eslint-plugin-react-compiler`.
+
+Write components and hooks that follow the Rules of React:
+
+- Keep components pure during rendering.
+- Never mutate props or React state directly.
+- Do not run a side effect during rendering.
+- Update state immutably.
+- Call hooks unconditionally, at the top level.
+- Avoid an effect that only copies props into state.
+- Trust the compiler for automatic memoization where it supports the code.
+- Do not add `useMemo`, `useCallback`, or `React.memo` unless a measurement or an integration requires it.
+- Do not use a compiler directive such as `'use no memo'` to hide incorrect React code.
 
 ## Navigation
 

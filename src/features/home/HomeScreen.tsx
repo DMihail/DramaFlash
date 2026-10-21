@@ -37,36 +37,66 @@ export function HomeScreen() {
     return () => clearTimeout(timer);
   }, [notice]);
 
+  const handleProfile = () => {
+    router.navigate(profileDestination());
+  };
+
+  const handleSearch = () => {
+    router.navigate(searchDestination());
+  };
+
+  const handleWatch = () => {
+    if (!spotlight) {
+      return;
+    }
+
+    router.push(seriesDestination(spotlight.seriesId));
+  };
+
+  const handleSave = () => {
+    if (!spotlight) {
+      return;
+    }
+
+    const result = requestSeriesSave(null, spotlight.seriesId);
+    if (result.type !== 'login') {
+      return;
+    }
+
+    holdLoginTicket(result.ticket);
+    router.push(loginDestination());
+  };
+
+  const handleOpenSeries = (seriesId: string) => {
+    router.push(seriesDestination(seriesId));
+  };
+
+  const handleSeeAll = (category: string) => {
+    router.navigate(discoverDestination(category));
+  };
+
   return (
     <Screen safeArea="tabs">
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <HomeHeader
           onNotifications={() => setNotice(caughtUpMessage)}
-          onProfile={() => router.navigate(profileDestination())}
-          onSearch={() => router.navigate(searchDestination())}
+          onProfile={handleProfile}
+          onSearch={handleSearch}
         />
         {spotlight ? (
           <HomeHero
             episodeLabel={spotlight.episodeLabel}
             image={posterArt(spotlight.seriesId)}
-            onSave={() => {
-              const result = requestSeriesSave(null, spotlight.seriesId);
-              if (result.type !== 'login') {
-                return;
-              }
-
-              holdLoginTicket(result.ticket);
-              router.push(loginDestination());
-            }}
-            onWatch={() => router.push(seriesDestination(spotlight.seriesId))}
+            onSave={handleSave}
+            onWatch={handleWatch}
             title={spotlight.title}
           />
         ) : null}
         <HomeCatalog
           genre={genre}
           onGenreChange={setGenre}
-          onOpenSeries={(seriesId) => router.push(seriesDestination(seriesId))}
-          onSeeAll={(category) => router.navigate(discoverDestination(category))}
+          onOpenSeries={handleOpenSeries}
+          onSeeAll={handleSeeAll}
         />
       </ScrollView>
       {notice ? (
