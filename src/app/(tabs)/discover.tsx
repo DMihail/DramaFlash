@@ -1,5 +1,5 @@
 import { Placeholder } from '@/navigation/placeholder';
 
 export default function DiscoverScreen() {
-  return <Placeholder title="Discover" />;
+  return <Placeholder safeArea="tabs" title="Discover" />;
 }
