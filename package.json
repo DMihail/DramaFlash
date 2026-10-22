@@ -49,7 +49,7 @@
     "android": "APP_VARIANT=development expo start --android",
     "ios": "APP_VARIANT=development expo start --ios",
     "web": "APP_VARIANT=development expo start --web",
-    "export:web": "APP_VARIANT=production expo export --platform web",
+    "export:web": "APP_VARIANT=production expo export --platform web --clear && node scripts/check-web-export.mjs",
     "lint": "expo lint",
     "lint:fix": "expo lint --fix",
     "format": "prettier --write .",

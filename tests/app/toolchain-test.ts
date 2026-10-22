@@ -86,6 +86,22 @@ describe('project toolchain', () => {
     expect(eas.build.production).not.toHaveProperty('developmentClient');
   });
 
+  test('the preview profile builds a standalone production APK', () => {
+    expect(eas.build.preview.distribution).toBe('internal');
+    expect(eas.build.preview.env.APP_VARIANT).toBe('production');
+    expect(eas.build.preview.android.buildType).toBe('apk');
+    expect(eas.build.preview).not.toHaveProperty('developmentClient');
+  });
+
+  test('the web export is always the production variant', () => {
+    // A development web bundle exposes the demo reset routes.
+    const exportWeb = packageJson.scripts['export:web'];
+
+    expect(exportWeb).toContain('APP_VARIANT=production');
+    expect(exportWeb).toContain('--clear');
+    expect(exportWeb).toContain('node scripts/check-web-export.mjs');
+  });
+
   test('CI validates the repository without native builds or secret access', () => {
     const workflow = read('.github/workflows/ci.yml');
 

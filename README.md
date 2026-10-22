@@ -94,7 +94,7 @@ npm run export:web
 
 `npm run validate` runs lint, format check, typecheck, unit tests, and Expo Doctor. Run it before you open a pull request.
 
-`npm run export:web` builds the production web app into `dist/`. It sets `APP_VARIANT=production`. A plain `npx expo export` uses whatever `APP_VARIANT` your shell has, and a development export ships the demo reset routes.
+`npm run export:web` builds the production web app into `dist/`. It sets `APP_VARIANT=production`, clears the Metro cache, and fails if any bundle still carries the development variant. Do not deploy a plain `npx expo export`: it uses whatever `APP_VARIANT` your shell has, and a development bundle ships the demo reset routes.
 
 ## iOS and Android builds
 
