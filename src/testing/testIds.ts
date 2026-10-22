@@ -138,6 +138,7 @@ export const testIds = {
     saved: 'profile.saved',
     continue: 'profile.continue',
     settings: 'profile.settings',
+    loading: 'profile.loading',
     guest: 'profile.guest',
     signIn: 'profile.signIn',
     createAccount: 'profile.createAccount',

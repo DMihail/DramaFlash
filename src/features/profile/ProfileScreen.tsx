@@ -8,6 +8,7 @@ import { Bookmark, ChevronRight, Settings, User, Zap } from 'lucide-react-native
 import { AppText } from '@/components/AppText';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
+import { Skeleton } from '@/components/Skeleton';
 import { isDevelopmentRuntime } from '@/config/runtimeVariant';
 import { demoProviderLabel } from '@/domain/session';
 import { useAuthSelector } from '@/features/auth/AuthProvider';
@@ -123,6 +124,24 @@ export function ProfileScreen({ allowReset = isDevelopmentRuntime() }: { allowRe
         />
       </View>
     ) : null;
+
+  // While the session is read (first launch, or Try again after an error) the
+  // provider is still null. Showing the guest view then would flash it for a
+  // signed-in user, so show a neutral placeholder instead.
+  if (authStatus === 'loading') {
+    return (
+      <Screen safeArea="tabs" testID={testIds.profile.screen}>
+        <View style={styles.content} testID={testIds.profile.loading}>
+          <AppText accessibilityRole="header" role="displayL">
+            {profileTitle}
+          </AppText>
+          <Skeleton height={72} radius={36} style={styles.centered} width={72} />
+          <Skeleton height={24} style={styles.centered} width={220} />
+          <Skeleton height={48} width="100%" />
+        </View>
+      </Screen>
+    );
+  }
 
   // A guest gets a welcome and sign-in actions, not the account dashboard.
   // Browsing, free episodes, and demo coins work without signing in.
@@ -307,6 +326,9 @@ const styles = StyleSheet.create({
   },
   title: {
     textAlign: 'center',
+  },
+  centered: {
+    alignSelf: 'center',
   },
   avatar: {
     width: 72,

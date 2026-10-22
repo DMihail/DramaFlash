@@ -123,6 +123,49 @@ describe('profile screen', () => {
     expect(mockRouter.push).toHaveBeenLastCalledWith(loginDestination());
   });
 
+  test('shows a placeholder, not the guest view, while the session loads', async () => {
+    const local = memoryLocal({ [MMKV_SESSION_KEY]: serializeSession({ provider: 'google' }) });
+    let renderer: TestRenderer.ReactTestRenderer | undefined;
+    // Synchronous act: effects run, but the async session read has not finished.
+    act(() => {
+      renderer = TestRenderer.create(
+        <SafeAreaProvider initialMetrics={metrics}>
+          <WalletProvider legacy={memoryLegacy()} local={local}>
+            <LibraryProvider local={local}>
+              <AuthProvider local={local}>
+                <ProfileScreen allowReset={false} />
+              </AuthProvider>
+            </LibraryProvider>
+          </WalletProvider>
+        </SafeAreaProvider>,
+      );
+    });
+    if (!renderer) {
+      throw new Error('expected a screen');
+    }
+    const screen = renderer;
+    const has = (testID: string) =>
+      screen.root.findAll((node) => node.props.testID === testID).length > 0;
+
+    expect(has(testIds.profile.loading)).toBe(true);
+    expect(has(testIds.profile.guest)).toBe(false);
+
+    await act(async () => {
+      for (let step = 0; step < 12; step += 1) {
+        await Promise.resolve();
+      }
+    });
+
+    // The stored session restores straight to the signed-in profile.
+    expect(has(testIds.profile.loading)).toBe(false);
+    expect(has(testIds.profile.guest)).toBe(false);
+    expect(textOf(screen)).toContain('Demo account · Google');
+
+    await act(async () => {
+      screen.unmount();
+    });
+  });
+
   test('restores a saved session and shows the wallet balance and library', async () => {
     const wallet = serializeWallet(freshWallet());
     const local = memoryLocal({
