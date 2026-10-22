@@ -4,7 +4,7 @@ import { type PlayerEpisodeData } from '@/api/player';
 import { EPISODE_COST, isEpisodeInSeries, type Wallet } from '@/domain/wallet';
 import { type EpisodeAccess, episodeAccess, walletForEpisodes } from '@/features/series/model';
 
-export const artworkPreviewMessage = 'Artwork preview. No video is playing.';
+export const artworkPreviewMessage = 'No video is playing.';
 export const unavailableMediaMessage = 'This preview has no playable video.';
 export const playerErrorMessage = 'The episode could not be loaded.';
 export const episodeOutOfRangeMessage = 'That episode is not in this series.';

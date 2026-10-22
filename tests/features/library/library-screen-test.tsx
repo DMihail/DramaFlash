@@ -10,7 +10,11 @@ import { HomeScreen } from '@/features/home/HomeScreen';
 import { seriesDestination } from '@/features/home/model';
 import { LibraryProvider } from '@/features/library/LibraryProvider';
 import { LibraryScreen } from '@/features/library/LibraryScreen';
-import { libraryEmptyBody, librarySaveFailedMessage } from '@/features/library/model';
+import {
+  libraryEmptyBody,
+  librarySavedEmpty,
+  librarySaveFailedMessage,
+} from '@/features/library/model';
 import { PlayerScreen } from '@/features/player/PlayerScreen';
 import { playerDestination } from '@/features/series/model';
 import { WalletProvider } from '@/features/wallet/WalletProvider';
@@ -175,6 +179,8 @@ describe('library screen', () => {
       ),
     ).toHaveLength(0);
     expect(textOf(renderer)).toContain('Love on Detours');
+    // Continue watching alone must not leave the Saved tab blank.
+    expect(textOf(renderer)).toContain(librarySavedEmpty);
 
     await act(async () => {
       press(renderer, testIds.library.resume('love-on-detours'));

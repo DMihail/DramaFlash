@@ -83,15 +83,6 @@ export function unlockEpisode(wallet: Wallet, seriesId: string, episode: number)
   };
 }
 
-export function purchaseCoins(wallet: Wallet, packIndex: number): Wallet {
-  const pack = coinPacks[packIndex];
-  if (!pack) {
-    return wallet;
-  }
-
-  return addPack(wallet, pack);
-}
-
 export function grantCoinPack(wallet: Wallet, packId: string): Wallet | null {
   const pack = coinPacks.find((item) => item.id === packId);
   if (!pack) {
@@ -170,19 +161,6 @@ export function loadWallet(storage: KeyValueStore): WalletLoadResult {
   } catch {
     return { status: 'corrupt' };
   }
-}
-
-export async function readStoredWallet(storage: WalletStorage): Promise<WalletLoadResult> {
-  try {
-    const raw = await storage.getItem(WALLET_STORAGE_KEY);
-    return loadWallet({ getItem: () => raw });
-  } catch {
-    return { status: 'corrupt' };
-  }
-}
-
-export async function writeStoredWallet(storage: WalletStorage, wallet: Wallet): Promise<void> {
-  await storage.setItem(WALLET_STORAGE_KEY, serializeWallet(wallet));
 }
 
 function addPack(wallet: Wallet, pack: (typeof coinPacks)[number]): Wallet {

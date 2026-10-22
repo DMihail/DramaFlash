@@ -56,9 +56,16 @@ coverage/
 .idea/
 /references/
 
-# Local planning notes. Keep them on disk for Cursor. Do not publish them.
+# Local planning notes and design audit work. Keep them on disk; do not publish.
+# Tracked docs: docs/FINAL_*.md and docs/screenshots/ (used by the README).
 /docs/PROTOTYPE_AUDIT.md
 /docs/ARCHITECTURE.md
 /docs/DESIGN_SYSTEM.md
 /docs/MIGRATION_MAP.md
 /docs/IMPLEMENTATION_PLAN.md
+/docs/FIGMA_*.md
+/docs/audit/
+
+# Original design source and prototype (large, kept locally)
+/FLASH.svg
+/High-Fidelity DramaFlash Prototype/

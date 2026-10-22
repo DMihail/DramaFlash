@@ -18,15 +18,12 @@ export const storyHighlights = [
 export const storyCast = [
   { id: 'elena', name: 'Elena', role: 'Mia (Artist)' },
   { id: 'julian-vance', name: 'Julian Vance', role: 'Alexander (CEO)' },
+  // The board clips this role after "Chloe (Best", so only Chloe is shown.
   { id: 'sarah-lin', name: 'Sarah Lin', role: 'Chloe' },
   { id: 'marcus', name: 'Marcus', role: 'Rival CEO' },
 ] as const;
 
 export type StoryCastId = (typeof storyCast)[number]['id'];
-
-/** Sarah Lin’s parenthetical is cut off on the board after “Chloe (Best”. */
-export const storyCastRoleNote =
-  'Sarah Lin’s longer role label is clipped on the board, so only Chloe is shown.';
 
 const episodeTitles: Readonly<Record<number, string>> = {
   1: 'The Accidental Message',

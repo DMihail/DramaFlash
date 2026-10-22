@@ -1,18 +1,26 @@
 # DramaFlash
 
-DramaFlash is a demo app for short drama series. It uses Expo SDK 58, React Native, TypeScript in strict mode, and Expo Router. The app runs on iOS, Android, and the web.
+DramaFlash is a demo app for short drama series: browse series, watch free episodes, unlock paid episodes with demo coins, and keep a library. It runs on iOS, Android, and the web.
+
+<p>
+  <img src="docs/screenshots/home.jpg" alt="Home with the Spotlight series" width="240" />
+  <img src="docs/screenshots/unlock.jpg" alt="Unlock sheet for a paid episode" width="240" />
+  <img src="docs/screenshots/library.jpg" alt="Library with Continue watching and saved series" width="240" />
+</p>
+
+**Tech:** Expo SDK 58 · React Native 0.88 · TypeScript (strict) · Expo Router · Zustand · MMKV (Nitro) · Jest · Maestro · EAS Build and Hosting.
 
 ## Try DramaFlash
 
 You do not need to clone the repo or install anything to try the demo.
 
-| Link                                                                                                                    | Use                                                               |
-| ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| [Live Web Demo](https://dramaflash--dramaflash-demo.expo.app/)                                                          | Open in any modern browser, on a phone or a desktop.              |
-| [Android APK](https://expo.dev/artifacts/eas/r2K672R3TN4dA_U9qEZNoq1vbW0f4j9FPmVS23iAz_s.apk)                           | Install on an Android phone or emulator. No Expo Go and no Metro. |
-| [EAS Android build](https://expo.dev/accounts/dmihail/projects/drama-flash/builds/699aace0-4879-4640-bb8f-96723bc7753a) | Build details for the preview APK.                                |
-| iOS                                                                                                                     | No public install. Use the web demo on iPhone or desktop.         |
-| [Source repository](https://github.com/DMihail/DramaFlash)                                                              | Read the code on GitHub.                                          |
+| Link                                                                                                                    | Use                                                                                                  |
+| ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| [Live Web Demo](https://dramaflash--dramaflash-demo.expo.app/)                                                          | Open in any modern browser, on a phone or a desktop.                                                 |
+| [Android APK](https://expo.dev/artifacts/eas/r2K672R3TN4dA_U9qEZNoq1vbW0f4j9FPmVS23iAz_s.apk)                           | Earlier preview build (22 Oct). It does not have the final image-scaling fix. A rebuild replaces it. |
+| [EAS Android build](https://expo.dev/accounts/dmihail/projects/drama-flash/builds/699aace0-4879-4640-bb8f-96723bc7753a) | Build details for the preview APK.                                                                   |
+| iOS                                                                                                                     | No public install. Use the web demo on iPhone or desktop.                                            |
+| [Source repository](https://github.com/DMihail/DramaFlash)                                                              | Read the code on GitHub.                                                                             |
 
 ### A two-minute tour
 
@@ -21,7 +29,7 @@ You do not need to clone the repo or install anything to try the demo.
 3. **Watch a free episode.** Tap **Play Ep 1**, then **Watch**. Episodes 1–3 are free.
 4. **Open a locked episode.** Tap **Next** until Episode 4, or pick it from the episode list. Opening it costs nothing.
 5. **Unlock it with demo coins.** Tap **Unlock**, then **Confirm unlock · 10 coins**. You start with 15 coins, so the balance drops to 5. For the next episode, tap **Get coins** and add a demo pack.
-6. **Explore Library and Continue Watching.** Tap the heart in the player to save the series. Open **Library** to see Saved and Purchases. Open **Profile** to see Continue watching and your coin balance.
+6. **Explore Library and Continue Watching.** Tap the heart in the player to save the series. Open **Library** to see Continue watching, Saved, and Purchases. **Profile** shows your coin balance and demo sign-in.
 
 Refresh the page at any point. Your coins, unlocks, and saved series stay.
 
@@ -38,7 +46,7 @@ Refresh the page at any point. Your coins, unlocks, and saved series stay.
 | Method              | Status          | Notes                                                                                                                                  |
 | ------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | Web demo            | Available       | No install. Hosted on EAS Hosting.                                                                                                     |
-| Android preview APK | Available       | Standalone release APK from the `preview` profile. No Expo Go, no Metro, MMKV included. Installed and launched on an emulator.         |
+| Android preview APK | Available       | Standalone release APK from the `preview` profile. No Expo Go, no Metro, MMKV included. The linked build predates the final image fix. |
 | iOS install         | Not available   | Ad hoc builds need each device UDID. TestFlight needs a paid Apple Developer account and App Store Connect setup. Use the web demo.    |
 | Expo Go             | Not supported   | `react-native-mmkv` 4 runs on `react-native-nitro-modules`. Expo Go cannot load custom native modules, so the app needs its own build. |
 | Development client  | Developers only | `development` profiles. Needs a local Metro server.                                                                                    |
@@ -94,7 +102,7 @@ npm run export:web
 
 `npm run validate` runs lint, format check, typecheck, unit tests, and Expo Doctor. Run it before you open a pull request.
 
-`npm run export:web` builds the production web app into `dist/`. It sets `APP_VARIANT=production`. A plain `npx expo export` uses whatever `APP_VARIANT` your shell has, and a development export ships the demo reset routes.
+`npm run export:web` builds the production web app into `dist/`. It sets `APP_VARIANT=production`, clears the Metro cache, and fails if any bundle still carries the development variant. Do not deploy a plain `npx expo export`: it uses whatever `APP_VARIANT` your shell has, and a development bundle ships the demo reset routes.
 
 ## iOS and Android builds
 

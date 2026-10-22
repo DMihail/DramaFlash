@@ -11,8 +11,18 @@ import { colors, fontFamily } from '@/theme/tokens';
  * React Native has no gradient text style. SVG is already in the app, so this
  * stays free of a mask library. The header role stays on the wrapper. Putting
  * it on the SVG makes web render a heading, and the gradient fill is then ignored.
+ * The box width is an estimate, so a centered layout must pass `align="center"`.
  */
-export function GradientTitle({ children, size = 24 }: { children: string; size?: number }) {
+export function GradientTitle({
+  align = 'start',
+  children,
+  size = 24,
+}: {
+  /** `center` centers the text inside its estimated box, for centered layouts. */
+  align?: 'start' | 'center';
+  children: string;
+  size?: number;
+}) {
   const gradientId = `brandTitle${useId().replace(/:/g, '')}`;
   const width = Math.ceil(children.length * size * 0.72);
   const height = Math.ceil(size * 1.3);
@@ -31,6 +41,8 @@ export function GradientTitle({ children, size = 24 }: { children: string; size?
           fontFamily={fontFamily.playfair}
           fontSize={size}
           fontWeight="700"
+          textAnchor={align === 'center' ? 'middle' : 'start'}
+          x={align === 'center' ? width / 2 : 0}
           y={size}
         >
           {children}

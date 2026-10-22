@@ -87,4 +87,17 @@ describe('auth store', () => {
       busy: false,
     });
   });
+
+  test('stays a guest when the session write fails', async () => {
+    const local = memoryLocal();
+    const store = createAuthStore({ local });
+    await store.getState().hydrate();
+    local.setString = () => {
+      throw new Error('disk full');
+    };
+
+    expect(await store.getState().signIn('apple')).toEqual({ status: 'save-failed' });
+    expect(store.getState()).toMatchObject({ provider: null, busy: false, status: 'ready' });
+    expect(local.snapshot(MMKV_SESSION_KEY)).toBeNull();
+  });
 });

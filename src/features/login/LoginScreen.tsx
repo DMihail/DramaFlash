@@ -141,8 +141,12 @@ export function LoginScreen() {
             </AppText>
           </View>
           <View accessibilityRole="header" style={styles.intro}>
-            <GradientTitle size={26}>{titleLead}</GradientTitle>
-            <GradientTitle size={26}>{titleRest}</GradientTitle>
+            <GradientTitle align="center" size={26}>
+              {titleLead}
+            </GradientTitle>
+            <GradientTitle align="center" size={26}>
+              {titleRest}
+            </GradientTitle>
             <AppText role="bodySmall" style={styles.subtitle}>
               {loginSubtitle}
             </AppText>

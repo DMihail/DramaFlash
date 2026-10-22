@@ -9,6 +9,7 @@ export const libraryIntroTitle = 'Your next chapter';
 export const libraryIntroBody = 'The stories you can’t stop thinking about.';
 export const librarySavedTitle = 'Saved for you';
 export const libraryContinueTitle = 'Continue watching';
+export const librarySavedEmpty = 'No saved series yet. Tap the heart on a series to save it.';
 export const libraryEmptyTitle = 'A little room for obsession.';
 export const libraryEmptyBody = 'Save a series with the + button to find it here.';
 export const libraryExploreLabel = 'Explore dramas';

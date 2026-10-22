@@ -180,7 +180,7 @@ Saved series and continue watching are separate MMKV records. A missing record m
 ```bash
 npx expo install <package>  # SDK-compatible install
 npx expo start              # dev server
-npx expo lint               # lint
+npm run lint                # eslint . (src, tests, scripts, config)
 npx tsc --noEmit            # typecheck
 npx expo-doctor             # dependency and config checks
 npx expo install --fix      # fix incompatible package versions

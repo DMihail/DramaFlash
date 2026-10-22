@@ -115,11 +115,14 @@ export function PlayerStage({
     <View style={styles.stage}>
       <View style={[styles.frame, columnWidth ? { maxWidth: columnWidth } : null]}>
         {preview === 'artwork' && image ? (
-          <CoverImage
-            label={`${title} artwork preview`}
-            source={image}
-            style={StyleSheet.absoluteFill}
-          />
+          <View style={styles.art}>
+            <CoverImage label={`${title} artwork preview`} source={image} />
+            <LinearGradient
+              colors={['rgba(0, 0, 0, 0)', colors.background]}
+              pointerEvents="none"
+              style={styles.artFade}
+            />
+          </View>
         ) : (
           <View style={[StyleSheet.absoluteFill, styles.fallback]} />
         )}
@@ -352,6 +355,23 @@ const styles = StyleSheet.create({
   },
   fallback: {
     backgroundColor: colors.surfaceMedia,
+  },
+  // Portrait artwork keeps its own shape at the top of the stage. Cover-filling
+  // the full-height stage cut the painted title off at both sides.
+  art: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    aspectRatio: 3 / 4,
+    overflow: 'hidden',
+  },
+  artFade: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: '30%',
   },
   topBar: {
     paddingHorizontal: layout.marginDetail,
