@@ -372,6 +372,7 @@ export function PlayerScreen({
           }
           episode={data.episode}
           error={unlockError}
+          {...(artwork ? { image: artwork } : {})}
           onCancel={handleCloseUnlock}
           onConfirm={handleConfirmUnlock}
           onGetCoins={handleGetCoins}
