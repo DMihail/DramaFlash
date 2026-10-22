@@ -1,184 +1,162 @@
 # DramaFlash
 
-DramaFlash is a short-drama streaming prototype built for the TargetVideo take-home assignment (Option A). You browse series, watch free episodes, hit a locked episode, and unlock it with demo coins. The app runs on Android, iOS, and the web from one Expo codebase.
+**A short-drama streaming prototype built with React Native and Expo.**
 
-<p>
-  <img src="deliverables/screenshots/home.jpg" alt="Home with the Spotlight series" width="200" />
-  <img src="deliverables/screenshots/unlock.jpg" alt="Unlock sheet for a paid episode" width="200" />
-  <img src="deliverables/screenshots/library.jpg" alt="Library with Continue watching and saved series" width="200" />
-  <img src="deliverables/screenshots/profile-guest.jpg" alt="Guest profile with Sign in and Create account" width="200" />
+DramaFlash was developed for **TargetVideo's Mobile App Developer take-home assignment (Option A)**. It demonstrates the core viewing journey: discover a series, open an episode, reach a cliffhanger, and unlock the next episode using demo coins.
+
+<p align="center">
+  <img src="deliverables/screenshots/home.jpg" alt="DramaFlash home screen" width="195" />
+  <img src="deliverables/screenshots/unlock.jpg" alt="Episode unlock sheet" width="195" />
+  <img src="deliverables/screenshots/library.jpg" alt="Personal library" width="195" />
+  <img src="deliverables/screenshots/profile-guest.jpg" alt="Guest profile" width="195" />
 </p>
 
-## Try it
+## Try DramaFlash
 
-| What                                                           | Status                                                                                            |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| [Live web demo](https://dramaflash--dramaflash-demo.expo.app/) | Permanent address on EAS Hosting. It shows this version only after the next deploy.               |
-| Android APK                                                    | New preview build pending. The link is added here after the EAS build succeeds and is tested.     |
-| [Demo video (70 s)](deliverables/DramaFlash_Demo.mp4)          | The real production web build in a 390 px phone window. No edits to the app UI.                   |
-| [Source code](https://github.com/DMihail/DramaFlash)           | This repository.                                                                                  |
-| iOS                                                            | No public install (needs device UDIDs or a paid TestFlight setup). Use the web demo on an iPhone. |
+| Experience | Link | Notes |
+| --- | --- | --- |
+| **Android APK** | **[Download v1.0.0 demo](https://github.com/DMihail/DramaFlash/releases/download/v1.0.0-demo/app-release.apk)** | Standalone APK; does not require Expo Go or Metro. |
+| **Web demo** | **[Open DramaFlash](https://dramaflash--dramaflash-demo.expo.app/)** | Hosted on EAS Hosting. Its deployed version may differ from the latest repository commit. |
+| **Demo video** | [Watch the 70-second walkthrough](deliverables/DramaFlash_Demo.mp4) | Captured from the production web build at mobile viewport width; not an Android recording. |
+| **Source code** | [GitHub repository](https://github.com/DMihail/DramaFlash) | React Native / Expo / TypeScript. |
 
-### Demo journey (about two minutes)
+**iOS:** Source code supports iOS, but no public iOS installation or TestFlight distribution is provided. The web demo is available in a mobile browser.
 
-1. Open the app as a guest. Browse **Home**, then **Discover** (it opens in browse mode, without the keyboard).
-2. Open **The CEO and I** and tap **Play Ep 1**, then **Watch**. Episodes 1–3 are free.
-3. Tap **Next** until **Episode 4**. It is locked. Opening it costs nothing.
-4. Tap **Unlock**, then **Confirm unlock · 10 coins**. You start with 15 coins, so 5 remain. The episode plays.
-5. Go to **Episode 5**. You now need more coins: tap **Get coins**, add a demo pack, go back, and unlock.
-6. Open **Profile**: a guest sees **Sign in** and **Create account**. Sign in with any email (demo only) to see the full profile.
-7. Open **Library** for Continue watching, Saved, and Purchases. Refresh or restart: everything stays.
+### Two-minute walkthrough
 
-**Reset the demo:** on the web, clear the site data for the demo URL (browser settings, or a private window). On Android, clear the app's storage or reinstall. Development builds also have `/dev/reset-wallet` and `/dev/reset-library`; production builds redirect those routes home.
+1. Browse **Home** and **Discover**, then open **The CEO and I**.
+2. Open the player. Episodes **1–3 are free**; Episode **4 is locked**.
+3. Select **Unlock** and confirm the **10-coin** charge. A new wallet starts with **15 demo coins**.
+4. Continue to another locked episode. Use **Get coins** to add a simulated coin pack when your balance is insufficient.
+5. Explore **Library** for saved series, Continue Watching and unlocked episodes.
+6. Open **Profile** and try demo sign-in. Refresh or restart to see locally saved progress.
 
-## What is implemented (Option A)
+To start over, clear the site's storage in your browser or clear the Android app's data. This resets locally stored demo progress.
 
-- Home with a spotlight series and genre rails; Discover with genre filters and search.
-- Series details: synopsis, cast, episode list with free and locked states.
-- Player: artwork preview with play and pause, previous and next, save, share, and a lock card for paid episodes.
-- Unlock sheet with confirmation. Each paid episode costs 10 coins, charged exactly once.
-- Coin store with demo coin packs. Season unlock, membership, and VIP are shown as unavailable.
-- Library: Continue watching, Saved series, and Purchases.
-- Demo sign-in (Google, Apple, email, or guest) and a guest or signed-in Profile.
-- Persistence across restarts, with protection against lost or corrupt data.
+## What's included
 
-## What is simulated
+- **Home and discovery:** Featured series, genre rails, search, and category filtering.
+- **Series details:** Artwork, synopsis, cast, and an episode list showing free and locked states.
+- **Player prototype:** Episode artwork, playback-like controls, previous/next navigation, and a cliffhanger lock experience.
+- **Coin unlocking:** A confirmation sheet, simulated coin store, balance updates, and protection from repeat charges.
+- **Personal library:** Saved titles, watching progress, and unlocked episodes, retained across restarts.
+- **Guest and demo profiles:** Simulated sign-in flows without real credentials or accounts.
+- **UI states:** Loading, empty and retry states driven by a local mock API.
 
-- **Payments:** coin packs show price labels, but no payment is made and no card is asked for.
-- **Authentication:** sign-in buttons do not contact any provider. Only the provider name is stored; no email or password is saved.
-- **Backend:** a local mock API (`src/api/`) returns catalog data from `src/data/` with a short delay, cancellation, and error states, so the screens show real loading and retry behavior. There is no server.
-- **Video:** the player shows episode artwork with demo controls. It does not stream video.
+## Important scope and limitations
 
-## Architecture
+This is an **interactive product prototype**, not a production streaming service.
 
-- **Expo SDK 58, React Native 0.88, TypeScript (strict), Expo Router** with typed routes and React Compiler.
-- **State:** small Zustand stores for wallet, library, and session. Business rules are pure functions in `src/domain/` (for example `confirmUnlock`), tested without rendering.
-- **Persistence:** MMKV 4 (Nitro) on Android and iOS, `localStorage` on the web, behind one storage interface. Every write is read back and checked before the UI shows the new value; a failed write restores the old value. Corrupt data is reported, never silently replaced by a fresh 15-coin wallet; a saved-wallet marker turns a later missing wallet into an error too. No AsyncStorage.
-- **Double charges:** the wallet store holds a lock during a write, so repeated taps cannot charge twice.
-- **Builds:** `development` and `production` app variants with separate app ids. The web export fails if it is not the production variant.
+- **Video:** The player displays episode artwork. No video files or real streaming are included.
+- **Payments:** Coins and top-ups are simulated. No payment is taken.
+- **Authentication:** Provider and email sign-in flows are demonstrations, not real account creation or provider authentication.
+- **Backend:** Series data is served by a local mock API. There is no hosted backend or server-side entitlement service.
+- **Subscriptions, VIP and season offers:** These may be visible as unavailable options, but are not implemented purchases.
 
-**Connecting a real backend:** replace the functions in `src/api/` with HTTP calls (same types), move coin balance and unlocks to server-side entitlements, verify store purchases on the server (Google Play Billing, StoreKit), and keep the local stores as a cache.
+## Engineering approach
 
-**Suggested metrics:** episode completion rate, lock impressions (locked episode views), unlock conversion (unlocks ÷ lock impressions), coin-pack conversion, and next-episode starts after an unlock.
+| Area | Implementation |
+| --- | --- |
+| Application | Expo SDK 58, React Native 0.88, TypeScript (strict) |
+| Navigation | Expo Router with typed routes |
+| Shared state | Zustand stores for wallet, library and demo session |
+| Native persistence | `react-native-mmkv` v4 with Nitro Modules |
+| Web persistence | `localStorage` behind the same storage interface |
+| UI | Reusable React Native components, responsive layouts, Lucide icons |
+| Quality | ESLint, Prettier, TypeScript, Jest, Expo Doctor; Maestro E2E flows |
+| Distribution | Android APK via GitHub Releases; web via EAS Hosting |
 
-## Tests
+Business rules such as episode access and coin deductions live in `src/domain/`, separate from screens. Wallet changes are written and checked before the updated value is shown, and repeated unlock taps are guarded against duplicate charges. Stored records have validation and error states. The demo wallet is **local to each device** and is not a secure, server-authoritative payments implementation.
 
-- 180 Jest tests (domain rules, stores, persistence, screens) and 9 Maestro flows in `tests/e2e/maestro`.
-- `npm run validate` runs ESLint on the whole repo, Prettier, TypeScript, Jest, and Expo Doctor. CI runs the same on every pull request.
-- A Playwright journey (43 checks at 390, 360, and 1440 px) was run against the production web export: guest start, Discover focus and repeated search, session restore without a guest flash, unlock and double-tap charge, coin top-up, persistence after reload, sign-in and sign-out, dev routes blocked, invalid links.
+For a production service, wallet balances, purchases, and entitlements would be validated and enforced on a backend, with platform purchase verification.
 
-## Known limitations
+## Run locally
 
-- No real video streaming, payments, accounts, or server-side entitlements.
-- No public iOS install.
-- The spotlight artwork on Home has another title painted into the image, as in the design reference.
+### Requirements
 
-## Media and licenses
-
-- Posters, stills, and cast portraits come from the design reference supplied for the assignment (`FLASH.svg`). They are used only for this demo. **Owner to confirm the usage terms of these images.**
-- Icons: [Lucide](https://lucide.dev) (ISC license). Fonts: Inter and Playfair Display via `@expo-google-fonts` (SIL Open Font License).
-
-## Launch methods
-
-| Method              | Status          | Notes                                                                                                                                  |
-| ------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Web demo            | Available       | No install. Hosted on EAS Hosting.                                                                                                     |
-| Android preview APK | Build pending   | Standalone release APK from the `preview` profile. No Expo Go, no Metro, MMKV included.                                                |
-| iOS install         | Not available   | Ad hoc builds need each device UDID. TestFlight needs a paid Apple Developer account and App Store Connect setup. Use the web demo.    |
-| Expo Go             | Not supported   | `react-native-mmkv` 4 runs on `react-native-nitro-modules`. Expo Go cannot load custom native modules, so the app needs its own build. |
-| Development client  | Developers only | `development` profiles. Needs a local Metro server.                                                                                    |
-
-## Requirements (local development)
-
-- Node.js `22.22.0` (`.nvmrc`)
-- npm `11.19.0`
-
-Node.js 22.22.0 includes npm 10.9.4. This repo needs npm 11.19.0. `.npmrc` keeps `engine-strict` on. EAS Build and GitHub Actions run `npm run eas-build-pre-install` before `npm ci`. That script installs npm 11.19.0.
+- Node.js **22.22.0** (`.nvmrc`)
+- npm **11.19.0**
+- Android Studio / Android SDK for Android builds
+- Xcode for iOS Simulator builds (macOS)
 
 ```bash
 nvm use
 npm install --global npm@11.19.0
-```
-
-## Install
-
-```bash
 npm ci
 ```
 
-Copy `.env.example` to `.env.local` only for local public settings. Do not commit secrets. The public demo needs no secret environment variables.
-
-## Development
+### Development
 
 ```bash
-npm run start
-npm run ios
-npm run android
-npm run web
+npm run start          # Development Metro server
+npm run web            # Browser development server
+npm run android:build  # Compile and install an Android development build
+npm run ios:build      # Compile and install an iOS Simulator development build
 ```
 
-These scripts set `APP_VARIANT=development`.
+The native app uses MMKV and Nitro Modules, so **Expo Go is not supported**. Install a development build before attempting to open it from Metro.
 
-| Variant     | Name              | iOS and Android id       | Scheme           |
-| ----------- | ----------------- | ------------------------ | ---------------- |
-| development | drama-flash (Dev) | `com.dramaflash.app.dev` | `dramaflash-dev` |
-| production  | drama-flash       | `com.dramaflash.app`     | `dramaflash`     |
-
-An empty `APP_VARIANT` means production. An unknown value throws an error.
-
-## Tests and validation
+### Validation
 
 ```bash
-npm test
-npm run lint
-npm run typecheck
-npm run doctor
-npm run validate
-npm run export:web
+npm run validate       # ESLint, Prettier, TypeScript, Jest and Expo Doctor
+npm run export:web     # Production web export with variant check
 ```
 
-`npm run validate` runs lint, format check, typecheck, unit tests, and Expo Doctor. Run it before you open a pull request.
+For Maestro E2E tests, install the Maestro CLI, start an emulator and a development build, then run:
 
-`npm run export:web` builds the production web app into `dist/`. It sets `APP_VARIANT=production`, clears the Metro cache, and fails if any bundle still carries the development variant. Do not deploy a plain `npx expo export`: it uses whatever `APP_VARIANT` your shell has, and a development bundle ships the demo reset routes.
+```bash
+npm run e2e
+```
 
-## iOS and Android builds
+The repository includes Jest unit/integration tests and Maestro YAML flows. GitHub Actions runs the standard validation suite on PRs and pushes to `main`; it does not run an emulator by default.
 
-EAS project: `drama-flash`  
-Owner: `dmihail`  
-Project ID: `33a80453-d173-4c89-a709-54dd349a68b2`
+## Build and deploy
 
-| Profile                 | Use                                                |
-| ----------------------- | -------------------------------------------------- |
-| `development`           | Dev client for Android, and for an iOS device      |
-| `development-simulator` | Dev client for the iOS Simulator                   |
-| `preview`               | Standalone Android APK for sharing (internal link) |
-| `production`            | Store build                                        |
+### Android demo APK
+
+The shared Android build is attached to the **[v1.0.0 demo release](https://github.com/DMihail/DramaFlash/releases/tag/v1.0.0-demo)**. For a new EAS preview build:
 
 ```bash
 npx eas-cli@latest build --platform android --profile preview
-npx eas-cli@latest build --platform ios --profile development-simulator
 ```
 
-`ios/` and `android/` are generated. Do not commit them. Do not commit keystores, certificates, or `credentials.json`.
+A new APK must be installed and tested separately; updating the source repository does not update an already published APK.
 
-A new native package needs a new development build. JavaScript-only changes use `npm run start`.
-
-## Web hosting
-
-The app exports with `expo.web.output: "server"`, so direct links such as `/series/the-ceo-and-i` work on refresh. The demo is on EAS Hosting under the `dramaflash-demo` alias. No secret environment variables are needed.
+### Web
 
 ```bash
 npm run export:web
 npx eas-cli@latest deploy --alias dramaflash-demo
 ```
 
-## Git
+The production export sets `APP_VARIANT=production` and checks generated JavaScript bundles to prevent accidental publication of a development variant. Development-only wallet and library reset routes are disabled in production.
 
-- Work on a feature branch.
-- Do not push directly to `main`.
-- Open a pull request. Do not merge it without the owner's approval.
-- Do not turn off tests, lint, or TypeScript to make CI pass.
+## Project structure
 
-GitHub Actions runs `npm ci`, lint, typecheck, tests, and Expo Doctor on pull requests to `main`. The check name is **Lint, types, tests, and Expo Doctor**. It does not build the native apps.
+```text
+src/
+  api/         Local mock API
+  app/         Expo Router routes
+  components/  Shared UI
+  data/        Mock catalog and story content
+  domain/      Pure business rules
+  features/    Feature screens and view models
+  storage/     MMKV / browser persistence
+  stores/      Zustand state
+  theme/       Design tokens and typography
+tests/
+  e2e/maestro/ Native E2E test flows
+  ...          Unit and integration tests
+deliverables/
+  screenshots/ UI previews
+  DramaFlash_Demo.mp4
+```
 
-Protect `main` on GitHub: require a pull request, require that check, and do not allow bypass.
+## Design assets and attribution
+
+The posters, stills and cast images were derived from the **`FLASH.svg` design reference supplied for the assignment** and are used for this evaluation prototype. Rights for broader reuse or distribution have not been independently verified. Icons use [Lucide](https://lucide.dev); the project uses Inter and Playfair Display fonts via Expo Google Fonts.
+
+---
+
+**Created for the TargetVideo Mobile App Developer technical assessment.**
