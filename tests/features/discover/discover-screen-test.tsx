@@ -234,6 +234,21 @@ describe('discover screen', () => {
     // Only the Home search button sends a request, and that focuses the field.
     expect(host(screen, testIds.discover.search).props.autoFocus).toBe(true);
 
+    await act(async () => {
+      changeSearch(screen, 'secret');
+    });
+    await act(async () => {
+      screen.update(
+        <SafeAreaProvider initialMetrics={metrics}>
+          <DiscoverScreen loadCatalog={loadNow()} searchRequest="2" />
+        </SafeAreaProvider>,
+      );
+    });
+
+    // A second search tap starts with an empty field, not the old query.
+    expect(host(screen, testIds.discover.search).props.value).toBe('');
+    expect(host(screen, testIds.discover.search).props.autoFocus).toBe(true);
+
     const dismiss = jest.spyOn(Keyboard, 'dismiss');
     await act(async () => {
       const cleanup = mockFocus.effect?.();

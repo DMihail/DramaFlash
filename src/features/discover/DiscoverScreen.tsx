@@ -83,6 +83,15 @@ export function DiscoverScreen({
     setQuery('');
   }
 
+  // Each Home search tap starts a fresh search, even when the genre is already All.
+  const [trackedRequest, setTrackedRequest] = useState(searchRequest);
+  if (searchRequest !== trackedRequest) {
+    setTrackedRequest(searchRequest);
+    if (searchRequest !== undefined) {
+      setQuery('');
+    }
+  }
+
   const handleOpenSeries = (seriesId: string) => {
     router.push(seriesDestination(seriesId));
   };
