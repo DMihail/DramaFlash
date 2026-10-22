@@ -186,8 +186,7 @@ describe('player screen', () => {
     expect(textOf(screen)).toContain('The CEO and I');
     expect(textOf(screen)).toContain('Episode 1');
     expect(textOf(screen)).not.toContain('Playing artwork preview');
-    expect(textOf(screen)).toContain('Paused artwork preview');
-    expect(textOf(screen)).toContain('No video is playing.');
+    expect(textOf(screen)).toContain('Paused artwork preview. No video is playing.');
     expect(hasTestId(screen, testIds.player.screen)).toBe(true);
     expect(hasTestId(screen, testIds.player.loading)).toBe(false);
     expect(hasTestId(screen, testIds.player.episode)).toBe(true);
