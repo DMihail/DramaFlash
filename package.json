@@ -45,8 +45,8 @@
   },
   "scripts": {
     "start": "APP_VARIANT=development expo start",
-    "android": "APP_VARIANT=development expo run --android",
-    "ios": "APP_VARIANT=development expo run --ios",
+    "android:build": "APP_VARIANT=development expo run:android",
+    "ios:build": "APP_VARIANT=development expo run:ios",
     "web": "APP_VARIANT=development expo start --web",
     "export:web": "APP_VARIANT=production expo export --platform web --clear && node scripts/check-web-export.mjs",
     "lint": "eslint .",
