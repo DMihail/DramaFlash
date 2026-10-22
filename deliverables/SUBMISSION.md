@@ -4,14 +4,14 @@ Internal checklist and email draft. Items marked **NOT READY** must be resolved 
 
 ## Status of links
 
-| Item                  | Link                                                     | Status                                                                                                                |
-| --------------------- | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| GitHub repository     | https://github.com/DMihail/DramaFlash                    | Verified public. Final branch `fix/final-qa` still needs push, PR, CI, and merge.                                     |
-| Live web demo         | https://dramaflash--dramaflash-demo.expo.app/            | **NOT READY.** The URL works, but it still serves an older development build. Redeploy needed.                        |
-| Android APK           | —                                                        | **NOT READY.** New EAS preview build not started yet. Do not send the old APK link.                                   |
-| Demo video            | `deliverables/DramaFlash_Demo.mp4` (70 s, H.264, 3.6 MB) | Ready as a file. After push it is also at `github.com/DMihail/DramaFlash/blob/main/deliverables/DramaFlash_Demo.mp4`. |
-| Waddington's Auctions | https://apps.apple.com/app/id6502690253                  | Store page verified. **Your contribution text: to fill.**                                                             |
-| Rejsespejder          | https://apps.apple.com/app/id1107399591                  | Store page verified. **Your contribution text: to fill.**                                                             |
+| Item                  | Link                                                     | Status                                                                                                                    |
+| --------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| GitHub repository     | https://github.com/DMihail/DramaFlash                    | Verified public. Final work is in PR #31 (`fix/final-qa`): CI green on `0d34f42`; later commits need push, CI, and merge. |
+| Live web demo         | https://dramaflash--dramaflash-demo.expo.app/            | **NOT READY.** The URL works, but it still serves an older development build. Redeploy needed.                            |
+| Android APK           | —                                                        | **NOT READY.** New EAS preview build not started yet. Do not send the old APK link.                                       |
+| Demo video            | `deliverables/DramaFlash_Demo.mp4` (70 s, H.264, 3.6 MB) | Ready as a file. After push it is also at `github.com/DMihail/DramaFlash/blob/main/deliverables/DramaFlash_Demo.mp4`.     |
+| Waddington's Auctions | https://apps.apple.com/app/id6502690253                  | Store page verified. **Your contribution text: to fill.**                                                                 |
+| Rejsespejder          | https://apps.apple.com/app/id1107399591                  | Store page verified. **Your contribution text: to fill.**                                                                 |
 
 ## Project description
 
@@ -35,7 +35,7 @@ DramaFlash is a short-drama streaming prototype (Option A). Users browse series,
 - A store-level lock prevents double coin charges from repeated taps.
 - A typed local mock API (`src/api/`) gives real loading, cancel, and error states without a server.
 - Separate development and production app variants. The web export fails if it is not production.
-- Tests: 179 Jest tests, 9 Maestro flows, and a 39-check Playwright journey on the production web export.
+- Tests: 180 Jest tests, 9 Maestro flows, and a 43-check Playwright journey on the production web export.
 
 ## Known limitations
 

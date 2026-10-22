@@ -63,9 +63,9 @@ DramaFlash is a short-drama streaming prototype built for the TargetVideo take-h
 
 ## Tests
 
-- 179 Jest tests (domain rules, stores, persistence, screens) and 9 Maestro flows in `tests/e2e/maestro`.
+- 180 Jest tests (domain rules, stores, persistence, screens) and 9 Maestro flows in `tests/e2e/maestro`.
 - `npm run validate` runs ESLint on the whole repo, Prettier, TypeScript, Jest, and Expo Doctor. CI runs the same on every pull request.
-- A Playwright journey (39 checks at 390, 360, and 1440 px) was run against the production web export: guest start, Discover focus, unlock and double-tap charge, coin top-up, persistence after reload, sign-in and sign-out, dev routes blocked, invalid links.
+- A Playwright journey (43 checks at 390, 360, and 1440 px) was run against the production web export: guest start, Discover focus and repeated search, session restore without a guest flash, unlock and double-tap charge, coin top-up, persistence after reload, sign-in and sign-out, dev routes blocked, invalid links.
 
 ## Known limitations
 
