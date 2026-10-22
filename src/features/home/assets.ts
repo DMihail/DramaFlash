@@ -3,6 +3,7 @@ import { type ImageSourcePropType } from 'react-native';
 import { type StoryCastId, storySeriesId } from '@/data/seriesStory';
 
 import avatarHomeHeader from '../../../assets/drama/avatar-home-header.jpg';
+
 import castElena from '../../../assets/drama/cast-elena.jpg';
 import castJulianVance from '../../../assets/drama/cast-julian-vance.jpg';
 import castMarcus from '../../../assets/drama/cast-marcus.jpg';
@@ -13,6 +14,7 @@ import episodeCeo3 from '../../../assets/drama/episode-the-ceo-and-i-3.jpg';
 import episodeCeo4 from '../../../assets/drama/episode-the-ceo-and-i-4.jpg';
 import episodeCeo5 from '../../../assets/drama/episode-the-ceo-and-i-5.jpg';
 import episodeCeo6 from '../../../assets/drama/episode-the-ceo-and-i-6.jpg';
+
 import heroHome from '../../../assets/drama/hero-home.jpg';
 import heroTheCeoAndI from '../../../assets/drama/hero-the-ceo-and-i.jpg';
 import posterAvengingAngel from '../../../assets/drama/poster-avenging-angel.jpg';
