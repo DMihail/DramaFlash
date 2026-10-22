@@ -1,9 +1,4 @@
-import {
-  Image,
-  type ImageSourcePropType,
-  type ImageStyle,
-  type StyleProp,
-} from 'react-native';
+import { Image, type ImageSourcePropType, type ImageStyle, type StyleProp } from 'react-native';
 
 import { fillFrame } from '@/components/fillFrame';
 

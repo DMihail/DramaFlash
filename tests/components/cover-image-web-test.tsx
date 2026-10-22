@@ -40,7 +40,6 @@ describe('web cover image', () => {
     });
   });
 
-
   test('keeps a remote URI', () => {
     const source = { uri: 'https://example.com/poster.jpg' };
     mockFromModule.mockReturnValue({ uri: source.uri });
