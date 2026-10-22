@@ -59,6 +59,7 @@ export function SeriesDetailsFooter({
                 <PosterCard
                   key={series.id}
                   onPress={() => onOpenRecommendation(series.id)}
+                  size={{ width: 138, height: 208 }}
                   title={series.title}
                   {...(image ? { image } : {})}
                   {...(meta ? { meta } : {})}

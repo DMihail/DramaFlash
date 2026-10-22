@@ -92,13 +92,13 @@ Each milestone is its own branch. Revert that pull request to drop one screen wi
 
 ## Status
 
-| Milestone | Status                                                |
-| --------- | ----------------------------------------------------- |
-| A Artwork | Done. Posters replaced. Home and series heroes wired. |
-| B Home    | Not started                                           |
-| C Series  | Not started                                           |
-| D Player  | Not started                                           |
-| E Unlock  | Not started                                           |
-| F Coins   | Not started                                           |
-| G Library | Not started                                           |
-| H Login   | Not started                                           |
+| Milestone | Status                                                               |
+| --------- | -------------------------------------------------------------------- |
+| A Artwork | Done. Posters replaced. Home and series heroes wired.                |
+| B Home    | Done. Tagline, poster scrim, Romance gradient, header over the hero. |
+| C Series  | Done. Synopsis, cast, titled rows, and an unavailable season note.   |
+| D Player  | Not started                                                          |
+| E Unlock  | Not started                                                          |
+| F Coins   | Not started                                                          |
+| G Library | Not started                                                          |
+| H Login   | Not started                                                          |
