@@ -13,11 +13,11 @@ DramaFlash was developed for **TargetVideo's Mobile App Developer take-home assi
 
 ## Try DramaFlash
 
-| Experience | Link | Notes |
-| --- | --- | --- |
-| **Android APK** | **[Download v1.0.0 demo](https://github.com/DMihail/DramaFlash/releases/download/v1.0.0-demo/app-release.apk)** | Standalone APK; does not require Expo Go or Metro. |
-| **Web demo** | **[Open DramaFlash](https://dramaflash--dramaflash-demo.expo.app/)** | Hosted on EAS Hosting. Its deployed version may differ from the latest repository commit. |
-| **Source code** | [GitHub repository](https://github.com/DMihail/DramaFlash) | React Native / Expo / TypeScript. |
+| Experience      | Link                                                                                                            | Notes                                                                                     |
+| --------------- | --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| **Android APK** | **[Download v1.0.0 demo](https://github.com/DMihail/DramaFlash/releases/download/v1.0.0-demo/app-release.apk)** | Standalone APK; does not require Expo Go or Metro.                                        |
+| **Web demo**    | **[Open DramaFlash](https://dramaflash--dramaflash-demo.expo.app/)**                                            | Hosted on EAS Hosting. Its deployed version may differ from the latest repository commit. |
+| **Source code** | [GitHub repository](https://github.com/DMihail/DramaFlash)                                                      | React Native / Expo / TypeScript.                                                         |
 
 **iOS:** Source code supports iOS, but no public iOS installation or TestFlight distribution is provided. The web demo is available in a mobile browser.
 
@@ -54,16 +54,16 @@ This is an **interactive product prototype**, not a production streaming service
 
 ## Engineering approach
 
-| Area | Implementation |
-| --- | --- |
-| Application | Expo SDK 58, React Native 0.88, TypeScript (strict) |
-| Navigation | Expo Router with typed routes |
-| Shared state | Zustand stores for wallet, library and demo session |
-| Native persistence | `react-native-mmkv` v4 with Nitro Modules |
-| Web persistence | `localStorage` behind the same storage interface |
-| UI | Reusable React Native components, responsive layouts, Lucide icons |
-| Quality | ESLint, Prettier, TypeScript, Jest, Expo Doctor; Maestro E2E flows |
-| Distribution | Android APK via GitHub Releases; web via EAS Hosting |
+| Area               | Implementation                                                     |
+| ------------------ | ------------------------------------------------------------------ |
+| Application        | Expo SDK 58, React Native 0.88, TypeScript (strict)                |
+| Navigation         | Expo Router with typed routes                                      |
+| Shared state       | Zustand stores for wallet, library and demo session                |
+| Native persistence | `react-native-mmkv` v4 with Nitro Modules                          |
+| Web persistence    | `localStorage` behind the same storage interface                   |
+| UI                 | Reusable React Native components, responsive layouts, Lucide icons |
+| Quality            | ESLint, Prettier, TypeScript, Jest, Expo Doctor; Maestro E2E flows |
+| Distribution       | Android APK via GitHub Releases; web via EAS Hosting               |
 
 Business rules such as episode access and coin deductions live in `src/domain/`, separate from screens. Wallet changes are written and checked before the updated value is shown, and repeated unlock taps are guarded against duplicate charges. Stored records have validation and error states. The demo wallet is **local to each device** and is not a secure, server-authoritative payments implementation.
 
