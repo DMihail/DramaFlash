@@ -52,6 +52,13 @@ export function serializeSavedSeries(savedSeriesIds: readonly string[]): string 
   });
 }
 
+/**
+ * Records the episode the viewer can open.
+ *
+ * @returns The next list, or `null` when the episode is locked, outside the
+ *   series, or the timestamp is not usable. Locked episodes are not saved as
+ *   continue-watching.
+ */
 export function recordOpenedEpisode(
   entries: readonly ProgressEntry[],
   seriesId: string,

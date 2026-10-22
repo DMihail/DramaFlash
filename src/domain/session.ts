@@ -15,6 +15,13 @@ export function guestSession(): DemoSession {
   return { provider: null };
 }
 
+/**
+ * Reads a saved demo session.
+ *
+ * @returns `guest` when nothing is stored, `ready` for schema 1, and `corrupt`
+ *   for broken JSON or another schema. Corrupt data is not replaced with a
+ *   guest session by this function.
+ */
 export function loadSession(raw: string | undefined): SessionLoadResult {
   if (raw === undefined) {
     return { status: 'guest' };

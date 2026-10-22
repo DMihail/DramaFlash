@@ -20,8 +20,14 @@ export type PersistedWalletResult =
   | { status: 'ready'; wallet: Wallet }
   | { status: 'error'; reason: 'corrupt' | 'migration-failed' | 'missing' | 'unreadable' };
 
-// Schema 1 is the wallet JSON written by serializeWallet. Any other version is
-// rejected by loadWallet. A missing MMKV wallet is not a schema error.
+/**
+ * Loads the wallet without turning a lost record into a new 15-coin balance.
+ *
+ * A missing MMKV wallet is copied from AsyncStorage once. A valid legacy
+ * wallet is written and read back before this returns `ready`. A completed
+ * migration marker with no wallet is `missing`. A reset marker returns a fresh
+ * wallet. Unreadable or incompatible JSON stays an error.
+ */
 export async function loadPersistedWallet(
   local: LocalStorage,
   legacy: WalletStorage,

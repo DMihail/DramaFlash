@@ -101,6 +101,16 @@ export function grantCoinPack(wallet: Wallet, packId: string): Wallet | null {
   return addPack(wallet, pack);
 }
 
+/**
+ * Charges 10 coins for one paid episode.
+ *
+ * Free episodes and an episode that is already open return the same wallet.
+ * The caller must persist the result before showing the new balance.
+ *
+ * @returns `unlocked` with the next wallet, `already-open` when no charge is
+ *   due, `insufficient` when the balance is too low, or `rejected` when the
+ *   episode is outside the series.
+ */
 export function confirmUnlock(wallet: Wallet, seriesId: string, episode: number): UnlockDecision {
   if (!isPaidEpisode(seriesId, episode)) {
     if (isEpisodeInSeries(episodeCountFor(seriesId), episode) && episode <= FREE_EPISODE_LIMIT) {

@@ -20,6 +20,12 @@ export function windowTier(windowWidth: number): WindowTier {
   return 'phone';
 }
 
+/**
+ * Where the main tabs sit.
+ *
+ * Desktop web uses the top. Phones, native tablets, and narrow web keep the
+ * bottom bar, including a wide iOS or Android window.
+ */
 export function navigationPlacement(windowWidth: number, platform: string): 'bottom' | 'top' {
   return platform === 'web' && windowTier(windowWidth) === 'desktop' ? 'top' : 'bottom';
 }
@@ -79,11 +85,17 @@ export function homeHeroFrame(windowWidth: number): { width: number; height: num
   return fittedFrame(width, wide ? 16 / 7 : 390 / 520, wide ? 460 : 640);
 }
 
+/**
+ * Series hero frame.
+ *
+ * The phone frame matches the measured detail hero, 390 × 488. Wider windows
+ * use a 16:9 crop so the portrait artwork is not stretched sideways.
+ */
 export function seriesHeroFrame(windowWidth: number): { width: number; height: number } {
   const width = contentWidth(windowWidth);
   const wide = width >= 720;
 
-  return fittedFrame(width, wide ? 16 / 9 : 3 / 4, wide ? 480 : 640);
+  return fittedFrame(width, wide ? 16 / 9 : 390 / 488, wide ? 480 : 640);
 }
 
 export function posterFrame(

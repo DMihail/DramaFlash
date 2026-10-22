@@ -1,3 +1,10 @@
+/**
+ * Pure sign-in decisions from the original demo.
+ *
+ * Saved series in this type are not the device library. The library store
+ * persists saves, and the session store persists only the provider. These
+ * helpers still decide the login ticket when a screen has no library store.
+ */
 export const AUTH_STORAGE_KEY = 'dramaflash.auth-demo.v1';
 
 export type DemoProvider = 'google' | 'apple' | 'email';

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { FlatList, Share, StyleSheet, View } from 'react-native';
 
 import { router } from 'expo-router';
@@ -38,6 +38,7 @@ import { SeriesEpisodeRow } from '@/features/series/SeriesEpisodeRow';
 import { type SeriesDetailsLoader, useSeriesDetails } from '@/features/series/useSeriesDetails';
 import { resolveScreenWallet } from '@/features/wallet/resolveWallet';
 import { useOptionalWallet } from '@/features/wallet/WalletProvider';
+import { useTransientNotice } from '@/hooks/useTransientNotice';
 import { holdLoginTicket } from '@/navigation/pendingLogin';
 import { testIds } from '@/testing/testIds';
 import { colors, layout, radius, space } from '@/theme/tokens';
@@ -68,14 +69,7 @@ export function SeriesDetailsScreen({
   const [notice, setNotice] = useState<string | null>(null);
   const resolved = resolveScreenWallet(wallet, shared);
 
-  useEffect(() => {
-    if (!notice) {
-      return;
-    }
-
-    const timer = setTimeout(() => setNotice(null), 2600);
-    return () => clearTimeout(timer);
-  }, [notice]);
+  useTransientNotice(notice, setNotice);
 
   const handleBack = () => {
     if (router.canGoBack()) {
@@ -266,6 +260,7 @@ export function SeriesDetailsScreen({
             onSort={handleSort}
             showPlay={data.episodes.some((episode) => episode.number === 1)}
             showSort={data.episodeStatus === 'success'}
+            sort={sort}
             sortLabel={sortLabel}
             title={data.series.title}
             topInset={insets.top}

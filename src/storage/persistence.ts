@@ -20,37 +20,70 @@ export type LocalStorage = {
   delete: (key: string) => void | Promise<void>;
 };
 
-// Write the wallet, read it back, and only then let the caller publish it.
-// A failed write restores the previous value when that is possible.
-export async function commitWallet(local: LocalStorage, wallet: Wallet): Promise<void> {
-  const payload = serializeWallet(wallet);
-  const previous = await local.getString(MMKV_WALLET_KEY);
+const walletWriteError = 'Wallet write could not be verified';
+
+/**
+ * Writes one record, reads it back, and restores the previous bytes when the
+ * check fails.
+ *
+ * The caller must publish the new value only after this resolves. A failed
+ * restore leaves that in-memory value unchanged.
+ *
+ * @param accept - Returns true only when `readBack` parses as the record that
+ *   was just written.
+ * @throws Error with `failureMessage` when the write cannot be verified.
+ */
+export async function commitVerifiedRecord(
+  local: LocalStorage,
+  key: string,
+  payload: string,
+  accept: (readBack: string) => boolean,
+  failureMessage: string,
+): Promise<void> {
+  const previous = await local.getString(key);
 
   try {
-    await local.setString(MMKV_WALLET_KEY, payload);
-    const readBack = await local.getString(MMKV_WALLET_KEY);
-    if (readBack !== payload || loadWallet({ getItem: () => readBack }).status !== 'ready') {
-      throw new Error('Wallet write could not be verified');
+    await local.setString(key, payload);
+    const readBack = await local.getString(key);
+    if (readBack === undefined || readBack !== payload || !accept(readBack)) {
+      throw new Error(failureMessage);
     }
   } catch (error) {
-    await restoreWalletKey(local, previous);
+    await restoreStoredKey(local, key, previous);
     if (error instanceof Error) {
       throw error;
     }
 
-    throw new Error('Wallet write could not be verified');
+    throw new Error(failureMessage);
   }
 }
 
-async function restoreWalletKey(local: LocalStorage, previous: string | undefined): Promise<void> {
+async function restoreStoredKey(
+  local: LocalStorage,
+  key: string,
+  previous: string | undefined,
+): Promise<void> {
   try {
     if (previous === undefined) {
-      await local.delete(MMKV_WALLET_KEY);
+      await local.delete(key);
       return;
     }
 
-    await local.setString(MMKV_WALLET_KEY, previous);
+    await local.setString(key, previous);
   } catch {
-    // The visible wallet stays unchanged either way.
+    // The in-memory record stays unchanged when the old bytes cannot be put back.
   }
+}
+
+/** Saves the wallet and checks the stored JSON before the UI may show it. */
+export async function commitWallet(local: LocalStorage, wallet: Wallet): Promise<void> {
+  const payload = serializeWallet(wallet);
+
+  await commitVerifiedRecord(
+    local,
+    MMKV_WALLET_KEY,
+    payload,
+    (readBack) => loadWallet({ getItem: () => readBack }).status === 'ready',
+    walletWriteError,
+  );
 }

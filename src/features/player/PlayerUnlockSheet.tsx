@@ -1,6 +1,6 @@
 import { Modal, Pressable, StyleSheet, View } from 'react-native';
 
-import { Lock, X, Zap } from 'lucide-react-native';
+import { LockKeyhole, X, Zap } from 'lucide-react-native';
 
 import { AppText } from '@/components/AppText';
 import { IconButton } from '@/components/IconButton';
@@ -60,7 +60,7 @@ export function PlayerUnlockSheet({
             />
           </View>
           <View style={styles.lockBadge}>
-            <Lock color={colors.coin} size={iconSize.button} strokeWidth={iconStroke} />
+            <LockKeyhole color={colors.coin} size={iconSize.button} strokeWidth={iconStroke} />
             <AppText role="caption">Locked</AppText>
           </View>
           <AppText role="caption">{`Episode ${episode}`}</AppText>
@@ -84,7 +84,7 @@ export function PlayerUnlockSheet({
           <PrimaryButton
             disabled={busy}
             fill
-            icon={canAfford ? Lock : Zap}
+            icon={canAfford ? LockKeyhole : Zap}
             label={busy ? 'Saving unlock' : confirmLabel}
             onPress={handlePrimary}
             testID={canAfford ? testIds.player.unlockConfirm : testIds.player.getCoins}

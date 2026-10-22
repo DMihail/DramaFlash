@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { router } from 'expo-router';
@@ -22,6 +22,7 @@ import {
 } from '@/features/home/model';
 import { useOptionalLibrarySelector } from '@/features/library/LibraryProvider';
 import { librarySaveFailedMessage } from '@/features/library/model';
+import { useTransientNotice } from '@/hooks/useTransientNotice';
 import { holdLoginTicket } from '@/navigation/pendingLogin';
 import { testIds } from '@/testing/testIds';
 import { colors, radius, space } from '@/theme/tokens';
@@ -37,14 +38,7 @@ export function HomeScreen() {
     ? (savedSeriesIds?.includes(spotlight.seriesId) ?? false)
     : false;
 
-  useEffect(() => {
-    if (!notice) {
-      return;
-    }
-
-    const timer = setTimeout(() => setNotice(null), 2600);
-    return () => clearTimeout(timer);
-  }, [notice]);
+  useTransientNotice(notice, setNotice);
 
   const handleProfile = () => {
     router.navigate(profileDestination());

@@ -44,6 +44,7 @@ import { type PlayerLoader, usePlayerEpisode } from '@/features/player/usePlayer
 import { seriesNotFoundTitle, sharingUnavailableMessage } from '@/features/series/model';
 import { resolveScreenWallet } from '@/features/wallet/resolveWallet';
 import { useOptionalWallet } from '@/features/wallet/WalletProvider';
+import { useTransientNotice } from '@/hooks/useTransientNotice';
 import { holdLoginTicket } from '@/navigation/pendingLogin';
 import { testIds } from '@/testing/testIds';
 import { colors, layout, radius, space } from '@/theme/tokens';
@@ -101,14 +102,7 @@ export function PlayerScreen({
     };
   }, [libraryStatus, openedEpisode, openedSeriesId, readyWallet, rememberEpisode]);
 
-  useEffect(() => {
-    if (!notice) {
-      return;
-    }
-
-    const timer = setTimeout(() => setNotice(null), 2600);
-    return () => clearTimeout(timer);
-  }, [notice]);
+  useTransientNotice(notice, setNotice);
 
   const handleBack = () => {
     if (router.canGoBack()) {

@@ -1,12 +1,13 @@
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 
-import { Bell, Heart, Search } from 'lucide-react-native';
+import { Bell, Search } from 'lucide-react-native';
 
 import { AppText } from '@/components/AppText';
 import { IconButton } from '@/components/IconButton';
+import { LogoMark } from '@/components/LogoMark';
 import { homeAvatar } from '@/features/home/assets';
 import { testIds } from '@/testing/testIds';
-import { colors, control, iconStroke, pressOpacity, radius, space } from '@/theme/tokens';
+import { colors, control, pressOpacity, space } from '@/theme/tokens';
 
 export function HomeHeader({
   onNotifications,
@@ -20,14 +21,7 @@ export function HomeHeader({
   return (
     <View style={styles.header}>
       <View accessibilityRole="header" style={styles.brand}>
-        <View style={styles.logo}>
-          <Heart
-            color={colors.onPrimary}
-            fill={colors.onPrimary}
-            size={18}
-            strokeWidth={iconStroke}
-          />
-        </View>
+        <LogoMark />
         <AppText role="titleL">DramaFlash</AppText>
       </View>
       <View style={styles.actions}>
@@ -83,14 +77,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: space.sm,
     flexShrink: 1,
-  },
-  logo: {
-    width: 32,
-    height: 32,
-    borderRadius: radius.sm,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   actions: {
     flexDirection: 'row',

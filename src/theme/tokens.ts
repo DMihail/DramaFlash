@@ -57,8 +57,10 @@ export const iconSize = {
   tab: 24,
   button: 22,
   header: 18,
+  logo: 23,
 } as const;
 
+/** Lucide stroke that matches the 1.75 pt outlines measured in FLASH.svg. */
 export const iconStroke = 1.75;
 
 export const pressOpacity = 0.7;

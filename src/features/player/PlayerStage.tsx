@@ -14,7 +14,7 @@ import {
   ChevronRight,
   Heart,
   ListVideo,
-  Lock,
+  LockKeyhole,
   type LucideIcon,
   MessageCircle,
   Pause,
@@ -153,7 +153,7 @@ export function PlayerStage({
             style={styles.lockCard}
             testID={testIds.player.locked}
           >
-            <Lock color={colors.coin} size={iconSize.button} strokeWidth={iconStroke} />
+            <LockKeyhole color={colors.coin} size={iconSize.button} strokeWidth={iconStroke} />
             <AppText role="titleS">{`Unlock Episode ${episode}`}</AppText>
             <AppText role="caption" style={styles.lockCopy}>
               {lockedEpisodeMessage(episode)}
@@ -204,7 +204,7 @@ export function PlayerStage({
           </AppText>
           {locked ? (
             <PrimaryButton
-              icon={Lock}
+              icon={LockKeyhole}
               label="Unlock"
               onPress={onUnlock}
               testID={testIds.player.unlock}

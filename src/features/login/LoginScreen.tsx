@@ -11,10 +11,11 @@ import {
 
 import { router } from 'expo-router';
 
-import { ChevronLeft, ChevronRight, Heart, Mail, ShieldCheck } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight, Mail, ShieldCheck } from 'lucide-react-native';
 
 import { AppText } from '@/components/AppText';
 import { IconButton } from '@/components/IconButton';
+import { LogoMark } from '@/components/LogoMark';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
 import { type DemoProvider } from '@/domain/auth';
@@ -128,14 +129,7 @@ export function LoginScreen() {
             />
           </View>
           <View style={styles.brand}>
-            <View style={styles.logo}>
-              <Heart
-                color={colors.onPrimary}
-                fill={colors.onPrimary}
-                size={18}
-                strokeWidth={iconStroke}
-              />
-            </View>
+            <LogoMark />
             <AppText color="primary" role="titleL">
               DramaFlash
             </AppText>
@@ -365,14 +359,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.sm,
-  },
-  logo: {
-    width: 32,
-    height: 32,
-    borderRadius: radius.sm,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   intro: {
     marginTop: space.section,
