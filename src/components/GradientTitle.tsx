@@ -11,7 +11,7 @@ import { colors, fontFamily } from '@/theme/tokens';
  * React Native has no gradient text style. SVG is already in the app, so this
  * stays free of a mask library. The header role stays on the wrapper. Putting
  * it on the SVG makes web render a heading, and the gradient fill is then ignored.
- */
+
 export function GradientTitle({ children, size = 24 }: { children: string; size?: number }) {
   const gradientId = `brandTitle${useId().replace(/:/g, '')}`;
   const width = Math.ceil(children.length * size * 0.72);
