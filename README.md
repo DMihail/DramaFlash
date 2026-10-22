@@ -6,12 +6,13 @@ DramaFlash is a demo app for short drama series. It uses Expo SDK 58, React Nati
 
 You do not need to clone the repo or install anything to try the demo.
 
-| Link                                                           | Use                                                       |
-| -------------------------------------------------------------- | --------------------------------------------------------- |
-| [Live Web Demo](https://dramaflash--dramaflash-demo.expo.app/) | Open in any modern browser, on a phone or a desktop.      |
-| Android APK                                                    | Not published yet.                                        |
-| iOS                                                            | No public install. Use the web demo on iPhone or desktop. |
-| [Source repository](https://github.com/DMihail/DramaFlash)     | Read the code on GitHub.                                  |
+| Link                                                                                                                    | Use                                                               |
+| ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| [Live Web Demo](https://dramaflash--dramaflash-demo.expo.app/)                                                          | Open in any modern browser, on a phone or a desktop.              |
+| [Android APK](https://expo.dev/artifacts/eas/r2K672R3TN4dA_U9qEZNoq1vbW0f4j9FPmVS23iAz_s.apk)                           | Install on an Android phone or emulator. No Expo Go and no Metro. |
+| [EAS Android build](https://expo.dev/accounts/dmihail/projects/drama-flash/builds/699aace0-4879-4640-bb8f-96723bc7753a) | Build details for the preview APK.                                |
+| iOS                                                                                                                     | No public install. Use the web demo on iPhone or desktop.         |
+| [Source repository](https://github.com/DMihail/DramaFlash)                                                              | Read the code on GitHub.                                          |
 
 ### A two-minute tour
 
@@ -37,7 +38,7 @@ Refresh the page at any point. Your coins, unlocks, and saved series stay.
 | Method              | Status          | Notes                                                                                                                                  |
 | ------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | Web demo            | Available       | No install. Hosted on EAS Hosting.                                                                                                     |
-| Android preview APK | Not yet         | `preview` profile in `eas.json`. A standalone release build: no Expo Go, no Metro, MMKV included.                                      |
+| Android preview APK | Available       | Standalone release APK from the `preview` profile. No Expo Go, no Metro, MMKV included. Installed and launched on an emulator.         |
 | iOS install         | Not available   | Ad hoc builds need each device UDID. TestFlight needs a paid Apple Developer account and App Store Connect setup. Use the web demo.    |
 | Expo Go             | Not supported   | `react-native-mmkv` 4 runs on `react-native-nitro-modules`. Expo Go cannot load custom native modules, so the app needs its own build. |
 | Development client  | Developers only | `development` profiles. Needs a local Metro server.                                                                                    |
