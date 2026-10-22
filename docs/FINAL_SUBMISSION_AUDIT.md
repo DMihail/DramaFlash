@@ -1,120 +1,88 @@
 # Final Submission Audit
 
-Branch: `feat/public-demo` (PR #29, not merged).
-Code SHA audited: `6a2a3e5`. The commit that adds this file and `FINAL_RECRUITMENT_EVALUATION.md` follows it.
-Date: 2026-10-22.
+Updated: 2026-10-22, release stage.
+`main`: `50a258e` (PR #29, squash-merged).
+Release branch: `fix/release-guard` on top of `main`. It carries the audit commits that were not part of the PR #29 merge, plus README screenshots and this report.
 
-## How this audit ran
+## Repository state
 
-| Environment                | What ran                                                                | What could not run, and why                                                                                                                         |
-| -------------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Linux sandbox, clean clone | `tsc --noEmit` (pass), `prettier --check .` (pass), export-guard script | ESLint, Jest, `expo export`: the repo's `node_modules` holds macOS-only native bindings (`unrs-resolver`, `esbuild`). The npm registry was blocked. |
-| Browser on the owner's Mac | Live web demo journeys, bundle inspection, console, local storage       | The live demo is an older build (see Distribution).                                                                                                 |
-| Owner's Mac terminal       | Nothing. Remote control could click but not type in Terminal.           | `npm run validate`, `npm run export:web`, Maestro, simulators, `git push`                                                                           |
-| GitHub                     | PR page read over the public web                                        | Push and CI: this session has no GitHub access. The PR page showed no check results.                                                                |
+- PR #29 merged only its first five commits. The six audit commits (export guard, dead code, player text, not-found page, Saved empty line, reports) were still local. They were cherry-picked onto `fix/release-guard` without conflicts.
+- Untracked user files (`FLASH.svg`, the prototype folder, design audits) were not touched.
 
-Nothing below is marked as passing unless it ran in this session.
+## Validation
 
-## Bugs found and fixed
+| Check                     | Result      | How                                                                                                                               |
+| ------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| TypeScript                | Pass        | `tsc --noEmit` on a clean clone.                                                                                                  |
+| Prettier                  | Pass        | `prettier --check .` on a clean clone.                                                                                            |
+| Production web export     | Pass        | `APP_VARIANT=production expo export --platform web --clear` in a Linux sandbox. See note.                                         |
+| Export guard              | Pass        | `node scripts/check-web-export.mjs`: production variant in 16 bundles. It fails on the old development `dist/` (checked earlier). |
+| ESLint, Jest, Expo Doctor | **Not run** | ESLint and Jest need the macOS-only `unrs-resolver` binary in `node_modules`. Doctor needs network. The npm registry was blocked. |
+| CI                        | **Not run** | This session has no GitHub access. The branch is not pushed.                                                                      |
 
-| ID  | Severity | Bug                                                                                                                                                                                                 | Fix                                                                                                                                                                                     | Commit    |
-| --- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| B1  | P1       | "Get coins" pushed the Coin Store while the unlock `Modal` stayed open on top of it. Seen on the first live deploy. The 15:04 redeploy includes the fix (verified live: no dialog after Get coins). | Close the sheet before `router.push`. Test asserts the sheet is gone.                                                                                                                   | `4b199a1` |
-| B2  | P0       | The live web demo is a development-variant bundle (`appVariant:"development"` in `entry-*.js`). `/dev/reset-wallet` returned 200 and erased the wallet.                                             | `export:web` pins `APP_VARIANT=production`, clears the Metro cache, and runs `scripts/check-web-export.mjs`, which fails on any non-production bundle. Toolchain test locks the script. | `98bd51b` |
-| B3  | P2       | Player status read "Paused artwork preview. Artwork preview. No video is playing."                                                                                                                  | Message is now "Paused artwork preview. No video is playing." Test pins the full sentence.                                                                                              | `5828673` |
-| B4  | P2       | Unknown URLs showed Expo Router's default "Unmatched Route" page with a Sitemap link.                                                                                                               | Branded `+not-found` route with a Go to Home button. New test.                                                                                                                          | `b5b4fa5` |
-| B5  | P2       | With Continue watching items but no saves, the Saved tab rendered nothing.                                                                                                                          | Empty line, matching the Purchases tab. Library test asserts it.                                                                                                                        | `6a2a3e5` |
+Note on the export: `app.config.ts` loads `tsx`, whose `esbuild` binary is macOS-only, so the sandbox used a plain-JS copy of the same variant logic. Global CSS went through a pass-through stub because no Linux `lightningcss` binary is installed. Both changes lived only in the sandbox clone. JavaScript bundles, routes, and assets are the real Metro output. Run `npm run export:web` on macOS for the deployable build.
 
-B2 is fixed in the repo only. The live site keeps the bug until it is redeployed with `npm run export:web`.
+## Production bundle security (from the export)
 
-## Refactoring and removed code
+- `appVariant` is `production` in every bundle. The development check `'development'===e.appVariant` is present but false.
+- The image fix is in the bundle (`height:254` posters; the old `height:255` is gone).
+- No `EXPO_PUBLIC_` variables, tokens, or keys. Search hits for "secret" and "password" are series titles and React Native Web input handling.
+- `/dev/reset-wallet` and `/dev/reset-library` still exist as route chunks, but in a browser they redirect home and leave stored data unchanged (see journeys).
 
-Removed (no screen or store called them; checked with a whole-repo search):
+## Browser journeys on the production export
 
-- `purchaseCoins` (duplicate of `grantCoinPack` by index). Its tests now use `grantCoinPack`, with the same assertions.
-- `readStoredWallet`, `writeStoredWallet`, `guestSession`: zero callers, including tests.
-- `loadAuth`, `resetSavedSeries`, `isSeriesSaved`, `AUTH_STORAGE_KEY`, and two private helpers: the pre-store auth persistence. The session and library stores replaced it. Their tests were removed with them. Sign-in, sign-out, ticket, and toggle tests stay.
-- `storyCastRoleNote`: a design note exported as a constant. Now a comment on the cast entry.
-- `src/app/unlocked.tsx`: a placeholder route from the first app shell. Nothing links to it.
+Playwright with Chromium, against the exported files served as `expo serve` rendered them. 31 checks, all pass, on three consecutive runs. Zero console errors apart from the expected 404 for the unknown-route test.
 
-Kept on purpose:
+| Area                     | Checks                                                                                                          |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| Layout at 390, 360, 1440 | Home renders. Every image fits its card on Home, Discover, Series, Player, and Library.                         |
+| Browse and play          | Discover, series direct link, free episode 1, player text "Paused artwork preview. No video is playing."        |
+| Unlock                   | Episode 4 locked and free to open. Double-click on Confirm: 15 → 5, one unlock. Reopen: no second charge.       |
+| Insufficient balance     | Get coins opens the store with no dialog left. Demo pack: 5 → 305. Unlock: 305 → 295.                           |
+| Library                  | Save persists. Continue watching and saved poster shown. Reload keeps wallet, unlocks, and library.             |
+| Auth                     | Email demo sign-in stores only `{"schema":1,"provider":"email"}`. Session survives reload. Sign-out keeps data. |
+| Security                 | `/dev/reset-wallet` and `/dev/reset-library` redirect home, data unchanged. Profile reset row disabled.         |
+| Invalid routes           | Unknown series, out-of-range episode, and unknown URL (branded "Page not found", HTTP 404).                     |
 
-- `api/series` `fetch*` helpers. Only tests call them, but those tests cover mock delay and abort behavior the screens rely on.
-- `domain/auth` `DemoAuth.savedSeriesIds` and `toggleSavedSeries`. Home still uses them for the login ticket. They overlap with the library store (see Remaining findings, P2).
+The image check compares each `<img>` with its card. Run against the current live site, the same check flags posters painted at 832×1248 inside 130×195 cards.
 
-No dependencies were added or removed. No stable module was rewritten.
+## Live deployments
 
-Test count: 175 test cases in 40 files (counted with `git grep`). `main` has 174. This PR adds 2 image-scaling cases (owner's commits), 2 toolchain cases, and 1 not-found case, and removes 4 legacy `loadAuth` cases. Assertions also changed in the wallet, auth, player, and library tests.
+| Target  | State                                                                                                                                                                                                                                             |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Web     | **Stale.** Still a development bundle from before the image fix. `/dev/reset-wallet` returns 200 and resets data. Needs `npm run export:web && npx eas-cli@latest deploy --alias dramaflash-demo` from `fix/release-guard` or `main` after merge. |
+| Android | **Stale.** EAS build `699aace0` (Succeeded) predates the image fix. Needs `npx eas-cli@latest build --platform android --profile preview`. Install and launch were not verified in this session.                                                  |
+| iOS     | No public route. Ad hoc needs device UDIDs. TestFlight needs a paid Apple Developer account. The web demo is the fallback.                                                                                                                        |
 
-## Code review summary
+## Bugs fixed across the audit
 
-- **Wallet.** Charges happen in pure `confirmUnlock`. The store holds a lock and publishes a new balance only after `commitWallet` writes, reads back, and verifies the JSON. A failed write restores the old bytes. Corrupt data reports `error` and is not replaced by a fresh 15-coin wallet. Live check: a double-click on Confirm charged exactly 10 coins once.
-- **Reset routes.** Gated by `isDevelopmentRuntime()` in the route, the Profile row, and both stores. The gate is correct. Only the build variant was wrong (B2).
-- **Auth.** Stores only the provider (`{"schema":1,"provider":"email"}` seen in local storage). No email, password, or token is written. Sign-out leaves the wallet and library alone (verified live).
-- **Library and progress.** Versioned records, verified writes, a locked episode is skipped in Continue watching.
-- **Image scaling (PR commits `9425348`–`c292ca0`).** Code review: every `Image` without explicit width and height now uses `fillFrame` (100% width and height), and the web `CoverImage` forces 100% on the `<img>`. That matches the root cause: React Native Web keeps the asset's pixel size. Not verified visually: the live build predates these commits (its bundle still has the old `height:255` poster).
+| ID  | Severity | Bug                                                                 | Status                                                                         |
+| --- | -------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| B1  | P1       | Unlock sheet stayed over the Coin Store after Get coins.            | Fixed in PR #29. Verified on the export and on the live site.                  |
+| B2  | P0       | Public web demo was a development bundle with working reset routes. | Guard on `fix/release-guard`. Verified on the export. **Live needs redeploy.** |
+| B3  | P2       | Player text repeated "artwork preview".                             | Fixed. Verified on the export.                                                 |
+| B4  | P2       | Unknown URLs showed Expo's default page with a Sitemap link.        | Fixed. Verified on the export.                                                 |
+| B5  | P2       | Saved tab blank when only Continue watching had items.              | Fixed. Unit test added (not run).                                              |
+| B6  | P1       | Posters and stills painted at asset size on web.                    | Fixed in PR #29. Verified on the export. **Live needs redeploy.**              |
 
-## Design comparison
-
-Compared the board frames in `docs/audit/frames/` with the live web demo (390 px wide).
-
-- Home hero: the board itself paints "ECHOES OF ETERNITY / A LOVE FORBIDDEN" into the hero image. The app matches the board. Under the "The CEO and I" title it reads as a mismatch. P2, needs a design decision, not a code fix.
-- Series details, player, unlock sheet, coin store, login: layout, gradients, and copy match the earlier fidelity work. The login gradient headline (#28) is live.
-- Library grid: the live build shows a poster painted at full asset size (only "TH" of the title visible). This is the bug the PR's fill-frame commits fix. Visual confirmation is pending a redeploy.
-
-## E2E results
-
-Executed on the live web demo in a real browser. These are genuine end-to-end runs on the deployed (older) build, not on HEAD. Some taps used DOM `click()` because the browser tool's synthetic pointer events did not reach some React Native Web `Pressable`s. The app handled the events the same way.
-
-| #   | Journey                           | Result                                                                                             |
-| --- | --------------------------------- | -------------------------------------------------------------------------------------------------- |
-| 1   | Fresh launch and browsing         | Pass. Home rails render. No console errors.                                                        |
-| 2   | Series details by direct link     | Pass. `/series/the-ceo-and-i` loads on refresh.                                                    |
-| 3   | Free episode                      | Pass. Episode 1 shows the preview. Progress is saved.                                              |
-| 4   | Locked episode                    | Pass. Episode 4 shows the lock card. Opening it does not charge.                                   |
-| 5   | Exactly-once 10-coin charge       | Pass. 15 → 5. One unlock record.                                                                   |
-| 6   | Rapid repeated taps               | Pass. Double-click on Confirm: one charge.                                                         |
-| 7   | Insufficient balance → Coin Store | Pass. "You need 5 more coins", then the store opens with the episode context.                      |
-| 8   | Modal dismissal on Get coins      | Failed on the first deploy (B1). Pass on the current live build after the fix.                     |
-| 9   | Save and remove a series          | Pass. Removal persisted.                                                                           |
-| 10  | Continue watching                 | Pass. Library and Profile show episode 2 after playing it.                                         |
-| 11  | Sign-in, sign-out, guest          | Pass. Email demo sign-in, session survives refresh, sign-out keeps wallet and library.             |
-| 12  | Persistence after refresh         | Pass for wallet, unlocks, library, progress, and session.                                          |
-| 13  | Invalid navigation                | Pass for bad series and bad episode. Unknown URL showed the default Expo page (B4, fixed in repo). |
-| 13  | Storage failures                  | Not run live. Covered by unit and integration tests in the repo (not executed this session).       |
-
-Maestro: 9 flows exist in `tests/e2e/maestro`. Not run in this session (no simulator or emulator access).
-
-## Distribution
-
-| Target  | Status                                                                                                                                                                                                                                                                                                                 |
-| ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Web     | Live at the README URL. **Stale and a development build.** It was exported at about 15:03 on 22 Oct: it has the modal fix (B1) but not the image commits. Redeploy: `npm run export:web && npx eas-cli@latest deploy --alias dramaflash-demo`. Then check that `/dev/reset-wallet` redirects home.                     |
-| Android | EAS build `699aace0` page shows "Succeeded" with an Install button (checked in a browser). Its commit is not shown. The README link was added before the image fix and this audit's fixes, so the APK does not contain them. Rebuild with the `preview` profile. Install and launch were not verified in this session. |
-| iOS     | No public route. Ad hoc needs device UDIDs. TestFlight needs a paid Apple Developer account. Nothing was changed. The web demo is the fallback.                                                                                                                                                                        |
-
-## CI
-
-Not verified. The PR page showed no check results, and this session cannot read the Actions API. The owner's PR description lists `npm run validate` as done locally. That run predates this audit's commits.
+Dead code removed: `purchaseCoins`, `readStoredWallet`, `writeStoredWallet`, `guestSession`, `loadAuth`, `resetSavedSeries`, `isSeriesSaved`, the old auth storage key, `storyCastRoleNote`, and the `/unlocked` placeholder route. Test cases: 175 on the release branch, 176 on `main`. The branch removes 4 legacy `loadAuth` cases and adds 3 (2 toolchain, 1 not-found).
 
 ## Remaining findings
 
-| Severity     | Finding                                                                                                             |
-| ------------ | ------------------------------------------------------------------------------------------------------------------- |
-| P0           | Live web demo is a development build. Fixed in the repo. **Redeploy required.**                                     |
-| P1           | Android APK predates the image-scaling fix and this audit's fixes. **Rebuild required.**                            |
-| P1           | `npm run validate` and CI have not run on the audited commits.                                                      |
-| P2           | `DemoAuth.savedSeriesIds` duplicates the library store's saved ids.                                                 |
-| P2           | Home hero artwork carries another title painted into the image.                                                     |
-| P2           | `PlayerScreen.tsx` (476 lines) and `LoginScreen.tsx` (490 lines) are the largest screens and the hardest to review. |
-| P2           | No screenshots in the README.                                                                                       |
-| Out of scope | Real payments, real auth, video streaming, season unlock, VIP.                                                      |
+| Severity     | Finding                                                                                     |
+| ------------ | ------------------------------------------------------------------------------------------- |
+| P0           | Live web demo is the old development build. Redeploy.                                       |
+| P1           | `npm run validate` (ESLint, Jest, Doctor) and CI have not run on the release branch.        |
+| P1           | Android APK predates the image fix. Rebuild, or keep the README note.                       |
+| P2           | Home hero artwork carries another title painted in ("ECHOES OF ETERNITY"), as on the board. |
+| P2           | `DemoAuth.savedSeriesIds` overlaps with the library store.                                  |
+| Out of scope | Real payments, real auth, streaming video, season unlock, VIP.                              |
 
 ## Verdict
 
-**NOT READY as of this commit.** The code is in good shape. The deployed artifacts are not. It becomes ready when the owner:
+**NOT READY TO SUBMIT yet.** The release branch is verified in a production export. Submission needs the owner to:
 
-1. runs `npm run validate` on the Mac and it passes,
-2. redeploys the web demo with `npm run export:web` and checks `/dev/reset-wallet` redirects,
-3. rebuilds the Android preview APK and updates the README link,
-4. pushes `feat/public-demo` and CI is green.
+1. Push `fix/release-guard`, open its PR, and get `npm run validate` and CI green.
+2. Merge, then `npm run export:web && npx eas-cli@latest deploy --alias dramaflash-demo`.
+3. Open the live URL: `/dev/reset-wallet` must redirect home, and Library posters must fit their cards.
+4. Rebuild the Android APK and update the README links, or leave the README note as is.
