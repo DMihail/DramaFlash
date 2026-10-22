@@ -25,6 +25,7 @@ import {
   libraryIntroBody,
   libraryIntroTitle,
   libraryReadErrorMessage,
+  librarySavedEmpty,
   librarySavedTitle,
   libraryTitle,
   purchaseLines,
@@ -180,6 +181,11 @@ export function LibraryScreen() {
                 <AppText role="caption">Purchases</AppText>
               </Pressable>
             </View>
+            {libraryTab === 'saved' && saved.length === 0 ? (
+              <AppText role="bodySmall" style={styles.intro}>
+                {librarySavedEmpty}
+              </AppText>
+            ) : null}
             {libraryTab === 'saved' && saved.length > 0 ? (
               <View style={styles.section} testID={testIds.library.saved}>
                 <SectionHeader title={librarySavedTitle} />

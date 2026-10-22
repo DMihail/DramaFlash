@@ -21,7 +21,7 @@ You do not need to clone the repo or install anything to try the demo.
 3. **Watch a free episode.** Tap **Play Ep 1**, then **Watch**. Episodes 1–3 are free.
 4. **Open a locked episode.** Tap **Next** until Episode 4, or pick it from the episode list. Opening it costs nothing.
 5. **Unlock it with demo coins.** Tap **Unlock**, then **Confirm unlock · 10 coins**. You start with 15 coins, so the balance drops to 5. For the next episode, tap **Get coins** and add a demo pack.
-6. **Explore Library and Continue Watching.** Tap the heart in the player to save the series. Open **Library** to see Saved and Purchases. Open **Profile** to see Continue watching and your coin balance.
+6. **Explore Library and Continue Watching.** Tap the heart in the player to save the series. Open **Library** to see Continue watching, Saved, and Purchases. **Profile** shows your coin balance and demo sign-in.
 
 Refresh the page at any point. Your coins, unlocks, and saved series stay.
 
