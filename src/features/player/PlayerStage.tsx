@@ -138,7 +138,6 @@ export function PlayerStage({
             onPress={onBack}
             testID={testIds.player.back}
           />
-          <AppText role="titleS">DramaFlash</AppText>
           <IconButton
             accessibilityLabel="Episodes"
             icon={ListVideo}
@@ -147,44 +146,45 @@ export function PlayerStage({
           />
         </View>
         {locked ? (
-          <Pressable
-            accessibilityRole="button"
-            onPress={onUnlock}
-            style={styles.lockCard}
-            testID={testIds.player.locked}
-          >
-            <LockKeyhole color={colors.coin} size={iconSize.button} strokeWidth={iconStroke} />
-            <AppText role="titleS">{`Unlock Episode ${episode}`}</AppText>
-            <AppText role="caption" style={styles.lockCopy}>
-              {lockedEpisodeMessage(episode)}
-            </AppText>
-          </Pressable>
-        ) : null}
-        <View style={[styles.bottom, { paddingBottom: bottomInset + space.lg }]}>
-          <View style={styles.sideActions}>
-            <SideAction
-              accessibilityLabel={saved ? 'Remove from library' : 'Save series'}
-              icon={Heart}
-              label={saved ? 'Saved' : 'Save'}
-              onPress={onSave}
-              saved={saved}
-              testID={testIds.player.save}
-            />
-            <SideAction
-              accessibilityLabel="Comments"
-              icon={MessageCircle}
-              label="Comments"
-              onPress={onComments}
-              testID={testIds.player.comments}
-            />
-            <SideAction
-              accessibilityLabel="Share episode"
-              icon={Share2}
-              label="Share"
-              onPress={onShare}
-              testID={testIds.player.share}
-            />
+          <View pointerEvents="box-none" style={styles.lockLayer}>
+            <Pressable
+              accessibilityRole="button"
+              onPress={onUnlock}
+              style={styles.lockCard}
+              testID={testIds.player.locked}
+            >
+              <LockKeyhole color={colors.coin} size={iconSize.button} strokeWidth={iconStroke} />
+              <AppText role="titleXS" style={styles.lockTitle}>
+                {`Unlock Episode ${episode}`}
+              </AppText>
+            </Pressable>
           </View>
+        ) : null}
+        <View style={[styles.sideActions, { bottom: bottomInset + 148 }]}>
+          <SideAction
+            accessibilityLabel={saved ? 'Remove from library' : 'Save series'}
+            icon={Heart}
+            label={saved ? 'Saved' : 'Save'}
+            onPress={onSave}
+            saved={saved}
+            testID={testIds.player.save}
+          />
+          <SideAction
+            accessibilityLabel="Comments"
+            icon={MessageCircle}
+            label="Comments"
+            onPress={onComments}
+            testID={testIds.player.comments}
+          />
+          <SideAction
+            accessibilityLabel="Share episode"
+            icon={Share2}
+            label="Share"
+            onPress={onShare}
+            testID={testIds.player.share}
+          />
+        </View>
+        <View style={[styles.bottom, { paddingBottom: bottomInset + space.lg }]}>
           <AppText accessibilityRole="header" role="displayM">
             {title}
           </AppText>
@@ -203,22 +203,26 @@ export function PlayerStage({
             {status}
           </AppText>
           {locked ? (
-            <PrimaryButton
-              icon={LockKeyhole}
-              label="Unlock"
-              onPress={onUnlock}
-              testID={testIds.player.unlock}
-              variant="player"
-            />
+            <View style={styles.watchWrap}>
+              <PrimaryButton
+                icon={LockKeyhole}
+                label="Unlock"
+                onPress={onUnlock}
+                testID={testIds.player.unlock}
+                variant="player"
+              />
+            </View>
           ) : null}
           {canPreviewPlayback(access, preview) ? (
-            <PrimaryButton
-              icon={playing ? Pause : Play}
-              label={playing ? 'Pause' : 'Watch'}
-              onPress={handleTogglePlayback}
-              testID={playing ? testIds.player.pause : testIds.player.play}
-              variant="player"
-            />
+            <View style={styles.watchWrap}>
+              <PrimaryButton
+                icon={playing ? Pause : Play}
+                label={playing ? 'Pause' : 'Watch'}
+                onPress={handleTogglePlayback}
+                testID={playing ? testIds.player.pause : testIds.player.play}
+                variant="player"
+              />
+            </View>
           ) : null}
           <View style={styles.transport}>
             <TransportButton
@@ -292,8 +296,8 @@ function SideAction({
           strokeWidth={iconStroke}
           {...(saved ? { fill: colors.primary } : {})}
         />
-        <AppText role="micro">{label}</AppText>
       </View>
+      <AppText role="micro">{label}</AppText>
     </Pressable>
   );
 }
@@ -355,19 +359,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  lockCard: {
-    marginHorizontal: layout.marginDetail,
-    marginTop: space.xxxl,
-    padding: space.lg,
-    borderRadius: radius.card,
-    backgroundColor: colors.surfaceRaised,
-    borderWidth: 1,
-    borderColor: colors.border,
-    gap: space.sm,
-    alignItems: 'flex-start',
+  lockLayer: {
+    ...StyleSheet.absoluteFill,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  lockCopy: {
-    color: colors.textOnMedia,
+  lockCard: {
+    width: 184,
+    minHeight: 126,
+    padding: space.md,
+    borderRadius: radius.sheetInner,
+    backgroundColor: 'rgba(6, 21, 50, 0.9)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.75)',
+    gap: space.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  lockTitle: {
+    textAlign: 'center',
   },
   bottom: {
     position: 'absolute',
@@ -375,18 +385,28 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     paddingHorizontal: layout.marginDetail,
+    paddingRight: 88,
     gap: space.md,
   },
+  watchWrap: {
+    alignSelf: 'flex-start',
+  },
   sideActions: {
-    alignSelf: 'flex-end',
+    position: 'absolute',
+    right: layout.marginScreen,
     alignItems: 'center',
-    gap: space.lg,
+    gap: 20,
+    zIndex: 2,
   },
   sideButton: {
+    width: control.icon,
+    height: control.icon,
+    borderRadius: control.icon / 2,
     alignItems: 'center',
-    gap: space.xs,
-    minWidth: control.icon,
-    minHeight: control.icon,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.85)',
   },
   transport: {
     flexDirection: 'row',
