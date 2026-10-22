@@ -17,7 +17,6 @@ DramaFlash was developed for **TargetVideo's Mobile App Developer take-home assi
 | --- | --- | --- |
 | **Android APK** | **[Download v1.0.0 demo](https://github.com/DMihail/DramaFlash/releases/download/v1.0.0-demo/app-release.apk)** | Standalone APK; does not require Expo Go or Metro. |
 | **Web demo** | **[Open DramaFlash](https://dramaflash--dramaflash-demo.expo.app/)** | Hosted on EAS Hosting. Its deployed version may differ from the latest repository commit. |
-| **Demo video** | [Watch the 70-second walkthrough](deliverables/DramaFlash_Demo.mp4) | Captured from the production web build at mobile viewport width; not an Android recording. |
 | **Source code** | [GitHub repository](https://github.com/DMihail/DramaFlash) | React Native / Expo / TypeScript. |
 
 **iOS:** Source code supports iOS, but no public iOS installation or TestFlight distribution is provided. The web demo is available in a mobile browser.
