@@ -108,6 +108,7 @@ export const testIds = {
     error: 'library.error',
     retry: 'library.retry',
     saved: 'library.saved',
+    purchases: 'library.purchases',
     continue: 'library.continue',
     explore: 'library.explore',
     reset: 'library.reset',

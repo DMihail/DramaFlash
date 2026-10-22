@@ -1,4 +1,5 @@
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { router } from 'expo-router';
 
@@ -10,6 +11,7 @@ import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
 import { Skeleton } from '@/components/Skeleton';
+import { findSeries } from '@/data/catalog';
 import { posterArt } from '@/features/home/assets';
 import { seriesDestination } from '@/features/home/model';
 import { useLibrarySelector } from '@/features/library/LibraryProvider';
@@ -25,14 +27,19 @@ import {
   libraryReadErrorMessage,
   librarySavedTitle,
   libraryTitle,
+  purchaseLines,
   resumeDestination,
   savedPosters,
+  savedProgressLabel,
 } from '@/features/library/model';
 import { useOptionalWallet } from '@/features/wallet/WalletProvider';
 import { testIds } from '@/testing/testIds';
-import { colors, iconSize, iconStroke, layout, space } from '@/theme/tokens';
+import { contentWidth } from '@/theme/responsive';
+import { colors, iconSize, iconStroke, layout, radius, space } from '@/theme/tokens';
 
 export function LibraryScreen() {
+  const { width } = useWindowDimensions();
+  const [libraryTab, setLibraryTab] = useState<'saved' | 'purchases'>('saved');
   const status = useLibrarySelector((state) => state.status);
   const savedSeriesIds = useLibrarySelector((state) => state.savedSeriesIds);
   const entries = useLibrarySelector((state) => state.entries);
@@ -46,6 +53,16 @@ export function LibraryScreen() {
       ? continueItems(entries, continueWallet)
       : [];
   const saved = status === 'ready' ? savedPosters(savedSeriesIds) : [];
+  const purchases =
+    wallet?.status === 'ready' && wallet.wallet ? purchaseLines(wallet.wallet) : [];
+  const columns = width >= 768 ? (width >= 1024 ? 4 : 3) : 2;
+  const cardWidth = Math.max(
+    1,
+    Math.floor(
+      (contentWidth(width) - layout.marginScreen * 2 - space.md * (columns - 1)) / columns,
+    ),
+  );
+  const cardSize = { width: cardWidth, height: Math.round(cardWidth * 1.5) };
 
   const handleExplore = () => {
     router.navigate('/');
@@ -95,7 +112,7 @@ export function LibraryScreen() {
     );
   }
 
-  const showEmpty = saved.length === 0 && continueList.length === 0;
+  const showEmpty = saved.length === 0 && continueList.length === 0 && purchases.length === 0;
 
   return (
     <Screen safeArea="tabs" testID={testIds.library.screen}>
@@ -145,30 +162,73 @@ export function LibraryScreen() {
                 })}
               </View>
             ) : null}
-            {saved.length > 0 ? (
+            <View style={styles.tabs}>
+              <Pressable
+                accessibilityRole="tab"
+                accessibilityState={{ selected: libraryTab === 'saved' }}
+                onPress={() => setLibraryTab('saved')}
+                style={[styles.tab, libraryTab === 'saved' ? styles.tabSelected : null]}
+              >
+                <AppText role="caption">Saved</AppText>
+              </Pressable>
+              <Pressable
+                accessibilityRole="tab"
+                accessibilityState={{ selected: libraryTab === 'purchases' }}
+                onPress={() => setLibraryTab('purchases')}
+                style={[styles.tab, libraryTab === 'purchases' ? styles.tabSelected : null]}
+                testID={testIds.library.purchases}
+              >
+                <AppText role="caption">Purchases</AppText>
+              </Pressable>
+            </View>
+            {libraryTab === 'saved' && saved.length > 0 ? (
               <View style={styles.section} testID={testIds.library.saved}>
                 <SectionHeader title={librarySavedTitle} />
-                <ScrollView
-                  contentContainerStyle={styles.rail}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                >
+                <View style={styles.grid}>
                   {saved.map((poster) => {
                     const image = posterArt(poster.id);
+                    const meta = savedProgressLabel(
+                      poster.id,
+                      findSeries(poster.id)?.episodeCount ?? null,
+                      continueList,
+                    );
 
                     return (
                       <PosterCard
                         key={poster.id}
                         onPress={() => handleOpenSaved(poster.id)}
+                        size={cardSize}
                         testID={testIds.library.poster(poster.id)}
                         title={poster.title}
-                        variant="rail"
+                        variant="grid"
                         {...(image ? { image } : {})}
-                        {...(poster.meta ? { meta: poster.meta } : {})}
+                        {...(meta ? { meta } : {})}
                       />
                     );
                   })}
-                </ScrollView>
+                </View>
+              </View>
+            ) : null}
+            {libraryTab === 'purchases' ? (
+              <View style={styles.section}>
+                <SectionHeader title="Purchases" />
+                {purchases.length === 0 ? (
+                  <AppText role="bodySmall" style={styles.intro}>
+                    No episode unlocks on this device yet.
+                  </AppText>
+                ) : (
+                  purchases.map((line) => (
+                    <Pressable
+                      key={line.seriesId}
+                      accessibilityRole="button"
+                      onPress={() => handleOpenSaved(line.seriesId)}
+                      style={styles.purchaseRow}
+                    >
+                      <AppText role="titleXS">{line.title}</AppText>
+                      <AppText role="caption">{`Episodes ${line.episodes.join(', ')}`}</AppText>
+                    </Pressable>
+                  ))
+                )}
               </View>
             ) : null}
           </>
@@ -198,9 +258,39 @@ const styles = StyleSheet.create({
     gap: space.md,
     paddingTop: space.lg,
   },
-  rail: {
+  tabs: {
+    flexDirection: 'row',
+    gap: space.sm,
     paddingHorizontal: layout.marginScreen,
+    paddingTop: space.lg,
+  },
+  tab: {
+    minHeight: 34,
+    paddingHorizontal: space.md,
+    borderRadius: radius.sheet,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tabSelected: {
+    borderColor: colors.primary,
+    backgroundColor: 'rgba(100, 237, 247, 0.12)',
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: space.md,
+    paddingHorizontal: layout.marginScreen,
+  },
+  purchaseRow: {
+    marginHorizontal: layout.marginScreen,
+    padding: space.md,
+    borderRadius: radius.card,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    gap: space.xs,
   },
   continueRow: {
     paddingHorizontal: layout.marginScreen,
