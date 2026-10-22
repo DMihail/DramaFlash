@@ -92,10 +92,7 @@ export function castPortrait(id: StoryCastId): ImageSourcePropType {
 }
 
 /** Episode still from the series-detail frame. Other episodes have no still. */
-export function episodeStill(
-  seriesId: string,
-  episode: number,
-): ImageSourcePropType | undefined {
+export function episodeStill(seriesId: string, episode: number): ImageSourcePropType | undefined {
   if (seriesId !== storySeriesId) {
     return undefined;
   }
