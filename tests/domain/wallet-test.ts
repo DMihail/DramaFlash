@@ -7,12 +7,12 @@ import {
   isEpisodeInSeries,
   isEpisodeUnlocked,
   loadWallet,
-  purchaseCoins,
   serializeWallet,
   STARTING_BALANCE,
   unlockEpisode,
   WALLET_SCHEMA_VERSION,
   WALLET_STORAGE_KEY,
+  type Wallet,
   type WalletLoadResult,
 } from '@/domain/wallet';
 
@@ -23,6 +23,15 @@ function readyWallet(storage: { getItem: (key: string) => string | null }) {
   }
 
   return result.wallet;
+}
+
+function withPack(wallet: Wallet, packId: string): Wallet {
+  const next = grantCoinPack(wallet, packId);
+  if (!next) {
+    throw new Error(`expected coin pack ${packId}`);
+  }
+
+  return next;
 }
 
 const seriesA = 'the-ceo-and-i';
@@ -53,7 +62,7 @@ describe('wallet', () => {
     expect(isEpisodeUnlocked(unlocked, seriesB, 4)).toBe(false);
     expect(unlockEpisode(unlocked, seriesB, 4)).toBe(unlocked);
 
-    const paid = purchaseCoins(unlocked, 0);
+    const paid = withPack(unlocked, 'coins-300');
     const otherSeries = unlockEpisode(paid, seriesB, 4);
 
     expect(otherSeries.balance).toBe(295);
@@ -65,7 +74,7 @@ describe('wallet', () => {
     const low = unlockEpisode(freshWallet(), seriesA, 4);
     expect(unlockEpisode(low, seriesA, 5)).toBe(low);
 
-    const purchased = purchaseCoins(low, 0);
+    const purchased = withPack(low, 'coins-300');
 
     expect(purchased.balance).toBe(305);
     expect(purchased.unlocks).toEqual([{ seriesId: seriesA, episode: 4 }]);
@@ -82,8 +91,8 @@ describe('wallet', () => {
   });
 
   test('adds each pack without changing unlocks', () => {
-    for (const [index, pack] of coinPacks.entries()) {
-      const wallet = purchaseCoins(freshWallet(), index);
+    for (const pack of coinPacks) {
+      const wallet = withPack(freshWallet(), pack.id);
 
       expect(wallet.balance).toBe(STARTING_BALANCE + pack.coins + pack.bonus);
       expect(wallet.unlocks).toEqual([]);
@@ -101,8 +110,8 @@ describe('wallet', () => {
     expect(unlockEpisode(wallet, 'missing-series', 4)).toBe(wallet);
     expect(isEpisodeInSeries(null, 4)).toBe(false);
     expect(isEpisodeUnlocked(wallet, 'missing-series', 1)).toBe(false);
-    expect(purchaseCoins(wallet, -1)).toBe(wallet);
-    expect(purchaseCoins(wallet, coinPacks.length)).toBe(wallet);
+    expect(grantCoinPack(wallet, '')).toBeNull();
+    expect(grantCoinPack(wallet, 'coins-999')).toBeNull();
   });
 
   test('uses the selected series length for episodes 25, 45, 50, and 90', () => {
@@ -112,7 +121,7 @@ describe('wallet', () => {
       ['the-ceo-and-i', 50],
       ['avenging-angel', 90],
     ] as const;
-    const funded = purchaseCoins(freshWallet(), 0);
+    const funded = withPack(freshWallet(), 'coins-300');
 
     for (const [seriesId, episodeCount] of lengths) {
       expect(episodeCountFor(seriesId)).toBe(episodeCount);

@@ -11,10 +11,6 @@ export type SessionLoadResult =
 
 const providers: readonly DemoProvider[] = ['google', 'apple', 'email'];
 
-export function guestSession(): DemoSession {
-  return { provider: null };
-}
-
 /**
  * Reads a saved demo session.
  *
