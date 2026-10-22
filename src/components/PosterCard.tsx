@@ -1,5 +1,7 @@
 import { Image, type ImageSourcePropType, Pressable, StyleSheet, View } from 'react-native';
 
+import { LinearGradient } from 'expo-linear-gradient';
+
 import { AppText } from '@/components/AppText';
 import { colors, layout, radius, space } from '@/theme/tokens';
 
@@ -27,27 +29,30 @@ export function PosterCard({
   testID?: string;
 }) {
   const measured = size ?? posterSize(variant);
-  const art = image ? (
-    <Image
-      accessibilityIgnoresInvertColors
-      resizeMode="cover"
-      source={image}
-      style={[styles.image, measured]}
-    />
-  ) : (
-    <View style={[styles.image, styles.placeholder, measured]} />
-  );
   const caption = (
     <View style={{ width: measured.width }} {...(!onPress && testID ? { testID } : {})}>
-      {art}
+      <View style={[styles.image, measured]}>
+        {image ? (
+          <Image
+            accessibilityIgnoresInvertColors
+            resizeMode="cover"
+            source={image}
+            style={StyleSheet.absoluteFill}
+          />
+        ) : (
+          <View style={[StyleSheet.absoluteFill, styles.placeholder]} />
+        )}
+        {meta ? (
+          <LinearGradient colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.82)']} style={styles.scrim}>
+            <AppText numberOfLines={1} role="micro" style={styles.scrimText}>
+              {meta}
+            </AppText>
+          </LinearGradient>
+        ) : null}
+      </View>
       <AppText numberOfLines={2} role="titleXS" style={styles.title}>
         {title}
       </AppText>
-      {meta ? (
-        <AppText numberOfLines={1} role="micro" style={styles.meta}>
-          {meta}
-        </AppText>
-      ) : null}
     </View>
   );
 
@@ -78,11 +83,20 @@ const styles = StyleSheet.create({
   placeholder: {
     backgroundColor: colors.surfaceMedia,
   },
+  scrim: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 47,
+    justifyContent: 'flex-end',
+    paddingHorizontal: space.sm,
+    paddingBottom: space.sm,
+  },
+  scrimText: {
+    color: colors.text,
+  },
   title: {
     marginTop: space.md,
-  },
-  meta: {
-    marginTop: space.xs,
-    color: colors.textMeta,
   },
 });

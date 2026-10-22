@@ -18,6 +18,7 @@ export function HomeHero({
   onSave,
   onWatch,
   saved = false,
+  tagline,
   title,
 }: {
   episodeLabel: string;
@@ -25,6 +26,7 @@ export function HomeHero({
   onSave: () => void;
   onWatch: () => void;
   saved?: boolean;
+  tagline?: string;
   title: string;
 }) {
   const { width } = useWindowDimensions();
@@ -59,6 +61,11 @@ export function HomeHero({
           </AppText>
         </View>
         <AppText role="displayXL">{title}</AppText>
+        {tagline ? (
+          <AppText role="bodySmall" style={styles.metaText}>
+            {tagline}
+          </AppText>
+        ) : null}
         <AppText role="bodySmall" style={styles.metaText}>
           {episodeLabel}
         </AppText>

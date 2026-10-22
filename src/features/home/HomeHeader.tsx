@@ -68,6 +68,7 @@ const styles = StyleSheet.create({
   header: {
     minHeight: 52,
     paddingHorizontal: space.lg,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

@@ -94,6 +94,7 @@ describe('home catalog', () => {
       seriesId: 'the-ceo-and-i',
       title: 'The CEO and I',
       episodeLabel: '50 Episodes',
+      tagline: "A CEO's dangerous secret contract.",
     });
     expect(spotlight && watchNowDestination(spotlight.seriesId)).toEqual(
       seriesDestination('the-ceo-and-i'),
