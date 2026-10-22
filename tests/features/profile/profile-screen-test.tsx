@@ -10,6 +10,7 @@ import { AuthProvider } from '@/features/auth/AuthProvider';
 import { coinBalanceLabel } from '@/features/coins/model';
 import { LibraryProvider } from '@/features/library/LibraryProvider';
 import { ProfileScreen } from '@/features/profile/ProfileScreen';
+import { profileResetFailed, profileSignOutFailed } from '@/features/profile/model';
 import { WalletProvider } from '@/features/wallet/WalletProvider';
 import { MMKV_LIBRARY_KEY, MMKV_SESSION_KEY, MMKV_WALLET_KEY } from '@/storage/persistence';
 import { testIds } from '@/testing/testIds';
@@ -148,5 +149,62 @@ describe('profile screen', () => {
     expect(local.snapshot(MMKV_WALLET_KEY)).toBe(wallet);
     expect(local.snapshot(MMKV_LIBRARY_KEY)).toBe(library);
     expect(local.snapshot(MMKV_SESSION_KEY)).toContain('"provider":null');
+  });
+
+  test('keeps the demo session when sign-out cannot be saved', async () => {
+    const session = serializeSession({ provider: 'apple' });
+    const local = memoryLocal({
+      [MMKV_WALLET_KEY]: serializeWallet(freshWallet()),
+      [MMKV_SESSION_KEY]: session,
+    });
+    local.setString = () => {
+      throw new Error('disk full');
+    };
+    const renderer = await mount(
+      <WalletProvider legacy={memoryLegacy()} local={local}>
+        <LibraryProvider local={local}>
+          <AuthProvider local={local}>
+            <ProfileScreen allowReset={false} />
+          </AuthProvider>
+        </LibraryProvider>
+      </WalletProvider>,
+    );
+
+    await act(async () => {
+      press(renderer, testIds.profile.signOut);
+      for (let step = 0; step < 8; step += 1) {
+        await Promise.resolve();
+      }
+    });
+
+    expect(textOf(renderer)).toContain(profileSignOutFailed);
+    expect(local.snapshot(MMKV_SESSION_KEY)).toBe(session);
+  });
+
+  test('shows an error when the demo wallet reset cannot be saved', async () => {
+    const wallet = serializeWallet(freshWallet());
+    const local = memoryLocal({ [MMKV_WALLET_KEY]: wallet });
+    local.delete = () => {
+      throw new Error('disk full');
+    };
+    const renderer = await mount(
+      <WalletProvider allowReset legacy={memoryLegacy()} local={local}>
+        <LibraryProvider local={local}>
+          <AuthProvider local={local}>
+            <ProfileScreen allowReset />
+          </AuthProvider>
+        </LibraryProvider>
+      </WalletProvider>,
+    );
+
+    await act(async () => {
+      press(renderer, testIds.profile.reset);
+      for (let step = 0; step < 8; step += 1) {
+        await Promise.resolve();
+      }
+    });
+
+    expect(textOf(renderer)).toContain(profileResetFailed);
+    expect(local.snapshot(MMKV_WALLET_KEY)).toBe(wallet);
   });
 });

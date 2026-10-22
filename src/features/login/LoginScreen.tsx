@@ -21,12 +21,14 @@ import { type DemoProvider } from '@/domain/auth';
 import { validateDemoEmail } from '@/domain/session';
 import { useAuthSelector } from '@/features/auth/AuthProvider';
 import { useOptionalLibrarySelector } from '@/features/library/LibraryProvider';
+import { librarySaveFailedMessage } from '@/features/library/model';
 import {
   hrefAfterLogin,
   loginDemoBadge,
   loginDisclaimer,
   loginEmailHint,
   loginPrivacyNotice,
+  loginReadError,
   loginSaveError,
   loginSubtitle,
   loginTermsNotice,
@@ -100,7 +102,11 @@ export function LoginScreen() {
       libraryStatus === 'ready' &&
       !savedSeriesIds?.includes(seriesId)
     ) {
-      await toggleSave(seriesId);
+      const saved = await toggleSave(seriesId);
+      if (saved.status !== 'saved') {
+        setError(librarySaveFailedMessage);
+        return;
+      }
     }
 
     leave(true);
@@ -146,7 +152,7 @@ export function LoginScreen() {
             {status === 'error' ? (
               <View style={styles.block}>
                 <AppText role="body" testID={testIds.login.error}>
-                  {loginSaveError}
+                  {loginReadError}
                 </AppText>
                 <PrimaryButton label="Try again" onPress={() => void retry()} />
               </View>

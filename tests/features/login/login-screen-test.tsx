@@ -6,6 +6,7 @@ import TestRenderer, { act } from 'react-test-renderer';
 import { createLoginTicket } from '@/domain/auth';
 import { AuthProvider } from '@/features/auth/AuthProvider';
 import { LibraryProvider } from '@/features/library/LibraryProvider';
+import { librarySaveFailedMessage } from '@/features/library/model';
 import { LoginScreen } from '@/features/login/LoginScreen';
 import { hrefAfterLogin } from '@/features/login/model';
 import { clearLoginTicket, holdLoginTicket } from '@/navigation/pendingLogin';
@@ -167,5 +168,45 @@ describe('login screen', () => {
         true,
       ),
     );
+  });
+
+  test('stays on login when the pending series cannot be saved', async () => {
+    const local = memoryLocal();
+    const originalSet = local.setString.bind(local);
+    local.setString = (key, value) => {
+      if (key === MMKV_LIBRARY_KEY) {
+        throw new Error('disk full');
+      }
+
+      originalSet(key, value);
+    };
+    holdLoginTicket(
+      createLoginTicket({
+        currentScreen: 'series',
+        destination: 'series',
+        wasPlaying: false,
+        seriesIdToSave: 'love-on-detours',
+      }),
+    );
+    mockRouter.canGoBack.mockReturnValue(false);
+    const renderer = await mount(
+      <LibraryProvider local={local}>
+        <AuthProvider local={local}>
+          <LoginScreen />
+        </AuthProvider>
+      </LibraryProvider>,
+    );
+
+    await act(async () => {
+      press(renderer, testIds.login.google);
+      for (let step = 0; step < 12; step += 1) {
+        await Promise.resolve();
+      }
+    });
+
+    expect(local.snapshot(MMKV_SESSION_KEY)).toContain('google');
+    expect(local.snapshot(MMKV_LIBRARY_KEY)).toBeNull();
+    expect(textOf(renderer)).toContain(librarySaveFailedMessage);
+    expect(mockRouter.replace).not.toHaveBeenCalled();
   });
 });

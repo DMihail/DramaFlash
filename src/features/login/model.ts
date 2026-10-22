@@ -12,6 +12,7 @@ export const loginTermsNotice =
 export const loginPrivacyNotice =
   'Demo privacy: no credentials are collected. Only the demo sign-in choice is stored on this device.';
 export const loginSaveError = 'Demo sign-in could not be saved on this device.';
+export const loginReadError = 'The demo sign-in could not be read on this device.';
 export const loginEmailHint = 'This email is checked and then discarded. It is not saved.';
 
 export function hrefAfterLogin(ticket: LoginTicket | null, signedIn: boolean): Href {

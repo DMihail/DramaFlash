@@ -18,12 +18,15 @@ import { continueItems } from '@/features/library/model';
 import {
   profileGuestBody,
   profileReadError,
+  profileResetDone,
+  profileResetFailed,
   profileResetLabel,
   profileResetNote,
   profileResetUnavailable,
   profileSettingsLabel,
   profileSettingsNote,
   profileSignedInBody,
+  profileSignOutFailed,
   profileSignOutNote,
   profileTitle,
   profileWelcome,
@@ -57,6 +60,11 @@ export function ProfileScreen({ allowReset = isDevelopmentRuntime() }: { allowRe
     void signOut().then((result) => {
       if (result.status === 'saved') {
         setNotice(profileSignOutNote);
+        return;
+      }
+
+      if (result.status === 'save-failed') {
+        setNotice(profileSignOutFailed);
       }
     });
   };
@@ -68,7 +76,12 @@ export function ProfileScreen({ allowReset = isDevelopmentRuntime() }: { allowRe
 
     void resetDemo().then((result) => {
       if (result === 'reset') {
-        setNotice('Demo wallet restored to 15 coins.');
+        setNotice(profileResetDone);
+        return;
+      }
+
+      if (result === 'failed') {
+        setNotice(profileResetFailed);
       }
     });
   };

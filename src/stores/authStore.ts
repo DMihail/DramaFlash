@@ -70,7 +70,9 @@ export function createAuthStore({ local }: { local: LocalStorage }): AuthStore {
         }
       },
       retry: async () => {
-        if (get().status === 'loading') {
+        // Sign-in holds the lock while status is still ready. Setting loading
+        // here would stick if hydrate returns without reading the session.
+        if (lock || get().status === 'loading') {
           return;
         }
 

@@ -49,4 +49,42 @@ describe('auth store', () => {
     expect(local.snapshot(MMKV_WALLET_KEY)).toBe(wallet);
     expect(await store.getState().signIn('google')).toEqual({ status: 'not-ready' });
   });
+
+  test('does not mark the session as loading when retry overlaps sign-in', async () => {
+    const local = memoryLocal();
+    let release: (() => void) | undefined;
+    const originalSet = local.setString.bind(local);
+    local.setString = (key, value) =>
+      new Promise((resolve) => {
+        release = () => {
+          originalSet(key, value);
+          resolve();
+        };
+      });
+
+    const store = createAuthStore({ local });
+    await store.getState().hydrate();
+    const signingIn = store.getState().signIn('google');
+
+    for (let step = 0; step < 6 && !release; step += 1) {
+      await Promise.resolve();
+    }
+
+    await store.getState().retry();
+
+    expect(store.getState().status).toBe('ready');
+    expect(store.getState().busy).toBe(true);
+    if (!release) {
+      throw new Error('expected the session write to wait');
+    }
+
+    release();
+    await signingIn;
+
+    expect(store.getState()).toMatchObject({
+      status: 'ready',
+      provider: 'google',
+      busy: false,
+    });
+  });
 });
