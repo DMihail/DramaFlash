@@ -49,6 +49,7 @@ export function SeriesStory({ seriesId }: { seriesId: string }) {
             <Image
               accessibilityIgnoresInvertColors
               accessibilityLabel={person.name}
+              resizeMode="cover"
               source={castPortrait(person.id)}
               style={styles.castPhoto}
             />
@@ -135,6 +136,7 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
+    overflow: 'hidden',
     backgroundColor: colors.surfaceMedia,
   },
   season: {

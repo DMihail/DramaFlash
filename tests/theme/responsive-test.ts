@@ -4,7 +4,9 @@ import {
   discoverColumnCount,
   homeHeroFrame,
   navigationPlacement,
+  posterAspectRatio,
   posterFrame,
+  posterSizeForWidth,
   seriesHeroFrame,
   storageKind,
   windowTier,
@@ -30,7 +32,11 @@ describe('responsive layout', () => {
     expect(navigationPlacement(1440, 'ios')).toBe('bottom');
   });
 
-  test('keeps poster frames in the portrait ratio', () => {
+  test('keeps poster frames in the 2:3 portrait ratio', () => {
+    expect(posterAspectRatio).toBe(1.5);
+    expect(posterSizeForWidth(130)).toEqual({ width: 130, height: 195 });
+    expect(posterSizeForWidth(169)).toEqual({ width: 169, height: 254 });
+
     for (const width of widths) {
       const columns = discoverColumnCount(width);
       const poster = posterFrame(width, columns, 16, 12);
@@ -38,7 +44,9 @@ describe('responsive layout', () => {
 
       expect(columns).toBeGreaterThanOrEqual(2);
       expect(poster.width).toBeGreaterThan(0);
-      expect(ratio).toBeCloseTo(255 / 169, 1);
+      expect(ratio).toBeCloseTo(posterAspectRatio, 2);
+      expect(homeHeroFrame(width).width).toBe(contentWidth(width));
+      expect(seriesHeroFrame(width).width).toBe(contentWidth(width));
     }
   });
 

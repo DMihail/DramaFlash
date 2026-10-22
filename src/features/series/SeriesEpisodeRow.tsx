@@ -4,6 +4,7 @@ import { LockKeyhole, Play } from 'lucide-react-native';
 
 import { type SeriesEpisode } from '@/api/series';
 import { AppText } from '@/components/AppText';
+import { fillFrame } from '@/components/fillFrame';
 import { storyEpisodeTitle } from '@/data/seriesStory';
 import { episodeStill } from '@/features/home/assets';
 import { accessLabel, type EpisodeAccess, episodeActionLabel } from '@/features/series/model';
@@ -46,7 +47,7 @@ export function SeriesEpisodeRow({
             accessibilityIgnoresInvertColors
             resizeMode="cover"
             source={still}
-            style={StyleSheet.absoluteFill}
+            style={fillFrame}
           />
         ) : null}
         <View style={styles.thumbIcon}>

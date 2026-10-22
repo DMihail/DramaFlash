@@ -10,11 +10,13 @@ import {
 import { Asset } from 'expo-asset';
 
 import { coverPosition } from '@/components/coverCrop';
+import { fillFrame } from '@/components/fillFrame';
 
 /**
  * Web cover crop. React Native Web paints `Image` as a background locked to
  * the center, so `objectPosition` on that component does not move the subject.
  * This file is the web build only. A missing URI falls back to `Image`.
+ * Width and height stay `100%` so the asset's pixel size does not win.
  */
 export function CoverImage({
   label,
@@ -26,7 +28,7 @@ export function CoverImage({
   style?: StyleProp<ImageStyle>;
 }) {
   const uri = assetUri(source);
-  const flat = StyleSheet.flatten([styles.cover, style]);
+  const flat = StyleSheet.flatten([fillFrame, style]);
 
   if (!uri) {
     return (
@@ -34,7 +36,7 @@ export function CoverImage({
         accessibilityIgnoresInvertColors
         resizeMode="cover"
         source={source}
-        style={[styles.cover, style]}
+        style={[fillFrame, style]}
         {...(label ? { accessibilityLabel: label } : {})}
       />
     );
@@ -45,6 +47,8 @@ export function CoverImage({
     src: uri,
     style: {
       ...flat,
+      width: '100%',
+      height: '100%',
       objectFit: 'cover',
       objectPosition: coverPosition,
     },
@@ -76,10 +80,3 @@ function assetModule(source: ImageSourcePropType): number | string | null {
 
   return null;
 }
-
-const styles = StyleSheet.create({
-  cover: {
-    width: '100%',
-    height: '100%',
-  },
-});

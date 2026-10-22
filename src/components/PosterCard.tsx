@@ -3,6 +3,7 @@ import { Image, type ImageSourcePropType, Pressable, StyleSheet, View } from 're
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { AppText } from '@/components/AppText';
+import { fillFrame } from '@/components/fillFrame';
 import { colors, layout, radius, space } from '@/theme/tokens';
 
 export type PosterVariant = 'rail' | 'grid';
@@ -37,10 +38,10 @@ export function PosterCard({
             accessibilityIgnoresInvertColors
             resizeMode="cover"
             source={image}
-            style={StyleSheet.absoluteFill}
+            style={fillFrame}
           />
         ) : (
-          <View style={[StyleSheet.absoluteFill, styles.placeholder]} />
+          <View style={[fillFrame, styles.placeholder]} />
         )}
         {meta ? (
           <LinearGradient colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.82)']} style={styles.scrim}>

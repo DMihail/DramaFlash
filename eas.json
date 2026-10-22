@@ -24,6 +24,17 @@
         "simulator": true
       }
     },
+    "preview": {
+      "extends": "base",
+      "distribution": "internal",
+      "environment": "production",
+      "env": {
+        "APP_VARIANT": "production"
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
     "production": {
       "extends": "base",
       "environment": "production",

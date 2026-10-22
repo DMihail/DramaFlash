@@ -1,16 +1,13 @@
-import {
-  Image,
-  type ImageSourcePropType,
-  type ImageStyle,
-  type StyleProp,
-  StyleSheet,
-} from 'react-native';
+import { Image, type ImageSourcePropType, type ImageStyle, type StyleProp } from 'react-native';
+
+import { fillFrame } from '@/components/fillFrame';
 
 /**
  * Fills a frame without stretching the artwork.
  *
  * Native `Image` cover crops from the center. The web file applies
- * `coverPosition` from `coverCrop.ts`.
+ * `coverPosition` from `coverCrop.ts`. Width and height stay `100%` so React
+ * Native Web does not keep the asset's pixel size.
  */
 export function CoverImage({
   label,
@@ -26,15 +23,8 @@ export function CoverImage({
       accessibilityIgnoresInvertColors
       resizeMode="cover"
       source={source}
-      style={[styles.cover, style]}
+      style={[fillFrame, style]}
       {...(label ? { accessibilityLabel: label } : {})}
     />
   );
 }
-
-const styles = StyleSheet.create({
-  cover: {
-    width: '100%',
-    height: '100%',
-  },
-});
