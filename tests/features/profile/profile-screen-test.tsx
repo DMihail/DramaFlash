@@ -8,6 +8,7 @@ import { serializeSession } from '@/domain/session';
 import { freshWallet, serializeWallet } from '@/domain/wallet';
 import { AuthProvider } from '@/features/auth/AuthProvider';
 import { coinBalanceLabel } from '@/features/coins/model';
+import { loginDestination } from '@/features/home/model';
 import { LibraryProvider } from '@/features/library/LibraryProvider';
 import { profileResetFailed, profileSignOutFailed } from '@/features/profile/model';
 import { ProfileScreen } from '@/features/profile/ProfileScreen';
@@ -87,12 +88,47 @@ describe('profile screen', () => {
     mockRouter.navigate.mockClear();
   });
 
-  test('shows the wallet balance and opens the library', async () => {
+  test('a fresh guest sees sign-in actions, not the account dashboard', async () => {
+    const local = memoryLocal();
+    const renderer = await mount(
+      <WalletProvider legacy={memoryLegacy()} local={local}>
+        <LibraryProvider local={local}>
+          <AuthProvider local={local}>
+            <ProfileScreen allowReset={false} />
+          </AuthProvider>
+        </LibraryProvider>
+      </WalletProvider>,
+    );
+
+    const ids = renderer.root.findAll((node) => typeof node.props.testID === 'string');
+    const has = (testID: string) => ids.some((node) => node.props.testID === testID);
+    expect(has(testIds.profile.guest)).toBe(true);
+    expect(has(testIds.profile.signIn)).toBe(true);
+    expect(has(testIds.profile.createAccount)).toBe(true);
+    expect(has(testIds.profile.balance)).toBe(false);
+    expect(has(testIds.profile.library)).toBe(false);
+    expect(has(testIds.profile.signOut)).toBe(false);
+    expect(has(testIds.profile.reset)).toBe(false);
+    // Opening Profile must not create a session or a wallet record.
+    expect(local.snapshot(MMKV_SESSION_KEY)).toBeNull();
+
+    await act(async () => {
+      press(renderer, testIds.profile.signIn);
+    });
+    expect(mockRouter.push).toHaveBeenLastCalledWith(loginDestination());
+
+    await act(async () => {
+      press(renderer, testIds.profile.createAccount);
+    });
+    expect(mockRouter.push).toHaveBeenLastCalledWith(loginDestination());
+  });
+
+  test('restores a saved session and shows the wallet balance and library', async () => {
     const wallet = serializeWallet(freshWallet());
     const local = memoryLocal({
       [MMKV_WALLET_KEY]: wallet,
       [MMKV_LIBRARY_KEY]: serializeSavedSeries(['the-ceo-and-i']),
-      [MMKV_SESSION_KEY]: serializeSession({ provider: null }),
+      [MMKV_SESSION_KEY]: serializeSession({ provider: 'email' }),
     });
     const renderer = await mount(
       <WalletProvider legacy={memoryLegacy()} local={local}>
@@ -104,6 +140,7 @@ describe('profile screen', () => {
       </WalletProvider>,
     );
 
+    expect(textOf(renderer)).toContain('Demo account · Email');
     expect(textOf(renderer)).toContain(coinBalanceLabel(15));
     expect(textOf(renderer)).toContain('Coming soon');
 
