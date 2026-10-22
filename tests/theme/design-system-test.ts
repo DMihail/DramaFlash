@@ -114,7 +114,7 @@ describe('design system', () => {
 
   test('uses the series length for poster, chip, and button variants', () => {
     expect(posterSize('rail')).toEqual(layout.posterRail);
-    expect(posterSize('grid')).toEqual({ width: 169, height: 255 });
+    expect(posterSize('grid')).toEqual({ width: 169, height: 254 });
     expect(buttonFill('primary')).toBe(colors.primary);
     expect(buttonFill('player')).toBe(colors.playerPrimary);
     expect(chipColors(true)).toEqual({

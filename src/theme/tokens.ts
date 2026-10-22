@@ -127,5 +127,5 @@ export const layout = {
   marginHero: 24,
   tabBar: 64,
   posterRail: { width: 130, height: 195 },
-  posterGrid: { width: 169, height: 255 },
+  posterGrid: { width: 169, height: 254 },
 } as const;

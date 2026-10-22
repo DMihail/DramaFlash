@@ -31,9 +31,15 @@ describe('web cover image', () => {
     expect(image.props).toMatchObject({
       src: '/assets/hero.jpg',
       alt: 'Hero',
-      style: { objectFit: 'cover', objectPosition: coverPosition },
+      style: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        objectPosition: coverPosition,
+      },
     });
   });
+
 
   test('keeps a remote URI', () => {
     const source = { uri: 'https://example.com/poster.jpg' };

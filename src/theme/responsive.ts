@@ -6,7 +6,8 @@ export const breakpoints = {
 
 export type WindowTier = 'phone' | 'tablet' | 'desktop';
 
-const posterRatio = 255 / 169;
+/** Poster height ÷ width. Design cards are 2:3 (130×195, library grids). */
+export const posterAspectRatio = 3 / 2;
 
 export function windowTier(windowWidth: number): WindowTier {
   if (windowWidth >= breakpoints.desktop) {
@@ -107,7 +108,12 @@ export function posterFrame(
   const available = contentWidth(windowWidth) - margin * 2 - gap * (columns - 1);
   const width = Math.max(1, Math.floor(available / columns));
 
-  return { width, height: Math.round(width * posterRatio) };
+  return { width, height: Math.round(width * posterAspectRatio) };
+}
+
+/** Portrait poster size for a chosen card width. */
+export function posterSizeForWidth(width: number): { width: number; height: number } {
+  return { width, height: Math.round(width * posterAspectRatio) };
 }
 
 export function coinPackColumns(windowWidth: number): number {

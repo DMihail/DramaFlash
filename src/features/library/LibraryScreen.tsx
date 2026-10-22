@@ -34,7 +34,7 @@ import {
 } from '@/features/library/model';
 import { useOptionalWallet } from '@/features/wallet/WalletProvider';
 import { testIds } from '@/testing/testIds';
-import { contentWidth } from '@/theme/responsive';
+import { contentWidth, posterSizeForWidth } from '@/theme/responsive';
 import { colors, iconSize, iconStroke, layout, radius, space } from '@/theme/tokens';
 
 export function LibraryScreen() {
@@ -61,7 +61,7 @@ export function LibraryScreen() {
       (contentWidth(width) - layout.marginScreen * 2 - space.md * (columns - 1)) / columns,
     ),
   );
-  const cardSize = { width: cardWidth, height: Math.round(cardWidth * 1.5) };
+  const cardSize = posterSizeForWidth(cardWidth);
 
   const handleExplore = () => {
     router.navigate('/');
