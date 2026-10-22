@@ -13,6 +13,7 @@ export const libraryEmptyTitle = 'A little room for obsession.';
 export const libraryEmptyBody = 'Save a series with the + button to find it here.';
 export const libraryExploreLabel = 'Explore dramas';
 export const librarySaveFailedMessage = 'The series could not be saved.';
+export const progressSaveFailedMessage = 'Continue watching could not be saved on this device.';
 export const libraryReadErrorMessage =
   'Saved series could not be read. Your library was not reset.';
 

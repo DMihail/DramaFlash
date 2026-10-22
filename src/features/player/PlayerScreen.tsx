@@ -25,7 +25,7 @@ import {
 import { posterArt } from '@/features/home/assets';
 import { loginDestination, requestSeriesSave, seriesDestination } from '@/features/home/model';
 import { useOptionalLibrarySelector } from '@/features/library/LibraryProvider';
-import { librarySaveFailedMessage } from '@/features/library/model';
+import { librarySaveFailedMessage, progressSaveFailedMessage } from '@/features/library/model';
 import {
   adjacentEpisode,
   commentsUnavailableMessage,
@@ -89,7 +89,16 @@ export function PlayerScreen({
       return;
     }
 
-    void rememberEpisode(openedSeriesId, openedEpisode, readyWallet);
+    let active = true;
+    void rememberEpisode(openedSeriesId, openedEpisode, readyWallet).then((result) => {
+      if (active && result.status === 'save-failed') {
+        setNotice(progressSaveFailedMessage);
+      }
+    });
+
+    return () => {
+      active = false;
+    };
   }, [libraryStatus, openedEpisode, openedSeriesId, readyWallet, rememberEpisode]);
 
   useEffect(() => {
@@ -315,7 +324,7 @@ export function PlayerScreen({
   };
 
   return (
-    <Screen safeArea="full" testID={testIds.player.screen}>
+    <Screen safeArea="full" frame="stage" testID={testIds.player.screen}>
       <PlayerStage
         access={access}
         bottomInset={insets.bottom}

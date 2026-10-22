@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { Image, type ImageSourcePropType, Pressable, StyleSheet, View } from 'react-native';
+import {
+  type ImageSourcePropType,
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -17,6 +23,7 @@ import {
 } from 'lucide-react-native';
 
 import { AppText } from '@/components/AppText';
+import { CoverImage } from '@/components/CoverImage';
 import { IconButton } from '@/components/IconButton';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import {
@@ -29,6 +36,7 @@ import {
 } from '@/features/player/model';
 import { type EpisodeAccess } from '@/features/series/model';
 import { testIds } from '@/testing/testIds';
+import { playerColumnWidth } from '@/theme/responsive';
 import {
   colors,
   control,
@@ -92,6 +100,8 @@ export function PlayerStage({
   }
   const locked = access === 'locked';
   const status = playerStatus(locked, episode, preview, playing);
+  const { width } = useWindowDimensions();
+  const columnWidth = playerColumnWidth(width);
 
   const handleTogglePlayback = () => {
     if (!canPreviewPlayback(access, preview)) {
@@ -103,130 +113,133 @@ export function PlayerStage({
 
   return (
     <View style={styles.stage}>
-      {preview === 'artwork' && image ? (
-        <Image
-          accessibilityIgnoresInvertColors
-          accessibilityLabel={`${title} artwork preview`}
-          resizeMode="cover"
-          source={image}
-          style={StyleSheet.absoluteFill}
-        />
-      ) : (
-        <View style={[StyleSheet.absoluteFill, styles.fallback]} />
-      )}
-      <LinearGradient
-        colors={gradient.playerScrim.colors}
-        end={gradient.playerScrim.end}
-        locations={gradient.playerScrim.locations}
-        pointerEvents="none"
-        start={gradient.playerScrim.start}
-        style={[StyleSheet.absoluteFill, { opacity: gradient.playerScrim.opacity }]}
-      />
-      <View style={[styles.topBar, { paddingTop: topInset + space.sm }]}>
-        <IconButton
-          accessibilityLabel="Go back"
-          icon={ChevronLeft}
-          onPress={onBack}
-          testID={testIds.player.back}
-        />
-        <AppText role="titleS">DramaFlash</AppText>
-        <IconButton
-          accessibilityLabel="Episodes"
-          icon={ListVideo}
-          onPress={onEpisodes}
-          testID={testIds.player.episodes}
-        />
-      </View>
-      {locked ? (
-        <Pressable
-          accessibilityRole="button"
-          onPress={onUnlock}
-          style={styles.lockCard}
-          testID={testIds.player.locked}
-        >
-          <Lock color={colors.coin} size={iconSize.button} strokeWidth={iconStroke} />
-          <AppText role="titleS">{`Unlock Episode ${episode}`}</AppText>
-          <AppText role="caption" style={styles.lockCopy}>
-            {lockedEpisodeMessage(episode)}
-          </AppText>
-        </Pressable>
-      ) : null}
-      <View style={[styles.bottom, { paddingBottom: bottomInset + space.lg }]}>
-        <View style={styles.sideActions}>
-          <SideAction
-            accessibilityLabel={saved ? 'Remove from library' : 'Save series'}
-            icon={Heart}
-            label={saved ? 'Saved' : 'Save'}
-            onPress={onSave}
-            saved={saved}
-            testID={testIds.player.save}
+      <View style={[styles.frame, columnWidth ? { maxWidth: columnWidth } : null]}>
+        {preview === 'artwork' && image ? (
+          <CoverImage
+            label={`${title} artwork preview`}
+            source={image}
+            style={StyleSheet.absoluteFill}
           />
-          <SideAction
-            accessibilityLabel="Comments"
-            icon={MessageCircle}
-            label="Comments"
-            onPress={onComments}
-            testID={testIds.player.comments}
+        ) : (
+          <View style={[StyleSheet.absoluteFill, styles.fallback]} />
+        )}
+        <LinearGradient
+          colors={gradient.playerScrim.colors}
+          end={gradient.playerScrim.end}
+          locations={gradient.playerScrim.locations}
+          pointerEvents="none"
+          start={gradient.playerScrim.start}
+          style={[StyleSheet.absoluteFill, { opacity: gradient.playerScrim.opacity }]}
+        />
+        <View style={[styles.topBar, { paddingTop: topInset + space.sm }]}>
+          <IconButton
+            accessibilityLabel="Go back"
+            icon={ChevronLeft}
+            onPress={onBack}
+            testID={testIds.player.back}
           />
-          <SideAction
-            accessibilityLabel="Share episode"
-            icon={Share2}
-            label="Share"
-            onPress={onShare}
-            testID={testIds.player.share}
+          <AppText role="titleS">DramaFlash</AppText>
+          <IconButton
+            accessibilityLabel="Episodes"
+            icon={ListVideo}
+            onPress={onEpisodes}
+            testID={testIds.player.episodes}
           />
         </View>
-        <AppText accessibilityRole="header" role="displayM">
-          {title}
-        </AppText>
-        <AppText role="bodySmall" testID={testIds.player.episode}>
-          {`Episode ${episode}`}
-        </AppText>
-        {balanceLabel ? (
-          <AppText role="bodySmall" {...(showBalanceId ? { testID: testIds.wallet.balance } : {})}>
-            {balanceLabel}
-          </AppText>
-        ) : null}
-        <AppText accessibilityLiveRegion="polite" role="bodySmall">
-          {status}
-        </AppText>
         {locked ? (
-          <PrimaryButton
-            icon={Lock}
-            label="Unlock"
+          <Pressable
+            accessibilityRole="button"
             onPress={onUnlock}
-            testID={testIds.player.unlock}
-            variant="player"
-          />
+            style={styles.lockCard}
+            testID={testIds.player.locked}
+          >
+            <Lock color={colors.coin} size={iconSize.button} strokeWidth={iconStroke} />
+            <AppText role="titleS">{`Unlock Episode ${episode}`}</AppText>
+            <AppText role="caption" style={styles.lockCopy}>
+              {lockedEpisodeMessage(episode)}
+            </AppText>
+          </Pressable>
         ) : null}
-        {canPreviewPlayback(access, preview) ? (
-          <PrimaryButton
-            icon={playing ? Pause : Play}
-            label={playing ? 'Pause' : 'Watch'}
-            onPress={handleTogglePlayback}
-            testID={playing ? testIds.player.pause : testIds.player.play}
-            variant="player"
-          />
-        ) : null}
-        <View style={styles.transport}>
-          <TransportButton
-            accessibilityLabel="Previous episode"
-            disabled={previousEpisode === null}
-            icon={ChevronLeft}
-            label="Previous"
-            onPress={onPrevious}
-            testID={testIds.player.previous}
-          />
-          <TransportButton
-            accessibilityLabel={
-              nextEpisode === null ? 'Next episode' : `Next episode ${nextEpisode}`
-            }
-            disabled={nextEpisode === null}
-            icon={ChevronRight}
-            label="Next"
-            onPress={onNext}
-            testID={testIds.player.next}
-          />
+        <View style={[styles.bottom, { paddingBottom: bottomInset + space.lg }]}>
+          <View style={styles.sideActions}>
+            <SideAction
+              accessibilityLabel={saved ? 'Remove from library' : 'Save series'}
+              icon={Heart}
+              label={saved ? 'Saved' : 'Save'}
+              onPress={onSave}
+              saved={saved}
+              testID={testIds.player.save}
+            />
+            <SideAction
+              accessibilityLabel="Comments"
+              icon={MessageCircle}
+              label="Comments"
+              onPress={onComments}
+              testID={testIds.player.comments}
+            />
+            <SideAction
+              accessibilityLabel="Share episode"
+              icon={Share2}
+              label="Share"
+              onPress={onShare}
+              testID={testIds.player.share}
+            />
+          </View>
+          <AppText accessibilityRole="header" role="displayM">
+            {title}
+          </AppText>
+          <AppText role="bodySmall" testID={testIds.player.episode}>
+            {`Episode ${episode}`}
+          </AppText>
+          {balanceLabel ? (
+            <AppText
+              role="bodySmall"
+              {...(showBalanceId ? { testID: testIds.wallet.balance } : {})}
+            >
+              {balanceLabel}
+            </AppText>
+          ) : null}
+          <AppText accessibilityLiveRegion="polite" role="bodySmall">
+            {status}
+          </AppText>
+          {locked ? (
+            <PrimaryButton
+              icon={Lock}
+              label="Unlock"
+              onPress={onUnlock}
+              testID={testIds.player.unlock}
+              variant="player"
+            />
+          ) : null}
+          {canPreviewPlayback(access, preview) ? (
+            <PrimaryButton
+              icon={playing ? Pause : Play}
+              label={playing ? 'Pause' : 'Watch'}
+              onPress={handleTogglePlayback}
+              testID={playing ? testIds.player.pause : testIds.player.play}
+              variant="player"
+            />
+          ) : null}
+          <View style={styles.transport}>
+            <TransportButton
+              accessibilityLabel="Previous episode"
+              disabled={previousEpisode === null}
+              icon={ChevronLeft}
+              label="Previous"
+              onPress={onPrevious}
+              testID={testIds.player.previous}
+            />
+            <TransportButton
+              accessibilityLabel={
+                nextEpisode === null ? 'Next episode' : `Next episode ${nextEpisode}`
+              }
+              disabled={nextEpisode === null}
+              icon={ChevronRight}
+              label="Next"
+              onPress={onNext}
+              testID={testIds.player.next}
+            />
+          </View>
         </View>
       </View>
     </View>
@@ -326,6 +339,12 @@ const styles = StyleSheet.create({
   stage: {
     flex: 1,
     backgroundColor: colors.background,
+    alignItems: 'center',
+  },
+  frame: {
+    flex: 1,
+    width: '100%',
+    overflow: 'hidden',
   },
   fallback: {
     backgroundColor: colors.surfaceMedia,

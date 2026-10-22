@@ -58,7 +58,12 @@ export function HomeHeader({
           style={({ pressed }) => (pressed ? styles.pressed : null)}
           testID={testIds.home.profile}
         >
-          <Image accessibilityIgnoresInvertColors source={homeAvatar} style={styles.avatar} />
+          <Image
+            accessibilityIgnoresInvertColors
+            resizeMode="cover"
+            source={homeAvatar}
+            style={styles.avatar}
+          />
         </Pressable>
       </View>
     </View>
@@ -105,6 +110,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
+    overflow: 'hidden',
   },
   pressed: {
     opacity: pressOpacity,

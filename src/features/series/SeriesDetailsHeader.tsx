@@ -1,14 +1,22 @@
-import { Image, type ImageSourcePropType, Pressable, StyleSheet, View } from 'react-native';
+import {
+  type ImageSourcePropType,
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { ArrowUpDown, ChevronLeft, Heart, Play, Share2 } from 'lucide-react-native';
 
 import { AppText } from '@/components/AppText';
+import { CoverImage } from '@/components/CoverImage';
 import { IconButton } from '@/components/IconButton';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { episodeCountLabel } from '@/features/series/model';
 import { testIds } from '@/testing/testIds';
+import { seriesHeroFrame } from '@/theme/responsive';
 import { colors, control, gradient, iconSize, iconStroke, layout, space } from '@/theme/tokens';
 
 export function SeriesDetailsHeader({
@@ -40,13 +48,16 @@ export function SeriesDetailsHeader({
   title: string;
   topInset: number;
 }) {
+  const { width } = useWindowDimensions();
+  const frame = seriesHeroFrame(width);
+
   return (
     <View>
-      <View style={styles.heroFrame}>
+      <View style={[styles.heroFrame, { height: frame.height }]}>
         {image ? (
-          <Image accessibilityIgnoresInvertColors source={image} style={styles.hero} />
+          <CoverImage label={`${title} artwork`} source={image} style={StyleSheet.absoluteFill} />
         ) : (
-          <View style={[styles.hero, styles.heroFallback]} />
+          <View style={[StyleSheet.absoluteFill, styles.heroFallback]} />
         )}
         <LinearGradient
           colors={gradient.detailHero.colors}
@@ -131,10 +142,8 @@ export function SeriesDetailsHeader({
 const styles = StyleSheet.create({
   heroFrame: {
     width: '100%',
-  },
-  hero: {
-    width: '100%',
-    aspectRatio: 3 / 4,
+    alignSelf: 'center',
+    overflow: 'hidden',
     backgroundColor: colors.surfaceMedia,
   },
   topBarScrim: {

@@ -1,0 +1,25 @@
+html,
+body,
+#root {
+  height: 100%;
+  background: #000000;
+}
+
+body {
+  margin: 0;
+}
+
+[role='button'],
+[role='tab'],
+a {
+  cursor: pointer;
+}
+
+button:focus-visible,
+[role='button']:focus-visible,
+[role='tab']:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 2px solid #64edf7;
+  outline-offset: 3px;
+}

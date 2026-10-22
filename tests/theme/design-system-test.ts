@@ -2,7 +2,7 @@ import { chipColors } from '@/components/GenreChip';
 import { iconButtonMetrics } from '@/components/IconButton';
 import { posterSize } from '@/components/PosterCard';
 import { buttonFill } from '@/components/PrimaryButton';
-import { screenEdges } from '@/components/Screen';
+import { screenEdgesFor } from '@/components/Screen';
 import { fontFaces, splashCanHide } from '@/theme/fonts';
 import { colors, fontFamily, gradient, layout, radius, space } from '@/theme/tokens';
 import { resolveFontFamily, textRoles } from '@/theme/type';
@@ -47,10 +47,14 @@ describe('design system', () => {
     expect(splashCanHide(false, new Error('Font failed'))).toBe(true);
   });
 
-  test('keeps the bottom inset off tab screens and the full-screen player', () => {
-    expect(screenEdges.tabs).toEqual(['top', 'left', 'right']);
-    expect(screenEdges.stack).toEqual(['top', 'right', 'bottom', 'left']);
-    expect(screenEdges.full).toEqual([]);
+  test('lets the tab bar own its edge and keeps the player edge to edge', () => {
+    expect(screenEdgesFor('tabs', 390, 'ios')).toEqual(['top', 'left', 'right']);
+    expect(screenEdgesFor('tabs', 768, 'android')).toEqual(['top', 'left', 'right']);
+    expect(screenEdgesFor('tabs', 1440, 'ios')).toEqual(['top', 'left', 'right']);
+    expect(screenEdgesFor('tabs', 390, 'web')).toEqual(['top', 'left', 'right']);
+    expect(screenEdgesFor('tabs', 1440, 'web')).toEqual(['bottom', 'left', 'right']);
+    expect(screenEdgesFor('stack', 1440, 'web')).toEqual(['top', 'right', 'bottom', 'left']);
+    expect(screenEdgesFor('full', 1440, 'web')).toEqual([]);
   });
 
   test('keeps the approved Home and Series Details gradients', () => {

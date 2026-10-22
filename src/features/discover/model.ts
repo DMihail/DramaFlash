@@ -5,6 +5,7 @@ import {
   homeGenres,
   seriesIdsForGenre,
 } from '@/features/home/model';
+import { discoverColumnCount, posterFrame } from '@/theme/responsive';
 import { layout, space } from '@/theme/tokens';
 
 export const discoverTitle = 'Discover';
@@ -74,10 +75,9 @@ export function filterDiscoverCatalog(
   return matches;
 }
 
-export function discoverPosterSize(screenWidth: number): { width: number; height: number } {
-  const available = screenWidth - layout.marginScreen * 2 - space.md;
-  const width = Math.max(1, Math.floor(available / 2));
-  const ratio = layout.posterGrid.height / layout.posterGrid.width;
-
-  return { width, height: Math.round(width * ratio) };
+export function discoverPosterSize(
+  screenWidth: number,
+  columns = discoverColumnCount(screenWidth),
+): { width: number; height: number } {
+  return posterFrame(screenWidth, columns, layout.marginScreen, space.md);
 }

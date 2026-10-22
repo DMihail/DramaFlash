@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -23,10 +23,19 @@ import {
 } from '@/features/coins/model';
 import { useWalletSelector } from '@/features/wallet/WalletProvider';
 import { testIds } from '@/testing/testIds';
+import { coinPackColumns, contentWidth } from '@/theme/responsive';
 import { colors, gradient, iconSize, iconStroke, layout, radius, space } from '@/theme/tokens';
 
 export function CoinStoreScreen({ episode, seriesId }: { episode?: string; seriesId?: string }) {
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const columns = coinPackColumns(width);
+  const packWidth = Math.max(
+    1,
+    Math.floor(
+      (contentWidth(width) - layout.marginScreen * 2 - space.md * (columns - 1)) / columns,
+    ),
+  );
   const status = useWalletSelector((state) => state.status);
   const wallet = useWalletSelector((state) => state.wallet);
   const busy = useWalletSelector((state) => state.busy);
@@ -148,7 +157,11 @@ export function CoinStoreScreen({ episode, seriesId }: { episode?: string; serie
                   accessibilityState={{ selected: isSelected }}
                   key={pack.id}
                   onPress={() => handleSelect(pack.id)}
-                  style={[styles.pack, isSelected ? styles.packSelected : null]}
+                  style={[
+                    styles.pack,
+                    { width: packWidth },
+                    isSelected ? styles.packSelected : null,
+                  ]}
                   testID={testIds.coins.package(pack.id)}
                 >
                   {pack.badge ? <AppText role="caption">{pack.badge}</AppText> : null}
@@ -228,7 +241,6 @@ const styles = StyleSheet.create({
     gap: space.md,
   },
   pack: {
-    width: '47%',
     minHeight: 140,
     padding: space.md,
     borderRadius: radius.lg,

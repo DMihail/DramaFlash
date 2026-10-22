@@ -1,13 +1,15 @@
-import { Image, type ImageSourcePropType, StyleSheet, View } from 'react-native';
+import { type ImageSourcePropType, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { Check, Play, Plus } from 'lucide-react-native';
 
 import { AppText } from '@/components/AppText';
+import { CoverImage } from '@/components/CoverImage';
 import { IconButton } from '@/components/IconButton';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { testIds } from '@/testing/testIds';
+import { homeHeroFrame } from '@/theme/responsive';
 import { colors, gradient, layout, radius, space } from '@/theme/tokens';
 
 export function HomeHero({
@@ -25,16 +27,13 @@ export function HomeHero({
   saved?: boolean;
   title: string;
 }) {
+  const { width } = useWindowDimensions();
+  const frame = homeHeroFrame(width);
+
   return (
-    <View style={styles.hero}>
+    <View style={[styles.hero, { height: frame.height }]}>
       {image ? (
-        <Image
-          accessibilityIgnoresInvertColors
-          accessibilityLabel={`${title} artwork`}
-          resizeMode="cover"
-          source={image}
-          style={StyleSheet.absoluteFill}
-        />
+        <CoverImage label={`${title} artwork`} source={image} style={StyleSheet.absoluteFill} />
       ) : null}
       <View pointerEvents="none" style={StyleSheet.absoluteFill}>
         <View style={styles.tint} />
@@ -88,7 +87,7 @@ export function HomeHero({
 const styles = StyleSheet.create({
   hero: {
     width: '100%',
-    aspectRatio: 390 / 520,
+    alignSelf: 'center',
     overflow: 'hidden',
     justifyContent: 'flex-end',
   },
