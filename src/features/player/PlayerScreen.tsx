@@ -22,7 +22,7 @@ import {
   unlockSaveFailedMessage,
   walletReadErrorMessage,
 } from '@/features/coins/model';
-import { posterArt } from '@/features/home/assets';
+import { seriesHeroArt } from '@/features/home/assets';
 import { loginDestination, requestSeriesSave, seriesDestination } from '@/features/home/model';
 import { useOptionalLibrarySelector } from '@/features/library/LibraryProvider';
 import { librarySaveFailedMessage, progressSaveFailedMessage } from '@/features/library/model';
@@ -197,7 +197,7 @@ export function PlayerScreen({
   }
 
   const { data } = state;
-  const artwork = posterArt(data.series.id);
+  const artwork = seriesHeroArt(data.series.id);
   const preview = previewFor(data, artwork !== undefined);
   const activeWallet = resolved.wallet;
   const access = playerAccess(activeWallet, data.series.id, data.episode, data.series.episodeCount);

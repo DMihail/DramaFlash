@@ -36,7 +36,11 @@ export type HomeSpotlight = {
   seriesId: string;
   title: string;
   episodeLabel: string;
+  tagline: string;
 };
+
+/** Overlay copy read from the home hero on the board. */
+export const homeHeroTagline = "A CEO's dangerous secret contract.";
 
 const featuredSeriesId = 'the-ceo-and-i';
 
@@ -97,6 +101,7 @@ export function homeSpotlight(): HomeSpotlight | null {
     seriesId: series.id,
     title: series.title,
     episodeLabel: `${series.episodeCount} Episodes`,
+    tagline: homeHeroTagline,
   };
 }
 

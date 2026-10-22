@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 
 import { AppText } from '@/components/AppText';
 import { Screen } from '@/components/Screen';
-import { posterArt } from '@/features/home/assets';
+import { homeHeroArt } from '@/features/home/assets';
 import { HomeCatalog } from '@/features/home/HomeCatalog';
 import { HomeHeader } from '@/features/home/HomeHeader';
 import { HomeHero } from '@/features/home/HomeHero';
@@ -94,21 +94,32 @@ export function HomeScreen() {
   return (
     <Screen safeArea="tabs" testID={testIds.home.screen}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <HomeHeader
-          onNotifications={() => setNotice(caughtUpMessage)}
-          onProfile={handleProfile}
-          onSearch={handleSearch}
-        />
         {spotlight ? (
-          <HomeHero
-            episodeLabel={spotlight.episodeLabel}
-            image={posterArt(spotlight.seriesId)}
-            onSave={handleSave}
-            onWatch={handleWatch}
-            saved={spotlightSaved}
-            title={spotlight.title}
+          <View>
+            <HomeHero
+              episodeLabel={spotlight.episodeLabel}
+              image={homeHeroArt}
+              onSave={handleSave}
+              onWatch={handleWatch}
+              saved={spotlightSaved}
+              tagline={spotlight.tagline}
+              title={spotlight.title}
+            />
+            <View pointerEvents="box-none" style={styles.headerOverlay}>
+              <HomeHeader
+                onNotifications={() => setNotice(caughtUpMessage)}
+                onProfile={handleProfile}
+                onSearch={handleSearch}
+              />
+            </View>
+          </View>
+        ) : (
+          <HomeHeader
+            onNotifications={() => setNotice(caughtUpMessage)}
+            onProfile={handleProfile}
+            onSearch={handleSearch}
           />
-        ) : null}
+        )}
         <HomeCatalog
           genre={genre}
           onGenreChange={setGenre}
@@ -130,6 +141,12 @@ export function HomeScreen() {
 const styles = StyleSheet.create({
   content: {
     paddingBottom: space.lg,
+  },
+  headerOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
   },
   notice: {
     position: 'absolute',

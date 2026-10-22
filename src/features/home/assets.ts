@@ -1,6 +1,8 @@
 import { type ImageSourcePropType } from 'react-native';
 
 import avatarHomeHeader from '../../../assets/drama/avatar-home-header.jpg';
+import heroHome from '../../../assets/drama/hero-home.jpg';
+import heroTheCeoAndI from '../../../assets/drama/hero-the-ceo-and-i.jpg';
 import posterAvengingAngel from '../../../assets/drama/poster-avenging-angel.jpg';
 import posterBandOfFate from '../../../assets/drama/poster-band-of-fate.jpg';
 import posterBloodyRoses from '../../../assets/drama/poster-bloody-roses.jpg';
@@ -32,6 +34,26 @@ const posters = {
 type PosterId = keyof typeof posters;
 
 export const homeAvatar: ImageSourcePropType = avatarHomeHeader;
+
+/** Home spotlight still from the board hero, separate from the series poster. */
+export const homeHeroArt: ImageSourcePropType = heroHome;
+
+const seriesHeroes = {
+  'the-ceo-and-i': heroTheCeoAndI,
+} as const satisfies Record<string, ImageSourcePropType>;
+
+/**
+ * Wide hero for a series when the board supplies one.
+ *
+ * Other series use their poster. A missing id returns undefined.
+ */
+export function seriesHeroArt(seriesId: string): ImageSourcePropType | undefined {
+  if (seriesId === 'the-ceo-and-i') {
+    return seriesHeroes['the-ceo-and-i'];
+  }
+
+  return posterArt(seriesId);
+}
 
 function isPosterId(seriesId: string): seriesId is PosterId {
   return Object.hasOwn(posters, seriesId);

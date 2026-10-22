@@ -2,6 +2,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/AppText';
 import { GenreChip } from '@/components/GenreChip';
+import { GradientTitle } from '@/components/GradientTitle';
 import { PosterCard } from '@/components/PosterCard';
 import { SectionHeader } from '@/components/SectionHeader';
 import { posterArt } from '@/features/home/assets';
@@ -57,9 +58,11 @@ export function HomeCatalog({
             {rail.groupLabel ? (
               <View style={styles.group}>
                 <View style={styles.marker} />
-                <AppText role="displayM" style={styles.groupTitle}>
-                  {rail.groupLabel}
-                </AppText>
+                {rail.groupLabel === 'Romance' ? (
+                  <GradientTitle size={24}>{rail.groupLabel}</GradientTitle>
+                ) : (
+                  <AppText role="displayM">{rail.groupLabel}</AppText>
+                )}
               </View>
             ) : null}
             <SectionHeader
@@ -127,11 +130,7 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: colors.primary,
   },
-  groupTitle: {
-    color: colors.primary,
-  },
   rail: {
-    paddingHorizontal: layout.marginScreen,
-    gap: space.md,
+    gap: space.lg,
   },
 });
