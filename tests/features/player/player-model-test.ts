@@ -10,9 +10,16 @@ import {
   requestedEpisode,
   shouldApplyPlayerResult,
   unlockDestination,
+  unlockSpendsCoins,
 } from '@/features/player/model';
 
 describe('player episode rules', () => {
+  test('charges coins for one episode only', () => {
+    expect(unlockSpendsCoins('episode')).toBe(true);
+    expect(unlockSpendsCoins('season')).toBe(false);
+    expect(unlockSpendsCoins('membership')).toBe(false);
+  });
+
   const ceo = findSeries('the-ceo-and-i');
 
   test('keeps the requested episode inside the series', () => {

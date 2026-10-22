@@ -93,6 +93,13 @@ export function unlockDestination(seriesId: string, episode: number): Href {
   };
 }
 
+export type UnlockProduct = 'episode' | 'season' | 'membership';
+
+/** Only a single episode can spend coins. Season and membership are not products. */
+export function unlockSpendsCoins(product: UnlockProduct): boolean {
+  return product === 'episode';
+}
+
 export function shareMessage(title: string, episode: number): { message: string } {
   return { message: `${title}, episode ${episode}` };
 }
