@@ -1,6 +1,5 @@
 import { episodeCountFor } from '@/data/catalog';
 
-export const WALLET_STORAGE_KEY = 'dramaflash.option-a.v1';
 export const WALLET_SCHEMA_VERSION = 1;
 export const EPISODE_COST = 10;
 export const FREE_EPISODE_LIMIT = 3;
@@ -25,18 +24,6 @@ export type Wallet = {
   balance: number;
   unlocks: EpisodeUnlock[];
 };
-
-export type KeyValueStore = {
-  getItem: (key: string) => string | null;
-};
-
-export type WalletStorage = {
-  getItem: (key: string) => Promise<string | null>;
-  setItem: (key: string, value: string) => Promise<void>;
-  removeItem: (key: string) => Promise<void>;
-};
-
-export type WalletLoadResult = { status: 'ready'; wallet: Wallet } | { status: 'corrupt' };
 
 export type UnlockDecision =
   | { type: 'unlocked'; wallet: Wallet }
@@ -135,31 +122,19 @@ export function serializeWallet(wallet: Wallet): string {
   });
 }
 
-// A missing key is a new install. Unreadable or incompatible data is corrupt.
-// Corrupt data must not be replaced with a fresh 15-coin wallet.
-export function loadWallet(storage: KeyValueStore): WalletLoadResult {
-  let raw: string | null;
-
-  try {
-    raw = storage.getItem(WALLET_STORAGE_KEY);
-  } catch {
-    return { status: 'corrupt' };
-  }
-
-  if (raw === null) {
-    return { status: 'ready', wallet: freshWallet() };
-  }
-
+/**
+ * Parses a stored wallet record.
+ *
+ * @returns the wallet, or `null` for broken JSON, another schema version, or
+ *   invalid fields. The caller must treat `null` as corrupt data and must not
+ *   replace it with a fresh 15-coin wallet.
+ */
+export function parseWallet(raw: string): Wallet | null {
   try {
     const parsed: unknown = JSON.parse(raw);
-    const wallet = parseStoredWallet(parsed);
-    if (!wallet) {
-      return { status: 'corrupt' };
-    }
-
-    return { status: 'ready', wallet };
+    return parseStoredWallet(parsed);
   } catch {
-    return { status: 'corrupt' };
+    return null;
   }
 }
 
