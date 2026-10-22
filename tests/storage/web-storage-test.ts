@@ -1,6 +1,6 @@
 import { freshWallet, serializeWallet } from '@/domain/wallet';
-import { createWebStorage, type WebStorageBackend } from '@/storage/webStorage';
 import { MMKV_SESSION_KEY, MMKV_WALLET_KEY } from '@/storage/persistence';
+import { createWebStorage, type WebStorageBackend } from '@/storage/webStorage';
 
 function memoryBackend(): WebStorageBackend & { snapshot: () => Record<string, string> } {
   const data = new Map<string, string>();

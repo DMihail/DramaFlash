@@ -109,6 +109,8 @@ describe('project toolchain', () => {
     expect(workflow).toContain('npm run eas-build-pre-install');
     expect(workflow).toContain('npm ci');
     expect(workflow).toContain('npm run lint');
+    // `expo lint` only covers src, app, and components. Tests and scripts need lint too.
+    expect(packageJson.scripts.lint).toBe('eslint .');
     expect(workflow).toContain('npm run format:check');
     expect(workflow).toContain('npm run typecheck');
     expect(workflow).toContain('npm test');

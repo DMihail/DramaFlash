@@ -10,9 +10,9 @@ import {
   serializeWallet,
   STARTING_BALANCE,
   unlockEpisode,
+  type Wallet,
   WALLET_SCHEMA_VERSION,
   WALLET_STORAGE_KEY,
-  type Wallet,
   type WalletLoadResult,
 } from '@/domain/wallet';
 
