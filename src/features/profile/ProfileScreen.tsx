@@ -129,7 +129,7 @@ export function ProfileScreen({ allowReset = isDevelopmentRuntime() }: { allowRe
   if (!signedIn) {
     return (
       <Screen safeArea="tabs" testID={testIds.profile.screen}>
-        <ScrollView contentContainerStyle={[styles.content, styles.guestContent]}>
+        <ScrollView contentContainerStyle={styles.content}>
           <AppText accessibilityRole="header" role="displayL">
             {profileTitle}
           </AppText>
@@ -146,7 +146,6 @@ export function ProfileScreen({ allowReset = isDevelopmentRuntime() }: { allowRe
           </View>
           {authError}
           <PrimaryButton
-            fill
             label="Sign in"
             onPress={() => router.push(loginDestination())}
             testID={testIds.profile.signIn}
@@ -300,9 +299,6 @@ const styles = StyleSheet.create({
     paddingBottom: space.xxxl,
     gap: space.lg,
     alignItems: 'stretch',
-  },
-  guestContent: {
-    flexGrow: 1,
   },
   guest: {
     alignItems: 'center',
