@@ -2,24 +2,18 @@ import { Pressable, Text } from 'react-native';
 
 import TestRenderer, { act } from 'react-test-renderer';
 
-import {
-  freshWallet,
-  serializeWallet,
-  STARTING_BALANCE,
-  unlockEpisode,
-  WALLET_STORAGE_KEY,
-} from '@/domain/wallet';
+import { freshWallet, serializeWallet, STARTING_BALANCE, unlockEpisode } from '@/domain/wallet';
 import { useWalletSelector, WalletProvider } from '@/features/wallet/WalletProvider';
 import {
   type LocalStorage,
-  MMKV_MIGRATION_KEY,
   MMKV_WALLET_KEY,
-  WALLET_MIGRATION_COMPLETE,
+  WALLET_MARKER_KEY,
   WALLET_RESET_MARKER,
+  WALLET_SAVED_MARKER,
 } from '@/storage/persistence';
 import { createWalletStore } from '@/stores/walletStore';
 
-import { memoryLegacy, memoryLocal, walletRecord } from '../support/storage';
+import { memoryLocal, walletRecord } from '../support/storage';
 
 const saved = unlockEpisode(freshWallet(), 'the-ceo-and-i', 4);
 
@@ -76,11 +70,7 @@ function deferredLocal(): LocalStorage & { release: () => void } {
 describe('wallet store', () => {
   test('stays empty until hydration and then restores a saved wallet', async () => {
     const local = memoryLocal(walletRecord(serializeWallet(saved)));
-    const store = createWalletStore({
-      allowReset: false,
-      legacy: memoryLegacy(),
-      local,
-    });
+    const store = createWalletStore({ allowReset: false, local });
 
     expect(store.getState().status).toBe('loading');
     expect(store.getState().wallet).toBeNull();
@@ -91,39 +81,39 @@ describe('wallet store', () => {
     expect(store.getState().wallet).toEqual(saved);
   });
 
-  test('shows an error for corrupt storage and retries a failed migration', async () => {
-    const corrupt = createWalletStore({
-      allowReset: false,
-      legacy: memoryLegacy(serializeWallet(saved)),
-      local: memoryLocal({ [MMKV_WALLET_KEY]: '{' }),
-    });
+  test('shows an error for corrupt or unreadable storage and recovers on retry', async () => {
+    const corruptLocal = memoryLocal({ [MMKV_WALLET_KEY]: '{' });
+    const corrupt = createWalletStore({ allowReset: false, local: corruptLocal });
     await corrupt.getState().hydrate();
 
     expect(corrupt.getState()).toMatchObject({ status: 'error', wallet: null });
+    // The broken record is kept for inspection, not replaced with 15 coins.
+    expect(corruptLocal.snapshot()).toBe('{');
 
-    const values = new Map<string, string>();
-    let failWrite = true;
+    const values = new Map([[MMKV_WALLET_KEY, serializeWallet(saved)]]);
+    let failRead = true;
     const local: LocalStorage = {
-      getString: (key) => values.get(key),
-      setString: (key, value) => {
-        if (failWrite) {
-          throw new Error('disk full');
+      getString: (key) => {
+        if (failRead) {
+          throw new Error('storage unavailable');
         }
 
+        return values.get(key);
+      },
+      setString: (key, value) => {
         values.set(key, value);
       },
       delete: (key) => {
         values.delete(key);
       },
     };
-    const legacy = memoryLegacy(serializeWallet(saved));
-    const store = createWalletStore({ allowReset: false, legacy, local });
+    const store = createWalletStore({ allowReset: false, local });
     await store.getState().hydrate();
 
     expect(store.getState()).toMatchObject({ status: 'error', wallet: null });
-    expect(legacy.snapshot()).toBe(serializeWallet(saved));
+    expect(values.get(MMKV_WALLET_KEY)).toBe(serializeWallet(saved));
 
-    failWrite = false;
+    failRead = false;
     await store.getState().retry();
 
     expect(store.getState().wallet).toEqual(saved);
@@ -139,7 +129,6 @@ describe('wallet store', () => {
     };
     const store = createWalletStore({
       allowReset: false,
-      legacy: memoryLegacy(),
       local,
     });
     await store.getState().hydrate();
@@ -155,7 +144,6 @@ describe('wallet store', () => {
     const local = deferredLocal();
     const store = createWalletStore({
       allowReset: false,
-      legacy: memoryLegacy(),
       local,
     });
     await store.getState().hydrate();
@@ -181,19 +169,11 @@ describe('wallet store', () => {
 
   test('keeps the wallet after a new store reads the same storage', async () => {
     const local = memoryLocal();
-    const first = createWalletStore({
-      allowReset: false,
-      legacy: memoryLegacy(),
-      local,
-    });
+    const first = createWalletStore({ allowReset: false, local });
     await first.getState().hydrate();
     await first.getState().grantPack('coins-800');
 
-    const restarted = createWalletStore({
-      allowReset: false,
-      legacy: memoryLegacy(serializeWallet(freshWallet())),
-      local,
-    });
+    const restarted = createWalletStore({ allowReset: false, local });
     await restarted.getState().hydrate();
 
     const restartedWallet = restarted.getState().wallet;
@@ -205,40 +185,44 @@ describe('wallet store', () => {
     expect(local.snapshot(MMKV_WALLET_KEY)).toBe(serializeWallet(restartedWallet));
   });
 
-  test('resets only in development and does not import the old AsyncStorage wallet again', async () => {
-    const local = memoryLocal();
-    const legacy = memoryLegacy(serializeWallet(saved));
-    const production = createWalletStore({ allowReset: false, legacy, local });
+  test('resets only in development, then protects the next saved wallet again', async () => {
+    const local = memoryLocal({
+      [MMKV_WALLET_KEY]: serializeWallet(saved),
+      [WALLET_MARKER_KEY]: WALLET_SAVED_MARKER,
+    });
+    const production = createWalletStore({ allowReset: false, local });
     await production.getState().hydrate();
 
     await expect(production.getState().resetDemo()).resolves.toBe('forbidden');
     expect(production.getState().wallet).toEqual(saved);
+    expect(local.snapshot()).toBe(serializeWallet(saved));
 
-    const development = createWalletStore({ allowReset: true, legacy, local });
+    const development = createWalletStore({ allowReset: true, local });
     await development.getState().hydrate();
     await expect(development.getState().resetDemo()).resolves.toBe('reset');
     expect(development.getState().wallet).toEqual(freshWallet());
     expect(local.snapshot()).toBeNull();
-    expect(local.snapshot(MMKV_MIGRATION_KEY)).toBe(WALLET_RESET_MARKER);
-    expect(legacy.snapshot()).toBeNull();
+    expect(local.snapshot(WALLET_MARKER_KEY)).toBe(WALLET_RESET_MARKER);
 
-    await legacy.setItem(WALLET_STORAGE_KEY, serializeWallet(saved));
-    const restarted = createWalletStore({ allowReset: true, legacy, local });
+    // After a reset, a restart starts at 15 coins.
+    const restarted = createWalletStore({ allowReset: true, local });
     await restarted.getState().hydrate();
-
     expect(restarted.getState().wallet).toEqual(freshWallet());
+
+    // The first save after the reset marks the wallet as saved again.
+    await restarted.getState().unlock('the-ceo-and-i', 4);
+    expect(local.snapshot(WALLET_MARKER_KEY)).toBe(WALLET_SAVED_MARKER);
   });
 
   test('reports a saved wallet that later disappears instead of granting 15 coins', async () => {
     const local = memoryLocal();
-    const legacy = memoryLegacy();
-    const store = createWalletStore({ allowReset: false, legacy, local });
+    const store = createWalletStore({ allowReset: false, local });
     await store.getState().hydrate();
     await store.getState().unlock('the-ceo-and-i', 4);
-    expect(local.snapshot(MMKV_MIGRATION_KEY)).toBe(WALLET_MIGRATION_COMPLETE);
+    expect(local.snapshot(WALLET_MARKER_KEY)).toBe(WALLET_SAVED_MARKER);
 
     await local.delete(MMKV_WALLET_KEY);
-    const restarted = createWalletStore({ allowReset: false, legacy, local });
+    const restarted = createWalletStore({ allowReset: false, local });
     await restarted.getState().hydrate();
 
     expect(restarted.getState()).toMatchObject({ status: 'error', wallet: null });
@@ -264,7 +248,7 @@ describe('wallet store', () => {
     let renderer: TestRenderer.ReactTestRenderer | undefined;
     await act(async () => {
       renderer = TestRenderer.create(
-        <WalletProvider legacy={memoryLegacy()} local={memoryLocal()}>
+        <WalletProvider local={memoryLocal()}>
           <BalanceLabel />
         </WalletProvider>,
       );

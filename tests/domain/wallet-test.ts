@@ -6,23 +6,21 @@ import {
   grantCoinPack,
   isEpisodeInSeries,
   isEpisodeUnlocked,
-  loadWallet,
+  parseWallet,
   serializeWallet,
   STARTING_BALANCE,
   unlockEpisode,
   type Wallet,
   WALLET_SCHEMA_VERSION,
-  WALLET_STORAGE_KEY,
-  type WalletLoadResult,
 } from '@/domain/wallet';
 
-function readyWallet(storage: { getItem: (key: string) => string | null }) {
-  const result = loadWallet(storage);
-  if (result.status !== 'ready') {
+function readyWallet(raw: string) {
+  const wallet = parseWallet(raw);
+  if (!wallet) {
     throw new Error('expected a saved wallet');
   }
 
-  return result.wallet;
+  return wallet;
 }
 
 function withPack(wallet: Wallet, packId: string): Wallet {
@@ -49,8 +47,7 @@ describe('wallet', () => {
     expect(isEpisodeUnlocked(unlocked, seriesA, 4)).toBe(true);
     expect(unlockEpisode(unlocked, seriesA, 4)).toBe(unlocked);
 
-    const stored = new Map([[WALLET_STORAGE_KEY, JSON.stringify(unlocked)]]);
-    const restored = readyWallet({ getItem: (key) => stored.get(key) ?? null });
+    const restored = readyWallet(JSON.stringify(unlocked));
 
     expect(restored).toEqual(unlocked);
     expect(unlockEpisode(restored, seriesA, 4)).toBe(restored);
@@ -145,20 +142,12 @@ describe('wallet', () => {
         unlocks: [{ seriesId, episode: episodeCount + 1 }],
       });
 
-      expect(readyWallet({ getItem: () => stored }).unlocks).toEqual([
-        { seriesId, episode: episodeCount },
-      ]);
-      expect(loadWallet({ getItem: () => tooFar })).toEqual({ status: 'corrupt' });
+      expect(readyWallet(stored).unlocks).toEqual([{ seriesId, episode: episodeCount }]);
+      expect(parseWallet(tooFar)).toBeNull();
     }
   });
 
-  test('starts a new install at 15 coins and keeps corrupt data unread', () => {
-    expect(loadWallet({ getItem: () => null })).toEqual({
-      status: 'ready',
-      wallet: freshWallet(),
-    });
-
-    const corrupt: WalletLoadResult = { status: 'corrupt' };
+  test('rejects corrupt or incompatible wallet records', () => {
     for (const value of [
       '',
       '{',
@@ -170,16 +159,8 @@ describe('wallet', () => {
       '{"balance":15,"unlocks":[{"seriesId":"missing-series","episode":4}]}',
       '{"balance":15,"unlockedEpisodes":[4]}',
     ]) {
-      expect(loadWallet({ getItem: () => value })).toEqual(corrupt);
+      expect(parseWallet(value)).toBeNull();
     }
-
-    expect(
-      loadWallet({
-        getItem: () => {
-          throw new Error('Unavailable');
-        },
-      }),
-    ).toEqual(corrupt);
   });
 
   test('saves a versioned wallet and does not charge a free or repeat unlock', () => {
@@ -190,7 +171,7 @@ describe('wallet', () => {
 
     expect(stored.version).toBe(WALLET_SCHEMA_VERSION);
     expect(stored.balance).toBe(STARTING_BALANCE);
-    expect(readyWallet({ getItem: () => serializeWallet(freshWallet()) })).toEqual(freshWallet());
+    expect(readyWallet(serializeWallet(freshWallet()))).toEqual(freshWallet());
 
     const wallet = freshWallet();
     expect(confirmUnlock(wallet, seriesA, 1)).toEqual({ type: 'already-open', wallet });

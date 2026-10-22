@@ -53,7 +53,7 @@ DramaFlash is a short-drama streaming prototype built for the TargetVideo take-h
 
 - **Expo SDK 58, React Native 0.88, TypeScript (strict), Expo Router** with typed routes and React Compiler.
 - **State:** small Zustand stores for wallet, library, and session. Business rules are pure functions in `src/domain/` (for example `confirmUnlock`), tested without rendering.
-- **Persistence:** MMKV 4 (Nitro) on Android and iOS, `localStorage` on the web, behind one storage interface. Every write is read back and checked before the UI shows the new value; a failed write restores the old value. Corrupt data is reported, never silently replaced by a fresh 15-coin wallet.
+- **Persistence:** MMKV 4 (Nitro) on Android and iOS, `localStorage` on the web, behind one storage interface. Every write is read back and checked before the UI shows the new value; a failed write restores the old value. Corrupt data is reported, never silently replaced by a fresh 15-coin wallet; a saved-wallet marker turns a later missing wallet into an error too. No AsyncStorage.
 - **Double charges:** the wallet store holds a lock during a write, so repeated taps cannot charge twice.
 - **Builds:** `development` and `production` app variants with separate app ids. The web export fails if it is not the production variant.
 

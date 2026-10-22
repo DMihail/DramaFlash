@@ -26,7 +26,7 @@ import {
 } from '@/storage/persistence';
 import { testIds } from '@/testing/testIds';
 
-import { memoryLegacy, memoryLocal } from '../../support/storage';
+import { memoryLocal } from '../../support/storage';
 
 const mockRouter = {
   back: jest.fn(),
@@ -267,7 +267,7 @@ describe('library screen', () => {
     });
 
     const renderer = await mount(
-      <WalletProvider legacy={memoryLegacy()} local={local}>
+      <WalletProvider local={local}>
         <LibraryProvider local={local}>
           <LibraryScreen />
         </LibraryProvider>
@@ -294,7 +294,7 @@ describe('library screen', () => {
     });
 
     const renderer = await mount(
-      <WalletProvider legacy={memoryLegacy()} local={local}>
+      <WalletProvider local={local}>
         <LibraryProvider local={local}>
           <LibraryScreen />
         </LibraryProvider>

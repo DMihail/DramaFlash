@@ -1,15 +1,19 @@
-import { loadWallet, serializeWallet, type Wallet } from '@/domain/wallet';
+import { parseWallet, serializeWallet, type Wallet } from '@/domain/wallet';
 
 export const STORAGE_NAMESPACE = 'dramaflash';
 export const MMKV_WALLET_KEY = 'wallet';
 export const MMKV_LIBRARY_KEY = 'library';
 export const MMKV_PROGRESS_KEY = 'progress';
 export const MMKV_SESSION_KEY = 'session';
-export const MMKV_MIGRATION_KEY = 'wallet-migration';
-export const WALLET_MIGRATION_COMPLETE = 'complete';
+/**
+ * Wallet marker. `saved` means a wallet was written at least once, so a later
+ * missing wallet is data loss, not a new install. `reset` marks an intentional
+ * development reset. The stored key and values predate this name; installed
+ * builds already wrote them, so they must not change.
+ */
+export const WALLET_MARKER_KEY = 'wallet-migration';
+export const WALLET_SAVED_MARKER = 'complete';
 export const WALLET_RESET_MARKER = 'reset';
-export const WALLET_ESTABLISHED_KEY = 'dramaflash.wallet-established.v1';
-export const WALLET_ESTABLISHED_VALUE = '1';
 // Keep records MMKV can still read. discard-on-error deletes the file and can
 // look like a new install.
 export const MMKV_RECOVERY_STRATEGY = 'recover-on-error' as const;
@@ -83,7 +87,7 @@ export async function commitWallet(local: LocalStorage, wallet: Wallet): Promise
     local,
     MMKV_WALLET_KEY,
     payload,
-    (readBack) => loadWallet({ getItem: () => readBack }).status === 'ready',
+    (readBack) => parseWallet(readBack) !== null,
     walletWriteError,
   );
 }

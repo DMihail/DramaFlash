@@ -5,7 +5,6 @@
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",
     "@expo-google-fonts/playfair-display": "^0.4.2",
-    "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "~58.0.17",
     "expo-asset": "~58.0.18",
     "expo-constants": "~58.0.12",
@@ -46,8 +45,8 @@
   },
   "scripts": {
     "start": "APP_VARIANT=development expo start",
-    "android": "APP_VARIANT=development expo start --android",
-    "ios": "APP_VARIANT=development expo start --ios",
+    "android:build": "APP_VARIANT=development expo run:android",
+    "ios:build": "APP_VARIANT=development expo run:ios",
     "web": "APP_VARIANT=development expo start --web",
     "export:web": "APP_VARIANT=production expo export --platform web --clear && node scripts/check-web-export.mjs",
     "lint": "eslint .",

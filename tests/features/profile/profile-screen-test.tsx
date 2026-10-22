@@ -16,7 +16,7 @@ import { WalletProvider } from '@/features/wallet/WalletProvider';
 import { MMKV_LIBRARY_KEY, MMKV_SESSION_KEY, MMKV_WALLET_KEY } from '@/storage/persistence';
 import { testIds } from '@/testing/testIds';
 
-import { memoryLegacy, memoryLocal } from '../../support/storage';
+import { memoryLocal } from '../../support/storage';
 
 const mockRouter = {
   back: jest.fn(),
@@ -91,7 +91,7 @@ describe('profile screen', () => {
   test('a fresh guest sees sign-in actions, not the account dashboard', async () => {
     const local = memoryLocal();
     const renderer = await mount(
-      <WalletProvider legacy={memoryLegacy()} local={local}>
+      <WalletProvider local={local}>
         <LibraryProvider local={local}>
           <AuthProvider local={local}>
             <ProfileScreen allowReset={false} />
@@ -130,7 +130,7 @@ describe('profile screen', () => {
     act(() => {
       renderer = TestRenderer.create(
         <SafeAreaProvider initialMetrics={metrics}>
-          <WalletProvider legacy={memoryLegacy()} local={local}>
+          <WalletProvider local={local}>
             <LibraryProvider local={local}>
               <AuthProvider local={local}>
                 <ProfileScreen allowReset={false} />
@@ -174,7 +174,7 @@ describe('profile screen', () => {
       [MMKV_SESSION_KEY]: serializeSession({ provider: 'email' }),
     });
     const renderer = await mount(
-      <WalletProvider legacy={memoryLegacy()} local={local}>
+      <WalletProvider local={local}>
         <LibraryProvider local={local}>
           <AuthProvider local={local}>
             <ProfileScreen allowReset={false} />
@@ -207,7 +207,7 @@ describe('profile screen', () => {
       [MMKV_SESSION_KEY]: serializeSession({ provider: 'apple' }),
     });
     const renderer = await mount(
-      <WalletProvider legacy={memoryLegacy()} local={local}>
+      <WalletProvider local={local}>
         <LibraryProvider local={local}>
           <AuthProvider local={local}>
             <ProfileScreen allowReset={false} />
@@ -241,7 +241,7 @@ describe('profile screen', () => {
       throw new Error('disk full');
     };
     const renderer = await mount(
-      <WalletProvider legacy={memoryLegacy()} local={local}>
+      <WalletProvider local={local}>
         <LibraryProvider local={local}>
           <AuthProvider local={local}>
             <ProfileScreen allowReset={false} />
@@ -268,7 +268,7 @@ describe('profile screen', () => {
       throw new Error('disk full');
     };
     const renderer = await mount(
-      <WalletProvider allowReset legacy={memoryLegacy()} local={local}>
+      <WalletProvider allowReset local={local}>
         <LibraryProvider local={local}>
           <AuthProvider local={local}>
             <ProfileScreen allowReset />

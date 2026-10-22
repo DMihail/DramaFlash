@@ -2,21 +2,13 @@ import { createContext, type ReactNode, useContext, useEffect, useState } from '
 
 import { useStore } from 'zustand';
 
-import { type WalletStorage } from '@/domain/wallet';
 import { type LocalStorage } from '@/storage/persistence';
 import { createWalletStore, type WalletState, type WalletStore } from '@/stores/walletStore';
 
 const WalletStoreContext = createContext<WalletStore | null>(null);
 
-const emptyLegacy: WalletStorage = {
-  getItem: async () => null,
-  setItem: async () => undefined,
-  removeItem: async () => undefined,
-};
-
 const fallbackStore = createWalletStore({
   allowReset: false,
-  legacy: emptyLegacy,
   local: {
     getString: () => undefined,
     setString: () => undefined,
@@ -29,31 +21,23 @@ const fallbackStore = createWalletStore({
 export function WalletProvider({
   allowReset = false,
   children,
-  legacy = emptyLegacy,
   local,
 }: {
   allowReset?: boolean;
   children: ReactNode;
-  legacy?: WalletStorage;
   local: LocalStorage;
 }) {
   const [generation, setGeneration] = useState(() => ({
     allowReset,
-    legacy,
     local,
-    store: createWalletStore({ allowReset, legacy, local }),
+    store: createWalletStore({ allowReset, local }),
   }));
 
-  if (
-    generation.allowReset !== allowReset ||
-    generation.legacy !== legacy ||
-    generation.local !== local
-  ) {
+  if (generation.allowReset !== allowReset || generation.local !== local) {
     setGeneration({
       allowReset,
-      legacy,
       local,
-      store: createWalletStore({ allowReset, legacy, local }),
+      store: createWalletStore({ allowReset, local }),
     });
   }
 

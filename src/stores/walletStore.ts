@@ -1,24 +1,15 @@
 import { createStore, type StoreApi } from 'zustand/vanilla';
 
-import {
-  confirmUnlock,
-  freshWallet,
-  grantCoinPack,
-  type Wallet,
-  WALLET_STORAGE_KEY,
-  type WalletStorage,
-} from '@/domain/wallet';
-import { loadPersistedWallet } from '@/storage/migrations';
+import { confirmUnlock, freshWallet, grantCoinPack, type Wallet } from '@/domain/wallet';
 import {
   commitWallet,
   type LocalStorage,
-  MMKV_MIGRATION_KEY,
   MMKV_WALLET_KEY,
-  WALLET_ESTABLISHED_KEY,
-  WALLET_ESTABLISHED_VALUE,
-  WALLET_MIGRATION_COMPLETE,
+  WALLET_MARKER_KEY,
   WALLET_RESET_MARKER,
+  WALLET_SAVED_MARKER,
 } from '@/storage/persistence';
+import { loadPersistedWallet } from '@/storage/walletPersistence';
 
 export type WalletActionResult =
   | { status: 'saved'; wallet: Wallet }
@@ -44,7 +35,6 @@ export type WalletStore = StoreApi<WalletState>;
 
 type WalletStoreOptions = {
   allowReset: boolean;
-  legacy: WalletStorage;
   local: LocalStorage;
 };
 
@@ -56,7 +46,7 @@ type WalletChange =
 
 // Subscribers see a new balance only after MMKV accepts it. Zustand persist
 // would publish the change first, so wallet actions commit manually.
-export function createWalletStore({ allowReset, legacy, local }: WalletStoreOptions): WalletStore {
+export function createWalletStore({ allowReset, local }: WalletStoreOptions): WalletStore {
   let lock = false;
 
   return createStore<WalletState>((set, get) => {
@@ -90,7 +80,7 @@ export function createWalletStore({ allowReset, legacy, local }: WalletStoreOpti
 
       try {
         await commitWallet(local, decision.wallet);
-        await rememberSavedWallet(local, legacy);
+        await rememberSavedWallet(local);
         set({ wallet: decision.wallet, status: 'ready' });
         return { status: 'saved', wallet: decision.wallet };
       } catch {
@@ -113,7 +103,7 @@ export function createWalletStore({ allowReset, legacy, local }: WalletStoreOpti
         lock = true;
 
         try {
-          const result = await loadPersistedWallet(local, legacy);
+          const result = await loadPersistedWallet(local);
           if (result.status === 'ready') {
             set({ status: 'ready', wallet: result.wallet });
             return;
@@ -173,10 +163,8 @@ export function createWalletStore({ allowReset, legacy, local }: WalletStoreOpti
         set({ busy: true });
 
         try {
-          await legacy.removeItem(WALLET_STORAGE_KEY);
-          await legacy.removeItem(WALLET_ESTABLISHED_KEY);
           await local.delete(MMKV_WALLET_KEY);
-          await local.setString(MMKV_MIGRATION_KEY, WALLET_RESET_MARKER);
+          await local.setString(WALLET_MARKER_KEY, WALLET_RESET_MARKER);
           set({ status: 'ready', wallet: freshWallet() });
           return 'reset';
         } catch {
@@ -190,19 +178,13 @@ export function createWalletStore({ allowReset, legacy, local }: WalletStoreOpti
   });
 }
 
-// The wallet JSON is already verified. These markers stop a later missing file
-// from looking like a new 15-coin install. A failure here does not roll back
-// the verified wallet.
-async function rememberSavedWallet(local: LocalStorage, legacy: WalletStorage): Promise<void> {
+// The wallet JSON is already verified. The marker stops a later missing wallet
+// from looking like a new 15-coin install. A failed marker write does not roll
+// back the verified wallet; the next save writes it again.
+async function rememberSavedWallet(local: LocalStorage): Promise<void> {
   try {
-    await local.setString(MMKV_MIGRATION_KEY, WALLET_MIGRATION_COMPLETE);
+    await local.setString(WALLET_MARKER_KEY, WALLET_SAVED_MARKER);
   } catch {
-    // The next launch still reads the wallet key.
-  }
-
-  try {
-    await legacy.setItem(WALLET_ESTABLISHED_KEY, WALLET_ESTABLISHED_VALUE);
-  } catch {
-    // The MMKV record is the source of truth.
+    // The wallet key itself is still read first on the next launch.
   }
 }

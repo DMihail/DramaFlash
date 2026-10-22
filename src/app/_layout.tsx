@@ -7,7 +7,6 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { isDevelopmentRuntime } from '@/config/runtimeVariant';
-import { asyncWalletStorage } from '@/data/walletStorage';
 import { AuthProvider, useAuthSelector } from '@/features/auth/AuthProvider';
 import { LibraryProvider, useLibrarySelector } from '@/features/library/LibraryProvider';
 import { useWalletSelector, WalletProvider } from '@/features/wallet/WalletProvider';
@@ -21,11 +20,7 @@ SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
 export default function RootLayout() {
   return (
-    <WalletProvider
-      allowReset={isDevelopmentRuntime()}
-      legacy={asyncWalletStorage}
-      local={appStorage}
-    >
+    <WalletProvider allowReset={isDevelopmentRuntime()} local={appStorage}>
       <LibraryProvider allowReset={isDevelopmentRuntime()} local={appStorage}>
         <AuthProvider local={appStorage}>
           <RootNavigator />
