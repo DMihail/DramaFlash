@@ -188,45 +188,47 @@ export function PlayerStage({
           />
         </View>
         <View style={[styles.bottom, { paddingBottom: bottomInset + space.lg }]}>
-          <AppText accessibilityRole="header" role="displayM">
-            {title}
-          </AppText>
-          <AppText role="bodySmall" testID={testIds.player.episode}>
-            {`Episode ${episode}`}
-          </AppText>
-          {balanceLabel ? (
-            <AppText
-              role="bodySmall"
-              {...(showBalanceId ? { testID: testIds.wallet.balance } : {})}
-            >
-              {balanceLabel}
+          <View style={styles.copy}>
+            <AppText accessibilityRole="header" role="displayM">
+              {title}
             </AppText>
-          ) : null}
-          <AppText accessibilityLiveRegion="polite" role="bodySmall">
-            {status}
-          </AppText>
-          {locked ? (
-            <View style={styles.watchWrap}>
-              <PrimaryButton
-                icon={LockKeyhole}
-                label="Unlock"
-                onPress={onUnlock}
-                testID={testIds.player.unlock}
-                variant="player"
-              />
-            </View>
-          ) : null}
-          {canPreviewPlayback(access, preview) ? (
-            <View style={styles.watchWrap}>
-              <PrimaryButton
-                icon={playing ? Pause : Play}
-                label={playing ? 'Pause' : 'Watch'}
-                onPress={handleTogglePlayback}
-                testID={playing ? testIds.player.pause : testIds.player.play}
-                variant="player"
-              />
-            </View>
-          ) : null}
+            <AppText role="bodySmall" testID={testIds.player.episode}>
+              {`Episode ${episode}`}
+            </AppText>
+            {balanceLabel ? (
+              <AppText
+                role="bodySmall"
+                {...(showBalanceId ? { testID: testIds.wallet.balance } : {})}
+              >
+                {balanceLabel}
+              </AppText>
+            ) : null}
+            <AppText accessibilityLiveRegion="polite" role="bodySmall">
+              {status}
+            </AppText>
+            {locked ? (
+              <View style={styles.watchWrap}>
+                <PrimaryButton
+                  icon={LockKeyhole}
+                  label="Unlock"
+                  onPress={onUnlock}
+                  testID={testIds.player.unlock}
+                  variant="player"
+                />
+              </View>
+            ) : null}
+            {canPreviewPlayback(access, preview) ? (
+              <View style={styles.watchWrap}>
+                <PrimaryButton
+                  icon={playing ? Pause : Play}
+                  label={playing ? 'Pause' : 'Watch'}
+                  onPress={handleTogglePlayback}
+                  testID={playing ? testIds.player.pause : testIds.player.play}
+                  variant="player"
+                />
+              </View>
+            ) : null}
+          </View>
           <View style={styles.transport}>
             <TransportButton
               accessibilityLabel="Previous episode"
@@ -342,6 +344,9 @@ function TransportButton({
   );
 }
 
+/** Space the side action column (Save, Comments, Share) takes at the right edge. */
+const sideActionsClearance = 88;
+
 const styles = StyleSheet.create({
   stage: {
     flex: 1,
@@ -405,8 +410,13 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     paddingHorizontal: layout.marginDetail,
-    paddingRight: 88,
     gap: space.md,
+  },
+  // Only the text column keeps clear of the side actions. The transport row
+  // sits below them, so Previous and Next span the full width like the board.
+  copy: {
+    gap: space.md,
+    paddingRight: sideActionsClearance - layout.marginDetail,
   },
   watchWrap: {
     alignSelf: 'flex-start',
