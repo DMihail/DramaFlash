@@ -91,8 +91,7 @@ After the screens change, open the web app at 360, 390, 768, 1024, 1280, 1440, a
 Each milestone is its own branch. Revert that pull request to drop one screen without touching the wallet schema.
 
 ## Status
-
-| Milestone | Status                                                                                     |
+                                                                      |
 | --------- | ------------------------------------------------------------------------------------------ |
 | A Artwork | Done. Posters replaced. Home and series heroes wired.                                      |
 | B Home    | Done. Tagline, poster scrim, Romance gradient, header over the hero.                       |
@@ -102,3 +101,4 @@ Each milestone is its own branch. Revert that pull request to drop one screen wi
 | F Coins   | Done. Pack borders, ribbons, selected state, and the locked cover. VIP stays unavailable.  |
 | G Library | Done. Phone poster grid, real continue progress, and a purchases list from wallet unlocks. |
 | H Login   | Not started                                                                                |
+
