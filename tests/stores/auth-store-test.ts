@@ -1,5 +1,5 @@
-import { freshWallet, serializeWallet } from '@/domain/wallet';
 import { serializeSavedSeries } from '@/domain/library';
+import { freshWallet, serializeWallet } from '@/domain/wallet';
 import { MMKV_LIBRARY_KEY, MMKV_SESSION_KEY, MMKV_WALLET_KEY } from '@/storage/persistence';
 import { createAuthStore } from '@/stores/authStore';
 
@@ -57,7 +57,7 @@ describe('auth store', () => {
     local.setString = (key, value) =>
       new Promise((resolve) => {
         release = () => {
-          originalSet(key, value);
+          void originalSet(key, value);
           resolve();
         };
       });

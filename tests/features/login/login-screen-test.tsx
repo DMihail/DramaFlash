@@ -178,7 +178,7 @@ describe('login screen', () => {
         throw new Error('disk full');
       }
 
-      originalSet(key, value);
+      return originalSet(key, value);
     };
     holdLoginTicket(
       createLoginTicket({
