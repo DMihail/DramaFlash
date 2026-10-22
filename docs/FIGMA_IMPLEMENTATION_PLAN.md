@@ -92,14 +92,13 @@ Each milestone is its own branch. Revert that pull request to drop one screen wi
 
 ## Status
 
-                                                                      |
-
-| --------- | ------------------------------------------------------------------------------------------ |
-| A Artwork | Done. Posters replaced. Home and series heroes wired. |
-| B Home | Done. Tagline, poster scrim, Romance gradient, header over the hero. |
-| C Series | Done. Synopsis, cast, titled rows, and an unavailable season note. |
-| D Player | Done. One-episode stage, centered lock card, side rail, smaller watch control. |
-| E Unlock | Done. Centered sheet. Season and membership stay unavailable and do not spend coins. |
-| F Coins | Done. Pack borders, ribbons, selected state, and the locked cover. VIP stays unavailable. |
-| G Library | Done. Phone poster grid, real continue progress, and a purchases list from wallet unlocks. |
-| H Login | Not started |
+| Milestone | Status                                                                                                                                                    |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A Artwork | Done. Posters replaced. Home and series heroes wired.                                                                                                     |
+| B Home    | Done. Tagline, poster scrim, Romance gradient, header over the hero.                                                                                      |
+| C Series  | Done. Synopsis, cast, titled rows, and an unavailable season note.                                                                                        |
+| D Player  | Done. One-episode stage, centered lock card, side rail, smaller watch control.                                                                            |
+| E Unlock  | Done. Centered sheet. Season and membership stay unavailable and do not spend coins.                                                                      |
+| F Coins   | Done. Pack borders, ribbons, selected state, and the locked cover. VIP stays unavailable.                                                                 |
+| G Library | Done. Phone poster grid, real continue progress, and a purchases list from wallet unlocks.                                                                |
+| H Login   | Done. Gradient headline, translucent card, and decorative glows. The gradient title keeps its header role on a wrapper so web and native paint the color. |

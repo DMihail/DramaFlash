@@ -1,4 +1,5 @@
 import { useId } from 'react';
+import { View } from 'react-native';
 
 import Svg, { Defs, LinearGradient, Stop, Text as SvgText } from 'react-native-svg';
 
@@ -8,7 +9,8 @@ import { colors, fontFamily } from '@/theme/tokens';
  * Serif title filled with the brand gradient.
  *
  * React Native has no gradient text style. SVG is already in the app, so this
- * stays free of a mask library.
+ * stays free of a mask library. The header role stays on the wrapper. Putting
+ * it on the SVG makes web render a heading, and the gradient fill is then ignored.
  */
 export function GradientTitle({ children, size = 24 }: { children: string; size?: number }) {
   const gradientId = `brandTitle${useId().replace(/:/g, '')}`;
@@ -16,22 +18,24 @@ export function GradientTitle({ children, size = 24 }: { children: string; size?
   const height = Math.ceil(size * 1.3);
 
   return (
-    <Svg accessibilityLabel={children} accessibilityRole="header" height={height} width={width}>
-      <Defs>
-        <LinearGradient id={gradientId} x1="0" x2="1" y1="0" y2="0">
-          <Stop offset="0" stopColor={colors.primary} />
-          <Stop offset="1" stopColor={colors.accent} />
-        </LinearGradient>
-      </Defs>
-      <SvgText
-        fill={`url(#${gradientId})`}
-        fontFamily={fontFamily.playfair}
-        fontSize={size}
-        fontWeight="700"
-        y={size}
-      >
-        {children}
-      </SvgText>
-    </Svg>
+    <View accessibilityLabel={children} accessibilityRole="header">
+      <Svg height={height} width={width}>
+        <Defs>
+          <LinearGradient id={gradientId} x1="0" x2="1" y1="0" y2="0">
+            <Stop offset="0" stopColor={colors.primary} />
+            <Stop offset="1" stopColor={colors.accent} />
+          </LinearGradient>
+        </Defs>
+        <SvgText
+          fill={`url(#${gradientId})`}
+          fontFamily={fontFamily.playfair}
+          fontSize={size}
+          fontWeight="700"
+          y={size}
+        >
+          {children}
+        </SvgText>
+      </Svg>
+    </View>
   );
 }

@@ -14,6 +14,7 @@ import { router } from 'expo-router';
 import { ChevronLeft, ChevronRight, Mail, ShieldCheck } from 'lucide-react-native';
 
 import { AppText } from '@/components/AppText';
+import { GradientTitle } from '@/components/GradientTitle';
 import { IconButton } from '@/components/IconButton';
 import { LogoMark } from '@/components/LogoMark';
 import { PrimaryButton } from '@/components/PrimaryButton';
@@ -113,6 +114,9 @@ export function LoginScreen() {
     leave(true);
   };
 
+  const titleLead = loginTitle.split(' starts ')[0] ?? loginTitle;
+  const titleRest = `starts ${loginTitle.split(' starts ')[1] ?? 'here.'}`;
+
   return (
     <Screen safeArea="stack" testID={testIds.login.screen}>
       <KeyboardAvoidingView
@@ -120,6 +124,8 @@ export function LoginScreen() {
         style={styles.flex}
       >
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+          <View pointerEvents="none" style={styles.glowCyan} />
+          <View pointerEvents="none" style={styles.glowPurple} />
           <View style={styles.back}>
             <IconButton
               accessibilityLabel="Back to browsing"
@@ -134,10 +140,9 @@ export function LoginScreen() {
               DramaFlash
             </AppText>
           </View>
-          <View style={styles.intro}>
-            <AppText accessibilityRole="header" role="displayL" style={styles.heading}>
-              {loginTitle}
-            </AppText>
+          <View accessibilityRole="header" style={styles.intro}>
+            <GradientTitle size={26}>{titleLead}</GradientTitle>
+            <GradientTitle size={26}>{titleRest}</GradientTitle>
             <AppText role="bodySmall" style={styles.subtitle}>
               {loginSubtitle}
             </AppText>
@@ -344,6 +349,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
+    position: 'relative',
     flexGrow: 1,
     paddingHorizontal: space.lg,
     paddingBottom: space.xxl,
@@ -365,18 +371,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: space.sm,
   },
-  heading: {
-    textAlign: 'center',
-  },
   subtitle: {
     textAlign: 'center',
     color: colors.textSecondary,
+  },
+  glowCyan: {
+    position: 'absolute',
+    top: 80,
+    left: -40,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    backgroundColor: 'rgba(100, 237, 247, 0.16)',
+  },
+  glowPurple: {
+    position: 'absolute',
+    top: 160,
+    right: -50,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(203, 100, 247, 0.14)',
   },
   card: {
     marginTop: space.xxxl,
     width: '100%',
     borderRadius: radius.card,
-    backgroundColor: colors.surfaceRaised,
+    backgroundColor: 'rgba(12, 21, 41, 0.72)',
     borderWidth: 1,
     borderColor: colors.border,
     overflow: 'hidden',
