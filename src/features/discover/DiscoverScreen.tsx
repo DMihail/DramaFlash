@@ -38,6 +38,7 @@ import {
 import { posterArt } from '@/features/home/assets';
 import { episodeMeta, type HomeGenre, homeGenres, seriesDestination } from '@/features/home/model';
 import { testIds } from '@/testing/testIds';
+import { discoverColumnCount } from '@/theme/responsive';
 import { colors, control, iconSize, iconStroke, layout, radius, space } from '@/theme/tokens';
 
 const skeletonSlots = [0, 1, 2, 3] as const;
@@ -55,7 +56,8 @@ export function DiscoverScreen({
   const [trackedGenre, setTrackedGenre] = useState(routeGenre);
   const [query, setQuery] = useState('');
   const { retry, state } = useDiscoverCatalog(loadCatalog);
-  const poster = discoverPosterSize(width);
+  const columns = discoverColumnCount(width);
+  const poster = discoverPosterSize(width, columns);
 
   if (routeGenre !== trackedGenre) {
     setTrackedGenre(routeGenre);
@@ -129,6 +131,7 @@ export function DiscoverScreen({
         ))}
       </ScrollView>
       <DiscoverBody
+        columns={columns}
         genre={genre}
         onOpenSeries={handleOpenSeries}
         onRetry={handleRetry}
@@ -141,6 +144,7 @@ export function DiscoverScreen({
 }
 
 function DiscoverBody({
+  columns,
   genre,
   onOpenSeries,
   onRetry,
@@ -148,6 +152,7 @@ function DiscoverBody({
   query,
   state,
 }: {
+  columns: number;
   genre: HomeGenre;
   onOpenSeries: (seriesId: string) => void;
   onRetry: () => void;
@@ -183,6 +188,7 @@ function DiscoverBody({
 
   return (
     <FlatList
+      key={columns}
       contentContainerStyle={styles.list}
       data={results}
       style={styles.results}
@@ -201,7 +207,7 @@ function DiscoverBody({
           {discoverHeading(query)}
         </AppText>
       }
-      numColumns={2}
+      numColumns={columns}
       renderItem={({ item }) => (
         <DiscoverPoster item={item} onOpenSeries={onOpenSeries} poster={poster} />
       )}

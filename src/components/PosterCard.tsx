@@ -28,7 +28,12 @@ export function PosterCard({
 }) {
   const measured = size ?? posterSize(variant);
   const art = image ? (
-    <Image accessibilityIgnoresInvertColors source={image} style={[styles.image, measured]} />
+    <Image
+      accessibilityIgnoresInvertColors
+      resizeMode="cover"
+      source={image}
+      style={[styles.image, measured]}
+    />
   ) : (
     <View style={[styles.image, styles.placeholder, measured]} />
   );
@@ -68,6 +73,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
+    overflow: 'hidden',
   },
   placeholder: {
     backgroundColor: colors.surfaceMedia,

@@ -1,12 +1,5 @@
-import { readLoginTicket } from '@/navigation/pendingLogin';
-import { Placeholder } from '@/navigation/placeholder';
+import { LoginScreen } from '@/features/login/LoginScreen';
 
-export default function LoginScreen() {
-  const seriesId = readLoginTicket()?.seriesIdToSave;
-
-  if (!seriesId) {
-    return <Placeholder safeArea="stack" title="Login" />;
-  }
-
-  return <Placeholder detail={seriesId} safeArea="stack" title="Login" />;
+export default function LoginRoute() {
+  return <LoginScreen />;
 }

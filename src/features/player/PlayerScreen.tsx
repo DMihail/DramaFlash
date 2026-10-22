@@ -315,7 +315,7 @@ export function PlayerScreen({
   };
 
   return (
-    <Screen safeArea="full" testID={testIds.player.screen}>
+    <Screen safeArea="full" frame="stage" testID={testIds.player.screen}>
       <PlayerStage
         access={access}
         bottomInset={insets.bottom}

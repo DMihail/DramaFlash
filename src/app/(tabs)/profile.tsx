@@ -1,5 +1,5 @@
-import { Placeholder } from '@/navigation/placeholder';
+import { ProfileScreen } from '@/features/profile/ProfileScreen';
 
-export default function ProfileScreen() {
-  return <Placeholder safeArea="tabs" title="Profile" />;
+export default function ProfileRoute() {
+  return <ProfileScreen />;
 }
