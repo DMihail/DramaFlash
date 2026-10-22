@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 
 import { AppText } from '@/components/AppText';
 import { Screen } from '@/components/Screen';
-import { posterArt } from '@/features/home/assets';
+import { homeHeroArt } from '@/features/home/assets';
 import { HomeCatalog } from '@/features/home/HomeCatalog';
 import { HomeHeader } from '@/features/home/HomeHeader';
 import { HomeHero } from '@/features/home/HomeHero';
@@ -102,7 +102,7 @@ export function HomeScreen() {
         {spotlight ? (
           <HomeHero
             episodeLabel={spotlight.episodeLabel}
-            image={posterArt(spotlight.seriesId)}
+            image={homeHeroArt}
             onSave={handleSave}
             onWatch={handleWatch}
             saved={spotlightSaved}

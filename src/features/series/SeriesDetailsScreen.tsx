@@ -12,7 +12,7 @@ import { Screen } from '@/components/Screen';
 import { type DemoAuth } from '@/domain/auth';
 import { type Wallet } from '@/domain/wallet';
 import { walletReadErrorMessage } from '@/features/coins/model';
-import { posterArt } from '@/features/home/assets';
+import { seriesHeroArt } from '@/features/home/assets';
 import { useOptionalLibrarySelector } from '@/features/library/LibraryProvider';
 import { librarySaveFailedMessage } from '@/features/library/model';
 import {
@@ -222,7 +222,7 @@ export function SeriesDetailsScreen({
   const { data } = state;
   const rows = visibleEpisodes(data.episodes, sort, expanded);
   const nextLocked = continueEpisode(episodesWallet, data.series.id, data.series.episodeCount);
-  const artwork = posterArt(data.series.id);
+  const artwork = seriesHeroArt(data.series.id);
   const sortLabel = sort === 'asc' ? 'Sort episodes, oldest first' : 'Sort episodes, newest first';
 
   return (
