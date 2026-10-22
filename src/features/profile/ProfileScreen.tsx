@@ -8,6 +8,7 @@ import { Bookmark, ChevronRight, Settings, User, Zap } from 'lucide-react-native
 import { AppText } from '@/components/AppText';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
+import { Skeleton } from '@/components/Skeleton';
 import { isDevelopmentRuntime } from '@/config/runtimeVariant';
 import { demoProviderLabel } from '@/domain/session';
 import { useAuthSelector } from '@/features/auth/AuthProvider';
@@ -17,12 +18,12 @@ import { useLibrarySelector } from '@/features/library/LibraryProvider';
 import { continueItems } from '@/features/library/model';
 import {
   profileGuestBody,
+  profileGuestNote,
   profileReadError,
   profileResetDone,
   profileResetFailed,
   profileResetLabel,
   profileResetNote,
-  profileResetUnavailable,
   profileSettingsLabel,
   profileSettingsNote,
   profileSignedInBody,
@@ -86,6 +87,108 @@ export function ProfileScreen({ allowReset = isDevelopmentRuntime() }: { allowRe
     });
   };
 
+  const resetBlock = allowReset ? (
+    <>
+      <PrimaryButton
+        label={profileResetLabel}
+        onPress={handleReset}
+        testID={testIds.profile.reset}
+      />
+      <AppText role="caption" style={styles.center}>
+        {profileResetNote}
+      </AppText>
+    </>
+  ) : null;
+
+  const noticeText = notice ? (
+    <AppText
+      accessibilityLiveRegion="polite"
+      role="bodySmall"
+      style={styles.center}
+      testID={testIds.profile.notice}
+    >
+      {notice}
+    </AppText>
+  ) : null;
+
+  const authError =
+    authStatus === 'error' ? (
+      <View style={styles.block}>
+        <AppText role="body" testID={testIds.profile.error}>
+          {profileReadError}
+        </AppText>
+        <PrimaryButton
+          label="Try again"
+          onPress={() => void authRetry()}
+          testID={testIds.profile.retry}
+        />
+      </View>
+    ) : null;
+
+  // While the session is read (first launch, or Try again after an error) the
+  // provider is still null. Showing the guest view then would flash it for a
+  // signed-in user, so show a neutral placeholder instead.
+  if (authStatus === 'loading') {
+    return (
+      <Screen safeArea="tabs" testID={testIds.profile.screen}>
+        <View style={styles.content} testID={testIds.profile.loading}>
+          <AppText accessibilityRole="header" role="displayL">
+            {profileTitle}
+          </AppText>
+          <Skeleton height={72} radius={36} style={styles.centered} width={72} />
+          <Skeleton height={24} style={styles.centered} width={220} />
+          <Skeleton height={48} width="100%" />
+        </View>
+      </Screen>
+    );
+  }
+
+  // A guest gets a welcome and sign-in actions, not the account dashboard.
+  // Browsing, free episodes, and demo coins work without signing in.
+  if (!signedIn) {
+    return (
+      <Screen safeArea="tabs" testID={testIds.profile.screen}>
+        <ScrollView contentContainerStyle={styles.content}>
+          <AppText accessibilityRole="header" role="displayL">
+            {profileTitle}
+          </AppText>
+          <View style={styles.guest} testID={testIds.profile.guest}>
+            <View style={styles.avatar}>
+              <User color={colors.primary} size={iconSize.button} strokeWidth={iconStroke} />
+            </View>
+            <AppText role="titleM" style={styles.title}>
+              {profileWelcome}
+            </AppText>
+            <AppText role="bodySmall" style={styles.center}>
+              {profileGuestBody}
+            </AppText>
+          </View>
+          {authError}
+          <PrimaryButton
+            label="Sign in"
+            onPress={() => router.push(loginDestination())}
+            testID={testIds.profile.signIn}
+          />
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.push(loginDestination())}
+            style={styles.textButton}
+            testID={testIds.profile.createAccount}
+          >
+            <AppText color="primary" role="bodySmall">
+              Create account
+            </AppText>
+          </Pressable>
+          <AppText role="caption" style={styles.center}>
+            {profileGuestNote}
+          </AppText>
+          {resetBlock}
+          {noticeText}
+        </ScrollView>
+      </Screen>
+    );
+  }
+
   return (
     <Screen safeArea="tabs" testID={testIds.profile.screen}>
       <ScrollView contentContainerStyle={styles.content}>
@@ -99,25 +202,12 @@ export function ProfileScreen({ allowReset = isDevelopmentRuntime() }: { allowRe
           {profileWelcome}
         </AppText>
         <AppText role="bodySmall" style={styles.center}>
-          {signedIn ? `Demo account · ${demoProviderLabel(provider)}` : profileGuestBody}
+          {`Demo account · ${demoProviderLabel(provider)}`}
         </AppText>
-        {signedIn ? (
-          <AppText role="caption" style={styles.center}>
-            {profileSignedInBody}
-          </AppText>
-        ) : null}
-        {authStatus === 'error' ? (
-          <View style={styles.block}>
-            <AppText role="body" testID={testIds.profile.error}>
-              {profileReadError}
-            </AppText>
-            <PrimaryButton
-              label="Try again"
-              onPress={() => void authRetry()}
-              testID={testIds.profile.retry}
-            />
-          </View>
-        ) : null}
+        <AppText role="caption" style={styles.center}>
+          {profileSignedInBody}
+        </AppText>
+        {authError}
         <View style={styles.balance} testID={testIds.profile.balance}>
           <AppText role="caption">Your balance</AppText>
           {walletStatus === 'ready' && wallet ? (
@@ -166,43 +256,18 @@ export function ProfileScreen({ allowReset = isDevelopmentRuntime() }: { allowRe
           label={profileSettingsLabel}
           testID={testIds.profile.settings}
         />
-        {signedIn ? (
-          <Pressable
-            accessibilityRole="button"
-            onPress={handleSignOut}
-            style={styles.textButton}
-            testID={testIds.profile.signOut}
-          >
-            <AppText color="primary" role="bodySmall">
-              Sign out of demo
-            </AppText>
-          </Pressable>
-        ) : (
-          <PrimaryButton
-            label="Sign in"
-            onPress={() => router.push(loginDestination())}
-            testID={testIds.profile.signIn}
-          />
-        )}
-        <PrimaryButton
-          disabled={!allowReset}
-          label={profileResetLabel}
-          onPress={handleReset}
-          testID={testIds.profile.reset}
-        />
-        <AppText role="caption" style={styles.center}>
-          {allowReset ? profileResetNote : profileResetUnavailable}
-        </AppText>
-        {notice ? (
-          <AppText
-            accessibilityLiveRegion="polite"
-            role="bodySmall"
-            style={styles.center}
-            testID={testIds.profile.notice}
-          >
-            {notice}
+        <Pressable
+          accessibilityRole="button"
+          onPress={handleSignOut}
+          style={styles.textButton}
+          testID={testIds.profile.signOut}
+        >
+          <AppText color="primary" role="bodySmall">
+            Sign out of demo
           </AppText>
-        ) : null}
+        </Pressable>
+        {resetBlock}
+        {noticeText}
       </ScrollView>
     </Screen>
   );
@@ -249,8 +314,21 @@ function ProfileRow({
 const styles = StyleSheet.create({
   content: {
     padding: space.lg,
+    // Keeps the last control clear of the bottom tab bar when scrolled to the end.
+    paddingBottom: space.xxxl,
     gap: space.lg,
     alignItems: 'stretch',
+  },
+  guest: {
+    alignItems: 'center',
+    gap: space.md,
+    paddingVertical: space.xl,
+  },
+  title: {
+    textAlign: 'center',
+  },
+  centered: {
+    alignSelf: 'center',
   },
   avatar: {
     width: 72,

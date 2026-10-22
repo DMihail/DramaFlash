@@ -1,4 +1,5 @@
 import { type ReactElement } from 'react';
+import { Keyboard } from 'react-native';
 
 import { type Metrics, SafeAreaProvider } from 'react-native-safe-area-context';
 import TestRenderer, { act } from 'react-test-renderer';
@@ -15,9 +16,15 @@ const mockRouter = {
   push: jest.fn(),
 };
 
+// Keeps the last focus effect so a test can run the tab's blur cleanup.
+const mockFocus: { effect: (() => void | (() => void)) | null } = { effect: null };
+
 jest.mock('expo-router', () => ({
   router: {
     push: (...args: unknown[]) => mockRouter.push(...args),
+  },
+  useFocusEffect: (effect: () => void | (() => void)) => {
+    mockFocus.effect = effect;
   },
 }));
 
@@ -213,7 +220,45 @@ describe('discover screen', () => {
     });
 
     expect(host(screen, testIds.discover.search).props.value).toBe('');
+    // Opening Discover from the tab bar browses. It must not open the keyboard.
+    expect(host(screen, testIds.discover.search).props.autoFocus).toBe(false);
+
+    await act(async () => {
+      screen.update(
+        <SafeAreaProvider initialMetrics={metrics}>
+          <DiscoverScreen loadCatalog={loadNow()} searchRequest="1" />
+        </SafeAreaProvider>,
+      );
+    });
+
+    // Only the Home search button sends a request, and that focuses the field.
     expect(host(screen, testIds.discover.search).props.autoFocus).toBe(true);
+
+    await act(async () => {
+      changeSearch(screen, 'secret');
+    });
+    await act(async () => {
+      screen.update(
+        <SafeAreaProvider initialMetrics={metrics}>
+          <DiscoverScreen loadCatalog={loadNow()} searchRequest="2" />
+        </SafeAreaProvider>,
+      );
+    });
+
+    // A second search tap starts with an empty field, not the old query.
+    expect(host(screen, testIds.discover.search).props.value).toBe('');
+    expect(host(screen, testIds.discover.search).props.autoFocus).toBe(true);
+
+    const dismiss = jest.spyOn(Keyboard, 'dismiss');
+    await act(async () => {
+      const cleanup = mockFocus.effect?.();
+      if (typeof cleanup === 'function') {
+        cleanup();
+      }
+    });
+    // Leaving the tab closes the keyboard.
+    expect(dismiss).toHaveBeenCalled();
+    dismiss.mockRestore();
     expect(host(screen, testIds.discover.genre('All')).props.accessibilityState).toEqual({
       selected: true,
     });
