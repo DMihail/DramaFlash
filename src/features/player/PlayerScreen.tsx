@@ -234,6 +234,8 @@ export function PlayerScreen({
   };
 
   const handleGetCoins = () => {
+    // A Modal renders above the navigation stack, so close it before leaving.
+    setUnlockOpen(false);
     router.push(unlockDestination(data.series.id, data.episode));
   };
 

@@ -351,6 +351,8 @@ describe('player screen', () => {
       pathname: '/coins',
       params: { seriesId: 'the-ceo-and-i', episode: '4' },
     });
+    // The sheet must close, or the modal stays on top of the coin store.
+    expect(hasTestId(screen, testIds.player.getCoins)).toBe(false);
     expect(wallet.balance).toBe(5);
     expect(wallet.unlocks).toEqual([]);
 
