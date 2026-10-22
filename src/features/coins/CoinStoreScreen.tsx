@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -21,6 +21,7 @@ import {
   demoPurchaseSuccess,
   walletReadErrorMessage,
 } from '@/features/coins/model';
+import { posterArt } from '@/features/home/assets';
 import { useWalletSelector } from '@/features/wallet/WalletProvider';
 import { testIds } from '@/testing/testIds';
 import { coinPackColumns, contentWidth } from '@/theme/responsive';
@@ -108,6 +109,7 @@ export function CoinStoreScreen({ episode, seriesId }: { episode?: string; serie
   }
 
   const balance = wallet.balance;
+  const lockedCover = seriesId ? posterArt(seriesId) : undefined;
 
   return (
     <Screen safeArea="full" testID={testIds.coins.store}>
@@ -133,7 +135,20 @@ export function CoinStoreScreen({ episode, seriesId }: { episode?: string; serie
       >
         <View style={styles.body}>
           {seriesId && episode ? (
-            <AppText role="bodySmall">{`Episode ${episode} is locked. It costs ${EPISODE_COST} coins.`}</AppText>
+            <View style={styles.lockedCard}>
+              {lockedCover ? (
+                <Image
+                  accessibilityIgnoresInvertColors
+                  resizeMode="cover"
+                  source={lockedCover}
+                  style={styles.lockedCover}
+                />
+              ) : null}
+              <View style={styles.lockedCopy}>
+                <AppText role="titleXS">Unlock episode</AppText>
+                <AppText role="bodySmall">{`Episode ${episode} is locked. It costs ${EPISODE_COST} coins.`}</AppText>
+              </View>
+            </View>
           ) : (
             <AppText role="bodySmall">Coins for your next episode.</AppText>
           )}
@@ -160,17 +175,40 @@ export function CoinStoreScreen({ episode, seriesId }: { episode?: string; serie
                   style={[
                     styles.pack,
                     { width: packWidth },
+                    pack.badge === 'Popular' ? styles.packPopular : null,
                     isSelected ? styles.packSelected : null,
                   ]}
                   testID={testIds.coins.package(pack.id)}
                 >
-                  {pack.badge ? <AppText role="caption">{pack.badge}</AppText> : null}
+                  {pack.badge === 'Best value' ? (
+                    <LinearGradient
+                      colors={[colors.accent, colors.primary]}
+                      end={{ x: 1, y: 0.5 }}
+                      start={{ x: 0, y: 0.5 }}
+                      style={styles.ribbon}
+                    >
+                      <AppText role="micro" style={styles.ribbonText}>
+                        BEST VALUE
+                      </AppText>
+                    </LinearGradient>
+                  ) : null}
+                  {pack.badge === 'Popular' ? (
+                    <View style={styles.ribbonPlain}>
+                      <AppText role="micro" style={styles.ribbonPlainText}>
+                        POPULAR
+                      </AppText>
+                    </View>
+                  ) : null}
                   <Zap color={colors.coin} size={iconSize.button} strokeWidth={iconStroke} />
                   <AppText role="titleS">{coinPackTitle(pack)}</AppText>
                   <AppText role="caption">{`${pack.priceLabel} · Demo only`}</AppText>
                 </Pressable>
               );
             })}
+          </View>
+          <View accessibilityState={{ disabled: true }} style={styles.vip}>
+            <AppText role="titleXS">VIP</AppText>
+            <AppText role="caption">Not available in this demo. No coins are spent.</AppText>
           </View>
           <View style={styles.demoRow}>
             <ShieldCheck color={colors.primary} size={iconSize.header} strokeWidth={iconStroke} />
@@ -240,17 +278,73 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: space.md,
   },
-  pack: {
-    minHeight: 140,
-    padding: space.md,
-    borderRadius: radius.lg,
+  lockedCard: {
+    minHeight: 120,
+    borderRadius: radius.card,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.surfaceRaised,
+    flexDirection: 'row',
+    gap: space.md,
+    padding: space.md,
+    alignItems: 'center',
+  },
+  lockedCover: {
+    width: 80,
+    height: 120,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceMedia,
+  },
+  lockedCopy: {
+    flex: 1,
+    gap: space.xs,
+  },
+  pack: {
+    minHeight: 190,
+    padding: space.md,
+    borderRadius: 13,
+    borderWidth: 2,
+    borderColor: colors.border,
+    backgroundColor: colors.surfaceRaised,
     gap: space.sm,
+    overflow: 'hidden',
+  },
+  packPopular: {
+    borderColor: colors.primary,
   },
   packSelected: {
     borderColor: colors.primary,
+    backgroundColor: 'rgba(100, 237, 247, 0.1)',
+  },
+  ribbon: {
+    alignSelf: 'flex-start',
+    borderRadius: radius.sm,
+    paddingHorizontal: space.sm,
+    paddingVertical: space.xs,
+  },
+  ribbonText: {
+    color: colors.onAccent,
+    fontWeight: '700',
+  },
+  ribbonPlain: {
+    alignSelf: 'flex-start',
+    borderRadius: radius.sm,
+    backgroundColor: colors.primary,
+    paddingHorizontal: space.sm,
+    paddingVertical: space.xs,
+  },
+  ribbonPlainText: {
+    color: colors.onPrimary,
+    fontWeight: '700',
+  },
+  vip: {
+    borderRadius: radius.card,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    padding: space.lg,
+    gap: space.xs,
+    opacity: 0.7,
   },
   demoRow: {
     flexDirection: 'row',
