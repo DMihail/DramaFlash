@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { type ComponentRef, useCallback, useRef, useState } from 'react';
 import {
   FlatList,
+  Keyboard,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -9,7 +10,7 @@ import {
   View,
 } from 'react-native';
 
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 
 import { Search, X } from 'lucide-react-native';
 
@@ -46,15 +47,32 @@ const skeletonSlots = [0, 1, 2, 3] as const;
 export function DiscoverScreen({
   category,
   loadCatalog = fetchDiscoverCatalog,
+  searchRequest,
 }: {
   category?: string;
   loadCatalog?: DiscoverLoader;
+  /** Set only by the Home search button. A new value focuses the field once. */
+  searchRequest?: string;
 }) {
   const { width } = useWindowDimensions();
   const routeGenre = discoverGenre(category);
   const [genre, setGenre] = useState<HomeGenre>(routeGenre);
   const [trackedGenre, setTrackedGenre] = useState(routeGenre);
   const [query, setQuery] = useState('');
+  // `TextInput` names the component here, so the instance type comes from ComponentRef.
+  const searchInput = useRef<ComponentRef<typeof TextInput>>(null);
+
+  // Leaving the tab must close the keyboard. Tabs stay mounted, so a focused
+  // field would otherwise keep the keyboard open over the next screen.
+  useFocusEffect(
+    useCallback(
+      () => () => {
+        searchInput.current?.blur();
+        Keyboard.dismiss();
+      },
+      [],
+    ),
+  );
   const { retry, state } = useDiscoverCatalog(loadCatalog);
   const columns = discoverColumnCount(width);
   const poster = discoverPosterSize(width, columns);
@@ -86,13 +104,14 @@ export function DiscoverScreen({
       </View>
       <View style={styles.searchField}>
         <Search color={colors.textMuted} size={iconSize.header} strokeWidth={iconStroke} />
-        {/* A new key mounts the field again, so autoFocus runs after Home search. */}
+        {/* Browse mode by default. A new search request mounts the field again so autoFocus runs. */}
         <TextInput
-          key={category === undefined ? 'search' : 'browse'}
+          key={searchRequest ?? 'browse'}
+          ref={searchInput}
           accessibilityLabel="Search dramas"
           autoCapitalize="none"
           autoCorrect={false}
-          autoFocus={category === undefined}
+          autoFocus={searchRequest !== undefined}
           onChangeText={setQuery}
           placeholder={discoverSearchPlaceholder}
           placeholderTextColor={colors.textMuted}
@@ -116,6 +135,7 @@ export function DiscoverScreen({
       <ScrollView
         contentContainerStyle={styles.chips}
         horizontal
+        keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
         showsHorizontalScrollIndicator={false}
         style={styles.chipScroll}

@@ -155,9 +155,15 @@ export function discoverDestination(category: string): Href {
   return { pathname: '/discover', params: { category } };
 }
 
-export function searchDestination(): Href {
-  // Send an empty category so Expo Router replaces the genre stored on the Discover tab.
-  return { pathname: '/discover', params: { category: '' } };
+/**
+ * Opens Discover with the search field focused.
+ *
+ * The empty category replaces the genre stored on the Discover tab. `request`
+ * must change on every tap, so a second search tap focuses the field again.
+ * Opening Discover from the tab bar sends no request and never opens the keyboard.
+ */
+export function searchDestination(request: string): Href {
+  return { pathname: '/discover', params: { category: '', search: request } };
 }
 
 export function profileDestination(): Href {

@@ -45,7 +45,7 @@ export function HomeScreen() {
   };
 
   const handleSearch = () => {
-    router.navigate(searchDestination());
+    router.navigate(searchDestination(String(Date.now())));
   };
 
   const handleWatch = () => {

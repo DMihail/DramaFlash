@@ -170,13 +170,16 @@ describe('home screen', () => {
       params: { category: 'Romance' },
     });
 
+    const now = jest.spyOn(Date, 'now').mockReturnValue(42);
     await act(async () => {
       pressTestId(screen, testIds.home.search)();
     });
+    now.mockRestore();
 
+    // The search button sends a fresh request so Discover focuses the field.
     expect(mockRouter.navigate).toHaveBeenLastCalledWith({
       pathname: '/discover',
-      params: { category: '' },
+      params: { category: '', search: '42' },
     });
 
     await act(async () => {
