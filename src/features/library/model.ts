@@ -77,6 +77,54 @@ export function continueItems(
   return items;
 }
 
+export type PurchaseLine = {
+  seriesId: string;
+  title: string;
+  episodes: number[];
+};
+
+/**
+ * Groups stored episode unlocks by series.
+ *
+ * The wallet remains the only record. Unknown series ids are left out.
+ */
+export function purchaseLines(wallet: Wallet): PurchaseLine[] {
+  const grouped = new Map<string, number[]>();
+
+  for (const unlock of wallet.unlocks) {
+    if (!findSeries(unlock.seriesId)) {
+      continue;
+    }
+
+    const episodes = grouped.get(unlock.seriesId) ?? [];
+    if (!episodes.includes(unlock.episode)) {
+      grouped.set(unlock.seriesId, [...episodes, unlock.episode]);
+    }
+  }
+
+  return [...grouped.entries()]
+    .map(([seriesId, episodes]) => ({
+      seriesId,
+      title: findSeries(seriesId)?.title ?? seriesId,
+      episodes: [...episodes].sort((left, right) => left - right),
+    }))
+    .sort((left, right) => left.title.localeCompare(right.title));
+}
+
+/** Uses a real continue-watching episode when one is stored. */
+export function savedProgressLabel(
+  seriesId: string,
+  episodeCount: number | null,
+  items: readonly ContinueItem[],
+): string | null {
+  const match = items.find((item) => item.seriesId === seriesId);
+  if (!match || episodeCount === null) {
+    return episodeMeta(episodeCount);
+  }
+
+  return `Ep ${match.episode} / ${episodeCount}`;
+}
+
 export function resumeDestination(seriesId: string, episode: number) {
   const series = findSeries(seriesId);
   return playerDestination(seriesId, episode, series?.episodeCount ?? null);
