@@ -53,8 +53,7 @@ export function LibraryScreen() {
       ? continueItems(entries, continueWallet)
       : [];
   const saved = status === 'ready' ? savedPosters(savedSeriesIds) : [];
-  const purchases =
-    wallet?.status === 'ready' && wallet.wallet ? purchaseLines(wallet.wallet) : [];
+  const purchases = wallet?.status === 'ready' && wallet.wallet ? purchaseLines(wallet.wallet) : [];
   const columns = width >= 768 ? (width >= 1024 ? 4 : 3) : 2;
   const cardWidth = Math.max(
     1,

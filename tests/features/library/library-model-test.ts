@@ -18,11 +18,9 @@ describe('library progress and purchases', () => {
     ]);
     expect(purchaseLines(freshWallet())).toEqual([]);
     expect(
-      savedProgressLabel(
-        'love-on-detours',
-        65,
-        [{ seriesId: 'love-on-detours', title: 'Love on Detours', episode: 2, meta: 'Episode 2' }],
-      ),
+      savedProgressLabel('love-on-detours', 65, [
+        { seriesId: 'love-on-detours', title: 'Love on Detours', episode: 2, meta: 'Episode 2' },
+      ]),
     ).toBe('Ep 2 / 65');
     expect(savedProgressLabel('love-on-detours', 65, [])).toBe('65 Eps');
   });
