@@ -5,7 +5,12 @@ import {
   serializeSavedSeries,
   serializeViewingProgress,
 } from '@/domain/library';
-import { type LocalStorage, MMKV_LIBRARY_KEY, MMKV_PROGRESS_KEY } from '@/storage/persistence';
+import {
+  commitVerifiedRecord,
+  type LocalStorage,
+  MMKV_LIBRARY_KEY,
+  MMKV_PROGRESS_KEY,
+} from '@/storage/persistence';
 
 export type PersistedLibrary =
   | { status: 'ready'; savedSeriesIds: string[]; entries: ProgressEntry[] }
@@ -40,10 +45,16 @@ export async function commitSavedSeries(
   savedSeriesIds: readonly string[],
 ): Promise<void> {
   const payload = serializeSavedSeries(savedSeriesIds);
-  await commitRecord(local, MMKV_LIBRARY_KEY, payload, (value) => {
-    const loaded = loadSavedSeries(value);
-    return loaded.status === 'ready' && sameIds(loaded.savedSeriesIds, savedSeriesIds);
-  });
+  await commitVerifiedRecord(
+    local,
+    MMKV_LIBRARY_KEY,
+    payload,
+    (value) => {
+      const loaded = loadSavedSeries(value);
+      return loaded.status === 'ready' && sameIds(loaded.savedSeriesIds, savedSeriesIds);
+    },
+    'Library write could not be verified',
+  );
 }
 
 export async function commitViewingProgress(
@@ -51,51 +62,16 @@ export async function commitViewingProgress(
   entries: readonly ProgressEntry[],
 ): Promise<void> {
   const payload = serializeViewingProgress(entries);
-  await commitRecord(local, MMKV_PROGRESS_KEY, payload, (value) => {
-    const loaded = loadViewingProgress(value);
-    return loaded.status === 'ready' && sameProgress(loaded.entries, entries);
-  });
-}
-
-async function commitRecord(
-  local: LocalStorage,
-  key: string,
-  payload: string,
-  accept: (value: string) => boolean,
-): Promise<void> {
-  const previous = await local.getString(key);
-
-  try {
-    await local.setString(key, payload);
-    const readBack = await local.getString(key);
-    if (readBack !== payload || !accept(readBack)) {
-      throw new Error('Library write could not be verified');
-    }
-  } catch (error) {
-    await restoreKey(local, key, previous);
-    if (error instanceof Error) {
-      throw error;
-    }
-
-    throw new Error('Library write could not be verified');
-  }
-}
-
-async function restoreKey(
-  local: LocalStorage,
-  key: string,
-  previous: string | undefined,
-): Promise<void> {
-  try {
-    if (previous === undefined) {
-      await local.delete(key);
-      return;
-    }
-
-    await local.setString(key, previous);
-  } catch {
-    // The visible library stays unchanged either way.
-  }
+  await commitVerifiedRecord(
+    local,
+    MMKV_PROGRESS_KEY,
+    payload,
+    (value) => {
+      const loaded = loadViewingProgress(value);
+      return loaded.status === 'ready' && sameProgress(loaded.entries, entries);
+    },
+    'Library write could not be verified',
+  );
 }
 
 function sameIds(left: readonly string[], right: readonly string[]): boolean {

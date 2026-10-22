@@ -21,6 +21,7 @@ jest.mock('lucide-react-native', () => {
     ChevronLeft: Icon,
     Heart: Icon,
     Lock: Icon,
+    LockKeyhole: Icon,
     Play: Icon,
     Share2: Icon,
   };

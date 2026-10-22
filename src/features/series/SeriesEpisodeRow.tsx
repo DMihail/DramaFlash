@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Lock, Play } from 'lucide-react-native';
+import { LockKeyhole, Play } from 'lucide-react-native';
 
 import { type SeriesEpisode } from '@/api/series';
 import { AppText } from '@/components/AppText';
@@ -36,7 +36,7 @@ export function SeriesEpisodeRow({
     >
       <View style={[styles.episodeBadge, access === 'locked' ? styles.episodeLocked : null]}>
         {access === 'locked' ? (
-          <Lock color={colors.text} size={iconSize.header} strokeWidth={iconStroke} />
+          <LockKeyhole color={colors.text} size={iconSize.header} strokeWidth={iconStroke} />
         ) : (
           <Play color={colors.onPrimary} size={iconSize.header} strokeWidth={iconStroke} />
         )}

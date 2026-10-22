@@ -8,16 +8,16 @@ import {
 
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { ArrowUpDown, ChevronLeft, Heart, Play, Share2 } from 'lucide-react-native';
+import { ChevronLeft, Heart, Play, Share2 } from 'lucide-react-native';
 
 import { AppText } from '@/components/AppText';
 import { CoverImage } from '@/components/CoverImage';
 import { IconButton } from '@/components/IconButton';
 import { PrimaryButton } from '@/components/PrimaryButton';
-import { episodeCountLabel } from '@/features/series/model';
+import { episodeCountLabel, type EpisodeSort } from '@/features/series/model';
 import { testIds } from '@/testing/testIds';
 import { seriesHeroFrame } from '@/theme/responsive';
-import { colors, control, gradient, iconSize, iconStroke, layout, space } from '@/theme/tokens';
+import { colors, control, gradient, layout, space } from '@/theme/tokens';
 
 export function SeriesDetailsHeader({
   episodeCount,
@@ -30,6 +30,7 @@ export function SeriesDetailsHeader({
   onSort,
   showPlay,
   showSort,
+  sort,
   sortLabel,
   title,
   topInset,
@@ -44,6 +45,7 @@ export function SeriesDetailsHeader({
   onSort: () => void;
   showPlay: boolean;
   showSort: boolean;
+  sort: EpisodeSort;
   sortLabel: string;
   title: string;
   topInset: number;
@@ -128,9 +130,8 @@ export function SeriesDetailsHeader({
             style={styles.sortButton}
             testID={testIds.series.sort}
           >
-            <ArrowUpDown color={colors.primary} size={iconSize.header} strokeWidth={iconStroke} />
             <AppText color="primary" role="caption">
-              Sort
+              {sort === 'asc' ? 'Sort ↓' : 'Sort ↑'}
             </AppText>
           </Pressable>
         ) : null}

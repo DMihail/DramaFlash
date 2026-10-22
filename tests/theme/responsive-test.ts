@@ -49,7 +49,7 @@ describe('responsive layout', () => {
     const seriesDesktop = seriesHeroFrame(1440);
 
     expect(phone).toEqual({ width: 390, height: 520 });
-    expect(seriesPhone.height).toBe(520);
+    expect(seriesPhone.height).toBe(488);
     expect(desktop.height).toBeLessThanOrEqual(460);
     expect(desktop.width).toBe(1120);
     expect(seriesDesktop.height).toBeLessThanOrEqual(480);

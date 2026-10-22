@@ -1,5 +1,5 @@
 import { type DemoSession, loadSession, serializeSession } from '@/domain/session';
-import { type LocalStorage, MMKV_SESSION_KEY } from '@/storage/persistence';
+import { commitVerifiedRecord, type LocalStorage, MMKV_SESSION_KEY } from '@/storage/persistence';
 
 export type PersistedSession =
   { status: 'ready'; session: DemoSession } | { status: 'error'; reason: 'corrupt' | 'unreadable' };
@@ -24,40 +24,18 @@ export async function loadPersistedSession(local: LocalStorage): Promise<Persist
   };
 }
 
+/** Saves the demo provider. The email address, password, and token are not written. */
 export async function commitSession(local: LocalStorage, session: DemoSession): Promise<void> {
   const payload = serializeSession(session);
-  const previous = await local.getString(MMKV_SESSION_KEY);
 
-  try {
-    await local.setString(MMKV_SESSION_KEY, payload);
-    const readBack = await local.getString(MMKV_SESSION_KEY);
-    const loaded = readBack === undefined ? null : loadSession(readBack);
-    if (
-      readBack !== payload ||
-      loaded?.status !== 'ready' ||
-      loaded.session.provider !== session.provider
-    ) {
-      throw new Error('Session write could not be verified');
-    }
-  } catch (error) {
-    await restoreSession(local, previous);
-    if (error instanceof Error) {
-      throw error;
-    }
-
-    throw new Error('Session write could not be verified');
-  }
-}
-
-async function restoreSession(local: LocalStorage, previous: string | undefined): Promise<void> {
-  try {
-    if (previous === undefined) {
-      await local.delete(MMKV_SESSION_KEY);
-      return;
-    }
-
-    await local.setString(MMKV_SESSION_KEY, previous);
-  } catch {
-    // The visible session stays unchanged either way.
-  }
+  await commitVerifiedRecord(
+    local,
+    MMKV_SESSION_KEY,
+    payload,
+    (readBack) => {
+      const loaded = loadSession(readBack);
+      return loaded.status === 'ready' && loaded.session.provider === session.provider;
+    },
+    'Session write could not be verified',
+  );
 }

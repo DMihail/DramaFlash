@@ -24,6 +24,16 @@ export type AuthState = {
 
 export type AuthStore = StoreApi<AuthState>;
 
+/**
+ * Demo session store.
+ *
+ * Sign-in and sign-out save only the provider. They do not write a password,
+ * token, or email, and they do not change the wallet or the library.
+ *
+ * `retry` returns immediately while a sign-in holds the lock. Setting
+ * `loading` in that window would stick if hydration then returns without
+ * reading storage.
+ */
 export function createAuthStore({ local }: { local: LocalStorage }): AuthStore {
   let lock = false;
 

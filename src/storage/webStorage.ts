@@ -6,6 +6,13 @@ export type WebStorageBackend = {
   removeItem: (key: string) => void;
 };
 
+/**
+ * Browser storage for the same records MMKV holds on a phone.
+ *
+ * Keys are prefixed with `dramaflash.` so they do not collide with other
+ * sites on the origin. Web and native installs do not share data. A missing
+ * `localStorage` throws instead of inventing a new wallet.
+ */
 export function createWebStorage(
   backend: WebStorageBackend | null = browserStorage(),
 ): LocalStorage {

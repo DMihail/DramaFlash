@@ -43,15 +43,3 @@ export function useAuthSelector<Selected>(selector: (state: AuthState) => Select
 
   return selected;
 }
-
-export function useOptionalAuthSelector<Selected>(
-  selector: (state: AuthState) => Selected,
-): Selected | undefined {
-  const store = useContext(AuthStoreContext);
-  const selected = useStore(store ?? fallbackStore, selector);
-  if (!store) {
-    return undefined;
-  }
-
-  return selected;
-}

@@ -2,6 +2,10 @@ import Svg, { Path } from 'react-native-svg';
 
 import { type DemoProvider } from '@/domain/auth';
 
+/**
+ * Google and Apple marks copied from the approved prototype SVG paths.
+ * They are brand artwork, not Lucide icons.
+ */
 export function ProviderMark({ provider }: { provider: Exclude<DemoProvider, 'email'> }) {
   if (provider === 'apple') {
     return (
