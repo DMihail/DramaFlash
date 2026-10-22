@@ -258,6 +258,7 @@ export function SeriesDetailsScreen({
             onShare={handleShare}
             saved={seriesId ? (savedSeriesIds?.includes(seriesId) ?? false) : false}
             onSort={handleSort}
+            seriesId={data.series.id}
             showPlay={data.episodes.some((episode) => episode.number === 1)}
             showSort={data.episodeStatus === 'success'}
             sort={sort}
@@ -269,6 +270,7 @@ export function SeriesDetailsScreen({
         }
         renderItem={({ item }) => (
           <SeriesEpisodeRow
+            seriesId={data.series.id}
             access={episodeAccess(
               episodesWallet,
               data.series.id,

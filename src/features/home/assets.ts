@@ -1,6 +1,18 @@
 import { type ImageSourcePropType } from 'react-native';
 
+import { type StoryCastId, storySeriesId } from '@/data/seriesStory';
+
 import avatarHomeHeader from '../../../assets/drama/avatar-home-header.jpg';
+import castElena from '../../../assets/drama/cast-elena.jpg';
+import castJulianVance from '../../../assets/drama/cast-julian-vance.jpg';
+import castMarcus from '../../../assets/drama/cast-marcus.jpg';
+import castSarahLin from '../../../assets/drama/cast-sarah-lin.jpg';
+import episodeCeo1 from '../../../assets/drama/episode-the-ceo-and-i-1.jpg';
+import episodeCeo2 from '../../../assets/drama/episode-the-ceo-and-i-2.jpg';
+import episodeCeo3 from '../../../assets/drama/episode-the-ceo-and-i-3.jpg';
+import episodeCeo4 from '../../../assets/drama/episode-the-ceo-and-i-4.jpg';
+import episodeCeo5 from '../../../assets/drama/episode-the-ceo-and-i-5.jpg';
+import episodeCeo6 from '../../../assets/drama/episode-the-ceo-and-i-6.jpg';
 import heroHome from '../../../assets/drama/hero-home.jpg';
 import heroTheCeoAndI from '../../../assets/drama/hero-the-ceo-and-i.jpg';
 import posterAvengingAngel from '../../../assets/drama/poster-avenging-angel.jpg';
@@ -57,6 +69,38 @@ export function seriesHeroArt(seriesId: string): ImageSourcePropType | undefined
 
 function isPosterId(seriesId: string): seriesId is PosterId {
   return Object.hasOwn(posters, seriesId);
+}
+
+const castPortraits = {
+  elena: castElena,
+  'julian-vance': castJulianVance,
+  'sarah-lin': castSarahLin,
+  marcus: castMarcus,
+} as const satisfies Record<StoryCastId, ImageSourcePropType>;
+
+const ceoEpisodeStills = {
+  1: episodeCeo1,
+  2: episodeCeo2,
+  3: episodeCeo3,
+  4: episodeCeo4,
+  5: episodeCeo5,
+  6: episodeCeo6,
+} as const satisfies Record<number, ImageSourcePropType>;
+
+export function castPortrait(id: StoryCastId): ImageSourcePropType {
+  return castPortraits[id];
+}
+
+/** Episode still from the series-detail frame. Other episodes have no still. */
+export function episodeStill(
+  seriesId: string,
+  episode: number,
+): ImageSourcePropType | undefined {
+  if (seriesId !== storySeriesId) {
+    return undefined;
+  }
+
+  return ceoEpisodeStills[episode as keyof typeof ceoEpisodeStills];
 }
 
 export function posterArt(seriesId: string): ImageSourcePropType | undefined {

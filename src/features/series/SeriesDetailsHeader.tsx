@@ -15,6 +15,7 @@ import { CoverImage } from '@/components/CoverImage';
 import { IconButton } from '@/components/IconButton';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { episodeCountLabel, type EpisodeSort } from '@/features/series/model';
+import { SeriesStory } from '@/features/series/SeriesStory';
 import { testIds } from '@/testing/testIds';
 import { seriesHeroFrame } from '@/theme/responsive';
 import { colors, control, gradient, layout, space } from '@/theme/tokens';
@@ -28,6 +29,7 @@ export function SeriesDetailsHeader({
   onShare,
   saved = false,
   onSort,
+  seriesId,
   showPlay,
   showSort,
   sort,
@@ -43,6 +45,7 @@ export function SeriesDetailsHeader({
   onShare: () => void;
   saved?: boolean;
   onSort: () => void;
+  seriesId: string;
   showPlay: boolean;
   showSort: boolean;
   sort: EpisodeSort;
@@ -117,6 +120,7 @@ export function SeriesDetailsHeader({
           />
         ) : null}
       </View>
+      <SeriesStory seriesId={seriesId} />
       <View style={styles.episodeHeading}>
         <View style={styles.episodeTitle}>
           <AppText role="titleM">Episodes</AppText>
