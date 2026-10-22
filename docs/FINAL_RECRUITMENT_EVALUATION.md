@@ -1,17 +1,21 @@
 # Final Recruitment Evaluation
 
 Role: Senior Mobile App Developer (React Native), TargetVideo.
-Updated: 2026-10-22, release stage. Evaluated: `fix/release-guard` on `main` `50a258e`.
+Updated: 2026-10-22, strict audit on PR #30. Evaluated: `fix/release-guard` on `main` `50a258e`.
 Evidence: `FINAL_SUBMISSION_AUDIT.md`. The original assignment text is not in the repository, so scope comes from the README.
 
 Two scores per perspective. **Today** is what a reviewer meets now: the live demo and APK are stale. **After release** assumes the owner redeploys, rebuilds, and CI passes. That second score rests on the production export verified here.
 
-| Perspective                  | Previous | Today | After release |
-| ---------------------------- | -------- | ----- | ------------- |
-| Senior React Native engineer | 7        | 7     | 8             |
-| HR / recruiter               | 6        | 5     | 8             |
-| Tech lead / hiring manager   | 7        | 7     | 8             |
-| Automated code reviewer      | 7        | 7     | 8             |
+| Perspective                  | First audit | Release stage | Now (code) | After release |
+| ---------------------------- | ----------- | ------------- | ---------- | ------------- |
+| Senior React Native engineer | 7           | 7             | 8          | 8             |
+| HR / recruiter               | 6           | 5             | 5          | 8             |
+| Tech lead / hiring manager   | 7           | 7             | 7.5        | 8             |
+| Automated code reviewer      | 7           | 7             | 8          | 8             |
+
+"Now (code)" scores the branch. HR stays at 5 because a recruiter sees the live site, which is still the old build.
+
+Changes since the release stage: lint now covers tests and scripts (the CI and editor gap), four visual fixes against `FLASH.svg` (Home header, player artwork, login headline, Continue watching rail), one added failure test, and 7 MB of stale audit images untracked.
 
 ## Senior React Native engineer
 
