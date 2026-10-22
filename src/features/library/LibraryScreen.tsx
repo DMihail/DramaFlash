@@ -144,12 +144,17 @@ export function LibraryScreen() {
             {continueList.length > 0 ? (
               <View style={styles.section} testID={testIds.library.continue}>
                 <SectionHeader title={libraryContinueTitle} />
-                {continueList.map((item) => {
-                  const image = posterArt(item.seriesId);
+                <ScrollView
+                  contentContainerStyle={styles.continueRail}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                >
+                  {continueList.map((item) => {
+                    const image = posterArt(item.seriesId);
 
-                  return (
-                    <View key={item.seriesId} style={styles.continueRow}>
+                    return (
                       <PosterCard
+                        key={item.seriesId}
                         meta={item.meta}
                         onPress={() => handleResume(item)}
                         testID={testIds.library.resume(item.seriesId)}
@@ -157,9 +162,9 @@ export function LibraryScreen() {
                         variant="rail"
                         {...(image ? { image } : {})}
                       />
-                    </View>
-                  );
-                })}
+                    );
+                  })}
+                </ScrollView>
               </View>
             ) : null}
             <View style={styles.tabs}>
@@ -297,7 +302,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     gap: space.xs,
   },
-  continueRow: {
+  // One horizontal rail, like Home. A column of rail cards left most of the row empty.
+  continueRail: {
+    gap: space.md,
     paddingHorizontal: layout.marginScreen,
   },
   empty: {
