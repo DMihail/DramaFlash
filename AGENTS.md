@@ -1,8 +1,8 @@
 # DramaFlash
 
-DramaFlash is an Expo SDK 58 app for iOS and Android. Use React Native, TypeScript strict mode, and Expo Router.
+DramaFlash is an Expo SDK 58 app for iOS and Android, with a production web demo. Use React Native, TypeScript strict mode, and Expo Router.
 
-Prioritize iOS and Android compatibility, performance, and code that is easy to maintain.
+Prioritize iOS and Android compatibility, performance, and code that is easy to maintain. Keep the web export working when you touch shared UI or storage.
 
 ## Rule files
 
@@ -14,14 +14,6 @@ Cursor also supports project rules in `.cursor/rules/` as `.mdc` files. A plain 
 | ---------------------------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------- |
 | `AGENTS.md`                              | Every coding agent      | App stack, React code quality, React Compiler, Expo docs, git, checks, how to talk to the user, GitHub writing |
 | `.cursor/rules/github-communication.mdc` | Cursor only, every chat | Do not add Cursor signatures or automatic AI co-author lines                                                   |
-
-## Local plans
-
-Before building a screen, read the local plans. They are not in git:
-
-`docs/PROTOTYPE_AUDIT.md`, `docs/ARCHITECTURE.md`, `docs/DESIGN_SYSTEM.md`, `docs/MIGRATION_MAP.md`, and `docs/IMPLEMENTATION_PLAN.md`.
-
-`references/DESIGN_GUIDE.md` is local too. Do not commit these files.
 
 ## Expo has changed — do not trust your training data
 
@@ -44,6 +36,7 @@ Before writing code that uses an Expo, EAS, or React Native API:
 - If `ios/` and `android/` are missing, Expo generates them (Continuous Native Generation). Do not create or edit them by hand. Configure native behavior in `app.json` and config plugins.
 - Expo Go only includes its own native modules. After you add a library with native code, use a development build: `npx expo run:ios` or `npx expo run:android` locally, or `eas build --profile development`.
 - Prefer Expo modules over third-party libraries. Check project skills before you add a dependency. Docs: `https://docs.expo.dev/versions/latest/index.md`
+- Production web uses Expo Router `web.output: "server"`. Serve exports with `npx expo serve`, not a static nginx root over `dist/`. See `Dockerfile` and the README Docker section.
 
 ## React and React Native
 
@@ -179,13 +172,17 @@ Saved series and continue watching are separate MMKV records. A missing record m
 
 ```bash
 npx expo install <package>  # SDK-compatible install
-npx expo start              # dev server
+npx expo start              # development Metro server
+npm run web                 # browser development server
+npm run export:web          # production web export + variant check
 npm run lint                # eslint . (src, tests, scripts, config)
 npx tsc --noEmit            # typecheck
 npx expo-doctor             # dependency and config checks
 npx expo install --fix      # fix incompatible package versions
-npm run validate            # lint, typecheck, unit tests, and Expo Doctor
+npm run validate            # lint, format check, typecheck, unit tests, Expo Doctor
 npm run e2e                 # Maestro flows on a booted simulator or emulator
+docker build -t dramaflash-web .                  # production web image
+docker run --rm -p 8081:8081 dramaflash-web       # expo serve on :8081
 ```
 
 Run `npm run validate` before you open a pull request.

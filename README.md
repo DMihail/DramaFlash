@@ -63,7 +63,8 @@ This is an **interactive product prototype**, not a production streaming service
 | Web persistence    | `localStorage` behind the same storage interface                   |
 | UI                 | Reusable React Native components, responsive layouts, Lucide icons |
 | Quality            | ESLint, Prettier, TypeScript, Jest, Expo Doctor; Maestro E2E flows |
-| Distribution       | Android APK via GitHub Releases; web via EAS Hosting               |
+| Distribution       | Android APK via GitHub Releases; web via EAS Hosting or Docker     |
+| Web containers     | `Dockerfile` (`expo serve`); optional `Dockerfile.dev`             |
 
 Business rules such as episode access and coin deductions live in `src/domain/`, separate from screens. Wallet changes are written and checked before the updated value is shown, and repeated unlock taps are guarded against duplicate charges. Stored records have validation and error states. The demo wallet is **local to each device** and is not a secure, server-authoritative payments implementation.
 
@@ -77,6 +78,7 @@ For a production service, wallet balances, purchases, and entitlements would be 
 - npm **11.19.0**
 - Android Studio / Android SDK for Android builds
 - Xcode for iOS Simulator builds (macOS)
+- Docker (optional) for the containerized web demo
 
 ```bash
 nvm use
@@ -94,6 +96,22 @@ npm run ios:build      # Compile and install an iOS Simulator development build
 ```
 
 The native app uses MMKV and Nitro Modules, so **Expo Go is not supported**. Install a development build before attempting to open it from Metro.
+
+### Docker (web)
+
+The production web app uses Expo Router **server** output (`dist/client` + `dist/server`). The image therefore runs `npx expo serve`, not a static nginx folder.
+
+```bash
+# Production web export served on http://localhost:8081
+docker build -t dramaflash-web .
+docker run --rm -p 8081:8081 dramaflash-web
+
+# Optional: development Expo web inside a container
+docker build -f Dockerfile.dev -t dramaflash-web-dev .
+docker run --rm -p 8081:8081 dramaflash-web-dev
+```
+
+For day-to-day work, prefer `npm run web` on the host. The development image does not replace a native simulator or emulator.
 
 ### Validation
 
@@ -129,6 +147,8 @@ npm run export:web
 npx eas-cli@latest deploy --alias dramaflash-demo
 ```
 
+Or serve the same production export from Docker with the commands in **Docker (web)** above.
+
 The production export sets `APP_VARIANT=production` and checks generated JavaScript bundles to prevent accidental publication of a development variant. Development-only wallet and library reset routes are disabled in production.
 
 ## Project structure
@@ -137,19 +157,22 @@ The production export sets `APP_VARIANT=production` and checks generated JavaScr
 src/
   api/         Local mock API
   app/         Expo Router routes
-  components/  Shared UI
+  components/  Shared UI (including CoverImage / fillFrame)
+  config/      App variant helpers
   data/        Mock catalog and story content
   domain/      Pure business rules
-  features/    Feature screens and view models
+  features/    Feature screens and hooks
   storage/     MMKV / browser persistence
-  stores/      Zustand state
-  theme/       Design tokens and typography
+  stores/      Zustand wallet, library, and session stores
+  testing/     Shared testID registry
+  theme/       Design tokens and responsive layout
 tests/
   e2e/maestro/ Native E2E test flows
   ...          Unit and integration tests
 deliverables/
-  screenshots/ UI previews
-  DramaFlash_Demo.mp4
+  screenshots/ UI previews used in this README
+Dockerfile     Production web image (`expo serve`)
+Dockerfile.dev Development Expo web image
 ```
 
 ## Design assets and attribution
