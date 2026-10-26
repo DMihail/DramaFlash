@@ -1,3 +1,7 @@
+# Development Metro / Expo web image.
+# Prefer a local `npm run web` or `npm run start` when you need hot reload with
+# a mounted workspace. This image is for a self-contained container run.
+
 FROM node:22-alpine
 
 WORKDIR /app
